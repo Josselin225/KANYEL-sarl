@@ -49,6 +49,15 @@ function authHeaders(): HeadersInit {
 }
 
 async function handleResponse<T>(res: Response): Promise<T> {
+  if (res.status === 401) {
+    // Token missing/expired/revoked — clear it and send the user back to
+    // login rather than showing a confusing error on a stale page.
+    clearToken();
+    if (typeof window !== "undefined" && !window.location.pathname.endsWith("/admin/login")) {
+      window.location.href = window.location.pathname.replace(/\/admin(\/.*)?$/, "/admin/login");
+    }
+    throw new ApiError("Session expirée, veuillez vous reconnecter.");
+  }
   if (!res.ok) {
     let message = `Erreur ${res.status}.`;
     try {

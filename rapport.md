@@ -107,6 +107,8 @@ dans le projet après un bug ayant exposé un risque de perte de données.
     CSV des candidatures/messages/devis
 21. Correctifs d'affichage du menu (retour à la ligne, logo trop éloigné
     du bord) — passage à un header pleine largeur
+22. **Audit de sécurité complet** et correction de toutes les failles
+    identifiées — voir section 6
 
 ## 4. Incident notable : suppression accidentelle du 17/09/2026
 
@@ -131,7 +133,31 @@ telle perte ne puisse plus se reproduire.
 - Anti-spam actif sur les formulaires de contact, candidature et devis
 - Code source sauvegardé sur GitHub (dépôt privé)
 
-## 6. Points nécessitant une action de ta part
+## 6. Audit de sécurité (17/09/2026)
+
+Un audit complet du backend, du frontend et du panneau d'administration a
+identifié 11 points, tous corrigés le jour même :
+
+| Sévérité | Faille | Correction |
+|---|---|---|
+| Critique | Connexion admin sans limite de tentatives (brute force) | Limite stricte de 5 essais/heure ; testé avec succès (429 après 5 tentatives) |
+| Critique | Fichiers uploadés (CV, photos) sans limite de taille/type, servis publiquement | Validateurs de taille/extension sur chaque champ fichier ; CV/lettres de motivation désormais accessibles uniquement aux administrateurs connectés |
+| Élevée | Faille connue (CVE) dans la librairie `sharp` (traitement d'images) | Mise à jour vers la version corrigée |
+| Élevée | Injection possible via les données SEO structurées (JSON-LD) | Échappement des caractères dangereux |
+| Élevée | Configuration image trop permissive (risque SSRF) | Restreinte au seul domaine du backend |
+| Élevée | Mode `DEBUG` actif, clé secrète de secours faible | Garde-fou : le serveur refuse de démarrer en production avec une clé par défaut |
+| Moyenne | Panneau d'administration Django natif toujours exposé en plus du panneau personnalisé | Complètement désactivé (confirmé : 404) |
+| Moyenne | Jetons de connexion sans expiration | Expiration automatique après 14 jours |
+| Moyenne | Absence d'en-têtes de sécurité HTTP | Ajout de 4 en-têtes (anti-clickjacking, anti-sniffing, etc.) |
+| Moyenne | Aucun fichier de dépendances Python figé | `requirements.txt` créé |
+| Faible | Anti-spam limité (honeypot uniquement) | Conservé pour l'instant ; passer à un reCAPTCHA si le spam devient réel |
+
+Toutes ces corrections ont été testées individuellement (tentative de
+connexion bloquée, upload de fichier invalide refusé, CV inaccessible sans
+connexion, images toujours fonctionnelles) avant d'être poussées sur
+GitHub.
+
+## 7. Points nécessitant une action de ta part
 
 - **Notifications e-mail** : en attente d'un mot de passe d'application
   Gmail pour `kanyelsarl3@gmail.com` (ou un autre compte/service) — le
@@ -145,7 +171,7 @@ telle perte ne puisse plus se reproduire.
   vides et affichent un message honnête en attendant du vrai contenu — à
   remplir depuis l'admin quand tu es prêt
 
-## 7. Étapes à venir / suggestions
+## 8. Étapes à venir / suggestions
 
 - Déploiement en production (hébergement, nom de domaine, base de données
   de production, HTTPS) — le site tourne actuellement uniquement en local

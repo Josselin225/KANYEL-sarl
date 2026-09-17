@@ -1,6 +1,9 @@
 from django.core.exceptions import ValidationError
+from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.utils.text import slugify
+
+from .validators import validate_document_size, validate_image_size
 
 
 class SiteSettings(models.Model):
@@ -13,7 +16,9 @@ class SiteSettings(models.Model):
     leader_name = models.CharField("Nom du dirigeant", max_length=200, default="Konan KANYEL")
     leader_role_fr = models.CharField("Fonction (français)", max_length=200, default="Président Directeur Général")
     leader_role_en = models.CharField("Fonction (anglais)", max_length=200, default="Chief Executive Officer")
-    leader_photo = models.ImageField("Photo du dirigeant", upload_to="leader/", blank=True, null=True)
+    leader_photo = models.ImageField(
+        "Photo du dirigeant", upload_to="leader/", blank=True, null=True, validators=[validate_image_size],
+    )
     ceo_message_fr = models.TextField("Mot du DG (français)", blank=True)
     ceo_message_en = models.TextField("Mot du DG (anglais)", blank=True)
 
@@ -51,13 +56,17 @@ class SiteSettings(models.Model):
     hero_title_en = models.CharField("Titre principal (anglais)", max_length=255, default="Trusted builders, partners in your ambitions")
     hero_subtitle_fr = models.TextField("Sous-titre (français)", blank=True)
     hero_subtitle_en = models.TextField("Sous-titre (anglais)", blank=True)
-    hero_image = models.ImageField("Photo de couverture", upload_to="hero/", blank=True, null=True)
+    hero_image = models.ImageField(
+        "Photo de couverture", upload_to="hero/", blank=True, null=True, validators=[validate_image_size],
+    )
 
     about_paragraph_1_fr = models.TextField("Paragraphe 1 (français)", blank=True)
     about_paragraph_1_en = models.TextField("Paragraphe 1 (anglais)", blank=True)
     about_paragraph_2_fr = models.TextField("Paragraphe 2 (français)", blank=True)
     about_paragraph_2_en = models.TextField("Paragraphe 2 (anglais)", blank=True)
-    about_image = models.ImageField("Photo à propos", upload_to="about/", blank=True, null=True)
+    about_image = models.ImageField(
+        "Photo à propos", upload_to="about/", blank=True, null=True, validators=[validate_image_size],
+    )
     about_image_caption = models.CharField("Légende de la photo", max_length=200, blank=True, default="Yamoussoukro, Côte d'Ivoire")
 
     visit_count = models.PositiveIntegerField(
@@ -111,7 +120,9 @@ class Department(models.Model):
         "Contenu détaillé (anglais)", blank=True,
         help_text="Fuller text shown on this trade's dedicated page. Leave blank to reuse the short description.",
     )
-    detail_image = models.ImageField("Photo de la page détail", upload_to="departments/", blank=True, null=True)
+    detail_image = models.ImageField(
+        "Photo de la page détail", upload_to="departments/", blank=True, null=True, validators=[validate_image_size],
+    )
     has_property_listing = models.BooleanField(
         "Afficher la liste des biens immobiliers", default=False,
         help_text="À cocher uniquement pour le département Gestion Immobilière : sa page affichera les biens gérés par l'agence.",
@@ -145,7 +156,7 @@ class DepartmentImage(models.Model):
         Department, related_name="gallery_images", on_delete=models.CASCADE, verbose_name="Activité",
     )
     order = models.PositiveIntegerField("Ordre", default=0)
-    image = models.ImageField("Photo", upload_to="departments/gallery/")
+    image = models.ImageField("Photo", upload_to="departments/gallery/", validators=[validate_image_size])
     caption_fr = models.CharField("Légende (français)", max_length=200, blank=True)
     caption_en = models.CharField("Légende (anglais)", max_length=200, blank=True)
     is_published = models.BooleanField("Publié", default=True)
@@ -188,7 +199,7 @@ class GalleryItem(models.Model):
     label_en = models.CharField("Libellé (anglais)", max_length=200)
     icon = models.CharField("Icône", max_length=20, choices=Department.ICON_CHOICES, default="building")
     accent = models.CharField("Couleur d'accent", max_length=10, choices=ACCENT_CHOICES, default="navy")
-    image = models.ImageField("Photo", upload_to="gallery/")
+    image = models.ImageField("Photo", upload_to="gallery/", validators=[validate_image_size])
     is_published = models.BooleanField("Publié", default=True)
 
     class Meta:
@@ -222,7 +233,7 @@ class Property(models.Model):
         "Prix / Loyer", max_length=100, blank=True,
         help_text="Ex. \"25 000 000 FCFA\", \"350 000 FCFA / mois\" ou \"Sur demande\".",
     )
-    image = models.ImageField("Photo", upload_to="properties/")
+    image = models.ImageField("Photo", upload_to="properties/", validators=[validate_image_size])
     is_published = models.BooleanField("Publié", default=True)
 
     class Meta:
@@ -257,7 +268,7 @@ class Partner(models.Model):
 
     order = models.PositiveIntegerField("Ordre", default=0)
     name = models.CharField("Nom du partenaire", max_length=200)
-    logo = models.ImageField("Logo", upload_to="partners/")
+    logo = models.ImageField("Logo", upload_to="partners/", validators=[validate_image_size])
     website_url = models.URLField("Site web", blank=True, help_text="Facultatif. Rend le logo cliquable.")
     is_published = models.BooleanField("Publié", default=True)
 
@@ -279,6 +290,7 @@ class Testimonial(models.Model):
     photo = models.ImageField(
         "Photo", upload_to="testimonials/", blank=True, null=True,
         help_text="Facultatif. Si absent, les initiales du client seront affichées à la place.",
+        validators=[validate_image_size],
     )
     message_fr = models.TextField("Témoignage (français)")
     message_en = models.TextField("Témoignage (anglais)")
@@ -337,9 +349,13 @@ class JobApplication(models.Model):
     email = models.EmailField("E-mail")
     phone = models.CharField("Téléphone", max_length=50)
     message = models.TextField("Message", blank=True)
-    cv = models.FileField("CV", upload_to="applications/cv/")
+    cv = models.FileField(
+        "CV", upload_to="applications/cv/",
+        validators=[validate_document_size, FileExtensionValidator(["pdf", "doc", "docx"])],
+    )
     cover_letter = models.FileField(
         "Lettre de motivation", upload_to="applications/cover_letters/", blank=True, null=True,
+        validators=[validate_document_size, FileExtensionValidator(["pdf", "doc", "docx"])],
     )
     created_at = models.DateTimeField("Reçue le", auto_now_add=True)
     is_read = models.BooleanField("Lue", default=False)
@@ -388,7 +404,7 @@ class Realisation(models.Model):
     client_name = models.CharField("Client", max_length=200, blank=True, help_text="Facultatif.")
     location = models.CharField("Lieu", max_length=200, blank=True)
     completed_at = models.DateField("Terminé le", blank=True, null=True)
-    image = models.ImageField("Photo principale", upload_to="realisations/")
+    image = models.ImageField("Photo principale", upload_to="realisations/", validators=[validate_image_size])
     is_published = models.BooleanField("Publié", default=True)
 
     class Meta:
@@ -407,7 +423,7 @@ class RealisationImage(models.Model):
         Realisation, related_name="gallery_images", on_delete=models.CASCADE, verbose_name="Réalisation",
     )
     order = models.PositiveIntegerField("Ordre", default=0)
-    image = models.ImageField("Photo", upload_to="realisations/gallery/")
+    image = models.ImageField("Photo", upload_to="realisations/gallery/", validators=[validate_image_size])
 
     class Meta:
         ordering = ["realisation", "order", "id"]
@@ -428,7 +444,9 @@ class Article(models.Model):
     excerpt_en = models.CharField("Résumé (anglais)", max_length=300, blank=True)
     content_fr = models.TextField("Contenu (français)")
     content_en = models.TextField("Contenu (anglais)")
-    cover_image = models.ImageField("Photo de couverture", upload_to="articles/", blank=True, null=True)
+    cover_image = models.ImageField(
+        "Photo de couverture", upload_to="articles/", blank=True, null=True, validators=[validate_image_size],
+    )
     is_published = models.BooleanField("Publié", default=True)
     published_at = models.DateTimeField("Publié le", auto_now_add=True)
 

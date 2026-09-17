@@ -34,11 +34,16 @@ export default function LocalBusinessJsonLd({
       : undefined,
   };
 
+  // Escape "<" so a value containing "</script>" can't break out of the
+  // script tag and inject arbitrary HTML/JS (JSON.stringify alone does not
+  // escape it).
+  const json = JSON.stringify(jsonLd).replace(/</g, "\\u003c");
+
   return (
     <script
       type="application/ld+json"
       // eslint-disable-next-line react/no-danger
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      dangerouslySetInnerHTML={{ __html: json }}
     />
   );
 }

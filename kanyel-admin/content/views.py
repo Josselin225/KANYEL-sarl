@@ -1,4 +1,9 @@
+import os
+
+from django.conf import settings
 from django.db.models import F
+from django.http import FileResponse, Http404
+from django.utils._os import safe_join
 
 from rest_framework import generics, permissions, status, views, viewsets
 from rest_framework.authtoken.views import ObtainAuthToken
@@ -61,10 +66,17 @@ class HoneypotCreateMixin:
         return super().create(request, *args, **kwargs)
 
 
+class LoginThrottle(AnonRateThrottle):
+    """Strict, dedicated rate for the login endpoint to slow down credential guessing."""
+
+    scope = "login"
+
+
 class LoginView(ObtainAuthToken):
     """POST {username, password} -> {token, username}. Used by the custom /admin panel."""
 
     permission_classes = [permissions.AllowAny]
+    throttle_classes = [LoginThrottle]
 
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data, context={"request": request})
@@ -313,3 +325,19 @@ class QuoteRequestAdminViewSet(viewsets.ModelViewSet):
     serializer_class = QuoteRequestSerializer
     permission_classes = [permissions.IsAuthenticated]
     http_method_names = ["get", "patch", "delete", "head", "options"]
+
+
+class ProtectedMediaView(views.APIView):
+    """Serves files under media/applications/ (CVs, cover letters — personal
+    data) to authenticated staff only, instead of the public media server."""
+
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, path):
+        try:
+            full_path = safe_join(str(settings.MEDIA_ROOT / "applications"), path)
+        except ValueError:
+            raise Http404
+        if not os.path.isfile(full_path):
+            raise Http404
+        return FileResponse(open(full_path, "rb"), as_attachment=True, filename=os.path.basename(full_path))
