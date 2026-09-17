@@ -36,6 +36,14 @@ export default function JobApplicationForm({ jobId }: { jobId: number | null }) 
 
   return (
     <form onSubmit={handleSubmit} className="mt-4 space-y-3">
+      <input
+        type="text"
+        name="website"
+        tabIndex={-1}
+        autoComplete="off"
+        aria-hidden="true"
+        className="absolute left-[-9999px] h-0 w-0 opacity-0"
+      />
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <div>
           <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-ink-dim">

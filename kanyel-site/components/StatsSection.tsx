@@ -20,10 +20,18 @@ export default function StatsSection({
   stats,
   settings,
   locale,
+  departmentsCount,
+  propertiesCount,
+  partnersCount,
+  realisationsCount,
 }: {
   stats: ApiStat[];
   settings: ApiSiteSettings | null;
   locale: Locale;
+  departmentsCount: number;
+  propertiesCount: number;
+  partnersCount: number;
+  realisationsCount: number;
 }) {
   const t = useTranslations("stats");
 
@@ -31,6 +39,19 @@ export default function StatsSection({
     value: s.value,
     label: pick(s, "label", locale),
   }));
+
+  if (realisationsCount > 0) {
+    items.push({ value: String(realisationsCount), label: t("realisationsLabel") });
+  }
+  if (departmentsCount > 0) {
+    items.push({ value: String(departmentsCount), label: t("departmentsLabel") });
+  }
+  if (propertiesCount > 0) {
+    items.push({ value: String(propertiesCount), label: t("propertiesLabel") });
+  }
+  if (partnersCount > 0) {
+    items.push({ value: String(partnersCount), label: t("partnersLabel") });
+  }
 
   items.push({
     value: (settings?.visit_count ?? 0).toLocaleString(locale === "en" ? "en-US" : "fr-FR"),

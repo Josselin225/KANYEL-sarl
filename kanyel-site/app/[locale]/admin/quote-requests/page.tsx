@@ -3,31 +3,47 @@
 import { useEffect, useState } from "react";
 import { adminApi, ApiError } from "@/lib/adminApi";
 
-interface JobApplication {
+const BUDGET_LABELS: Record<string, string> = {
+  lt_5m: "Moins de 5 000 000 FCFA",
+  "5m_20m": "5 000 000 – 20 000 000 FCFA",
+  "20m_100m": "20 000 000 – 100 000 000 FCFA",
+  gt_100m: "Plus de 100 000 000 FCFA",
+  unknown: "À définir",
+};
+
+const TIMELINE_LABELS: Record<string, string> = {
+  urgent: "Urgent (moins d'1 mois)",
+  "1_3_months": "1 à 3 mois",
+  "3_6_months": "3 à 6 mois",
+  "6_plus_months": "Plus de 6 mois",
+  flexible: "Flexible",
+};
+
+interface QuoteRequest {
   id: number;
-  job: number | null;
-  job_title: string | null;
+  department: string | null;
+  department_title: string | null;
   full_name: string;
   email: string;
   phone: string;
-  message: string;
-  cv: string;
-  cover_letter: string | null;
+  budget: string;
+  timeline: string;
+  description: string;
   created_at: string;
   is_read: boolean;
 }
 
-export default function AdminJobApplicationsPage() {
-  const [items, setItems] = useState<JobApplication[]>([]);
+export default function AdminQuoteRequestsPage() {
+  const [items, setItems] = useState<QuoteRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selected, setSelected] = useState<JobApplication | null>(null);
+  const [selected, setSelected] = useState<QuoteRequest | null>(null);
 
   async function load() {
     setLoading(true);
     setError(null);
     try {
-      const data = await adminApi.list<JobApplication>("job-applications");
+      const data = await adminApi.list<QuoteRequest>("quote-requests");
       setItems(data);
     } catch (e) {
       setError(e instanceof ApiError ? e.message : "Erreur de chargement.");
@@ -40,11 +56,11 @@ export default function AdminJobApplicationsPage() {
     load();
   }, []);
 
-  async function openItem(item: JobApplication) {
+  async function openItem(item: QuoteRequest) {
     setSelected(item);
     if (!item.is_read) {
       try {
-        const updated = await adminApi.update<JobApplication>("job-applications", item.id, { is_read: true });
+        const updated = await adminApi.update<QuoteRequest>("quote-requests", item.id, { is_read: true });
         setItems((prev) => prev.map((it) => (it.id === item.id ? updated : it)));
         setSelected(updated);
       } catch {
@@ -53,10 +69,10 @@ export default function AdminJobApplicationsPage() {
     }
   }
 
-  async function handleDelete(item: JobApplication) {
-    if (!confirm("Supprimer définitivement cette candidature ?")) return;
+  async function handleDelete(item: QuoteRequest) {
+    if (!confirm("Supprimer définitivement cette demande de devis ?")) return;
     try {
-      await adminApi.remove("job-applications", item.id);
+      await adminApi.remove("quote-requests", item.id);
       setItems((prev) => prev.filter((it) => it.id !== item.id));
       setSelected(null);
     } catch (e) {
@@ -65,13 +81,15 @@ export default function AdminJobApplicationsPage() {
   }
 
   function exportCsv() {
-    const header = ["Nom", "E-mail", "Téléphone", "Offre", "Message", "Reçue le"];
+    const header = ["Nom", "E-mail", "Téléphone", "Activité", "Budget", "Délai", "Description", "Reçue le"];
     const rows = items.map((it) => [
       it.full_name,
       it.email,
       it.phone,
-      it.job_title || "Candidature spontanée",
-      it.message.replace(/\n/g, " "),
+      it.department_title || "Devis général",
+      BUDGET_LABELS[it.budget] || it.budget,
+      TIMELINE_LABELS[it.timeline] || it.timeline,
+      it.description.replace(/\n/g, " "),
       new Date(it.created_at).toLocaleString("fr-FR"),
     ]);
     const csv = [header, ...rows]
@@ -81,7 +99,7 @@ export default function AdminJobApplicationsPage() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `candidatures-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.download = `demandes-devis-${new Date().toISOString().slice(0, 10)}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   }
@@ -90,7 +108,7 @@ export default function AdminJobApplicationsPage() {
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
       <div className="lg:col-span-2">
         <div className="flex items-center justify-between">
-          <h2 className="font-display text-xl font-semibold text-navy">Candidatures</h2>
+          <h2 className="font-display text-xl font-semibold text-navy">Demandes de devis</h2>
           {items.length > 0 && (
             <button
               onClick={exportCsv}
@@ -114,18 +132,14 @@ export default function AdminJobApplicationsPage() {
               >
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-semibold text-navy">{item.full_name}</p>
-                  <p className="truncate text-xs text-ink-dim">
-                    {item.job_title || "Candidature spontanée"}
-                  </p>
+                  <p className="truncate text-xs text-ink-dim">{item.department_title || "Devis général"}</p>
                 </div>
-                {!item.is_read && (
-                  <span className="mt-0.5 h-2 w-2 shrink-0 rounded-full bg-gold-dark" />
-                )}
+                {!item.is_read && <span className="mt-0.5 h-2 w-2 shrink-0 rounded-full bg-gold-dark" />}
               </button>
             </li>
           ))}
           {!loading && items.length === 0 && (
-            <p className="text-sm text-ink-dim">Aucune candidature reçue pour le moment.</p>
+            <p className="text-sm text-ink-dim">Aucune demande de devis reçue pour le moment.</p>
           )}
         </ul>
       </div>
@@ -136,7 +150,7 @@ export default function AdminJobApplicationsPage() {
             <div className="flex items-start justify-between">
               <div>
                 <h3 className="font-display text-lg font-semibold text-navy">{selected.full_name}</h3>
-                <p className="text-sm text-ink-dim">{selected.job_title || "Candidature spontanée"}</p>
+                <p className="text-sm text-ink-dim">{selected.department_title || "Devis général"}</p>
               </div>
               <button
                 onClick={() => handleDelete(selected)}
@@ -155,52 +169,37 @@ export default function AdminJobApplicationsPage() {
                   </a>
                 </dd>
               </div>
-              {selected.phone && (
+              <div>
+                <dt className="text-xs font-semibold uppercase tracking-wide text-ink-dim">Téléphone</dt>
+                <dd>
+                  <a href={`tel:${selected.phone}`} className="text-navy hover:underline">
+                    {selected.phone}
+                  </a>
+                </dd>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <dt className="text-xs font-semibold uppercase tracking-wide text-ink-dim">Téléphone</dt>
-                  <dd>
-                    <a href={`tel:${selected.phone}`} className="text-navy hover:underline">
-                      {selected.phone}
-                    </a>
-                  </dd>
+                  <dt className="text-xs font-semibold uppercase tracking-wide text-ink-dim">Budget</dt>
+                  <dd className="text-ink-dim">{BUDGET_LABELS[selected.budget] || selected.budget}</dd>
                 </div>
-              )}
-              {selected.message && (
                 <div>
-                  <dt className="text-xs font-semibold uppercase tracking-wide text-ink-dim">Message</dt>
-                  <dd className="whitespace-pre-line text-ink-dim">{selected.message}</dd>
+                  <dt className="text-xs font-semibold uppercase tracking-wide text-ink-dim">Délai souhaité</dt>
+                  <dd className="text-ink-dim">{TIMELINE_LABELS[selected.timeline] || selected.timeline}</dd>
                 </div>
-              )}
+              </div>
+              <div>
+                <dt className="text-xs font-semibold uppercase tracking-wide text-ink-dim">Description du projet</dt>
+                <dd className="whitespace-pre-line text-ink-dim">{selected.description}</dd>
+              </div>
               <div>
                 <dt className="text-xs font-semibold uppercase tracking-wide text-ink-dim">Reçue le</dt>
                 <dd className="text-ink-dim">{new Date(selected.created_at).toLocaleString("fr-FR")}</dd>
               </div>
             </dl>
-
-            <div className="mt-6 flex flex-wrap gap-3">
-              <a
-                href={selected.cv}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="rounded-full bg-navy px-5 py-2.5 text-sm font-semibold text-white shadow-soft transition-transform hover:-translate-y-0.5"
-              >
-                Télécharger le CV
-              </a>
-              {selected.cover_letter && (
-                <a
-                  href={selected.cover_letter}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="rounded-full bg-navy-soft px-5 py-2.5 text-sm font-semibold text-navy transition-colors hover:bg-navy hover:text-white"
-                >
-                  Lettre de motivation
-                </a>
-              )}
-            </div>
           </div>
         ) : (
           <div className="flex h-full min-h-[240px] items-center justify-center rounded-3xl border border-dashed border-border text-sm text-ink-dim">
-            Sélectionnez une candidature pour voir le détail.
+            Sélectionnez une demande pour voir le détail.
           </div>
         )}
       </div>

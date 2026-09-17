@@ -18,6 +18,7 @@ staticfiles/
 # --- Database & uploaded media (contains real personal data: CVs, contact info) ---
 kanyel-admin/db.sqlite3
 kanyel-admin/media/
+kanyel-admin/backups/
 
 # --- Editor / tooling ---
 .claude/

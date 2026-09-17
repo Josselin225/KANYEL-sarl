@@ -39,8 +39,12 @@ export default function Footer({
     { href: `/${locale}`, label: tNav("home") },
     { href: `/${locale}#about`, label: tNav("about") },
     { href: `/${locale}#services`, label: tNav("services") },
+    { href: `/${locale}/realisations`, label: tNav("realisations") },
+    { href: `/${locale}/actualites`, label: tNav("articles") },
     { href: `/${locale}/temoignages`, label: tNav("testimonials") },
     { href: `/${locale}/offres-emploi`, label: tNav("jobs") },
+    { href: `/${locale}/devis`, label: tNav("quoteCta") },
+    { href: `/${locale}/faq`, label: tNav("faq") },
     { href: `/${locale}#contact`, label: tNav("contact") },
   ];
 

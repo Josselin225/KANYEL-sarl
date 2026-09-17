@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
 import { Reveal, RevealGroup, RevealItem } from "../Reveal";
@@ -15,6 +15,8 @@ import {
   type ApiCredential,
   type ApiDepartment,
   type ApiPartner,
+  type ApiProperty,
+  type ApiRealisation,
   type ApiSiteSettings,
   type ApiStat,
   type Locale,
@@ -47,6 +49,8 @@ export default function MinimalHome({
   credentials,
   stats,
   partners,
+  properties,
+  realisations,
   locale,
 }: {
   settings: ApiSiteSettings | null;
@@ -54,6 +58,8 @@ export default function MinimalHome({
   credentials: ApiCredential[];
   stats: ApiStat[];
   partners: ApiPartner[];
+  properties: ApiProperty[];
+  realisations: ApiRealisation[];
   locale: Locale;
 }) {
   const t = useTranslations("hero");
@@ -156,7 +162,7 @@ export default function MinimalHome({
               {t("ctaPrimary")}
             </Link>
             <Link
-              href="#contact"
+              href="/devis"
               className="rounded-full border border-white/40 px-7 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-white/10"
             >
               {t("ctaSecondary")}
@@ -229,17 +235,44 @@ export default function MinimalHome({
               </div>
             </Reveal>
           </div>
+        </div>
 
-          {(settings?.ceo_message_fr || settings?.ceo_message_en) && (
-            <Reveal delay={0.15} className="mt-16 rounded-3xl bg-navy-deep p-8 text-center sm:p-12">
-              <Kicker light>{tAbout("ceoKicker")}</Kicker>
-              <p className="mx-auto mt-5 max-w-3xl font-display text-xl italic leading-relaxed text-white sm:text-2xl">
-                « {pick(settings, "ceo_message", locale) || tAbout("ceoMessage")} »
-              </p>
-            </Reveal>
-          )}
+        {(settings?.ceo_message_fr || settings?.ceo_message_en) && (
+          <Reveal delay={0.15} className="mt-16 bg-navy-deep py-14 sm:py-20">
+            <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-10 px-5 sm:px-8 lg:grid-cols-[320px_1fr] lg:gap-16">
+              <div className="relative mx-auto aspect-[4/5] w-full max-w-xs overflow-hidden rounded-3xl shadow-soft-lg lg:mx-0">
+                {leaderPhoto ? (
+                  <Image
+                    src={leaderPhoto}
+                    alt={settings?.leader_name || ""}
+                    fill
+                    sizes="(max-width: 1024px) 60vw, 320px"
+                    className="object-cover"
+                  />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center bg-navy font-display text-5xl font-semibold text-white">
+                    {leaderInitials}
+                  </div>
+                )}
+              </div>
+              <div>
+                <Kicker light>{tAbout("ceoKicker")}</Kicker>
+                <p className="mt-5 font-display text-xl italic leading-relaxed text-white sm:text-2xl">
+                  « {pick(settings, "ceo_message", locale) || tAbout("ceoMessage")} »
+                </p>
+                <p className="mt-6 font-display text-base font-semibold text-gold-light">
+                  {settings?.leader_name || tAbout("leaderTitle")}
+                </p>
+                <p className="text-sm text-white/60">
+                  {locale === "en" ? settings?.leader_role_en : settings?.leader_role_fr || tAbout("leaderRole")}
+                </p>
+              </div>
+            </div>
+          </Reveal>
+        )}
 
-          {credentials.length > 0 && (
+        {credentials.length > 0 && (
+          <div className="mx-auto max-w-7xl px-5 sm:px-8">
             <div className="mt-16">
               <Reveal className="text-center">
                 <h3 className="font-display text-2xl font-semibold text-navy">{tAbout("credTitle")}</h3>
@@ -253,8 +286,8 @@ export default function MinimalHome({
                 ))}
               </RevealGroup>
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </section>
 
       {/* SERVICES */}
@@ -358,7 +391,15 @@ export default function MinimalHome({
         </div>
       </section>
 
-      <StatsSection stats={stats} settings={settings} locale={locale} />
+      <StatsSection
+        stats={stats}
+        settings={settings}
+        locale={locale}
+        departmentsCount={departments.length}
+        propertiesCount={properties.length}
+        partnersCount={partners.length}
+        realisationsCount={realisations.length}
+      />
       <PartnersMarquee partners={partners} />
     </main>
   );

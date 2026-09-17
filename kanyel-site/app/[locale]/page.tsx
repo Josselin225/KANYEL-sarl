@@ -21,6 +21,8 @@ export default async function Home({
         credentials={data.credentials}
         stats={data.stats}
         partners={data.partners}
+        properties={data.properties}
+        realisations={data.realisations}
         locale={locale as Locale}
       />
       <Contact settings={data.settings} />

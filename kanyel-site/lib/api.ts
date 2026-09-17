@@ -7,6 +7,8 @@ export type IconKey = "plot" | "building" | "globe" | "truck" | "exchange" | "ho
 export type Accent = "navy" | "gold";
 export type ContractType = "cdi" | "cdd" | "stage" | "freelance";
 export type PropertyCategory = "villa" | "appartement" | "terrain" | "bureau_commerce" | "immeuble";
+export type Budget = "lt_5m" | "5m_20m" | "20m_100m" | "gt_100m" | "unknown";
+export type Timeline = "urgent" | "1_3_months" | "3_6_months" | "6_plus_months" | "flexible";
 
 export interface ApiSiteSettings {
   id: number;
@@ -159,6 +161,53 @@ export interface ApiJobOffer {
   created_at: string;
 }
 
+export interface ApiRealisation {
+  id: number;
+  order: number;
+  department: string | null;
+  title_fr: string;
+  title_en: string;
+  description_fr: string;
+  description_en: string;
+  client_name: string;
+  location: string;
+  completed_at: string | null;
+  image: string;
+  is_published: boolean;
+}
+
+export interface ApiRealisationImage {
+  id: number;
+  realisation: number;
+  order: number;
+  image: string;
+}
+
+export interface ApiArticle {
+  id: number;
+  slug: string;
+  title_fr: string;
+  title_en: string;
+  excerpt_fr: string;
+  excerpt_en: string;
+  content_fr: string;
+  content_en: string;
+  cover_image: string | null;
+  is_published: boolean;
+  published_at: string;
+}
+
+export interface ApiFAQ {
+  id: number;
+  order: number;
+  department: string | null;
+  question_fr: string;
+  question_en: string;
+  answer_fr: string;
+  answer_en: string;
+  is_published: boolean;
+}
+
 async function safeFetchJson<T>(url: string, fallback: T): Promise<T> {
   try {
     const res = await fetch(url, { next: { revalidate: 60 } });
@@ -210,6 +259,23 @@ export async function getDepartmentImages(slug: string): Promise<ApiDepartmentIm
   return all.filter((img) => img.department === slug);
 }
 
+export async function getRealisations(): Promise<ApiRealisation[]> {
+  return safeFetchJson<ApiRealisation[]>(`${API_URL}/api/realisations/`, []);
+}
+
+export async function getRealisationImages(realisationId: number): Promise<ApiRealisationImage[]> {
+  const all = await safeFetchJson<ApiRealisationImage[]>(`${API_URL}/api/realisation-images/`, []);
+  return all.filter((img) => img.realisation === realisationId);
+}
+
+export async function getArticles(): Promise<ApiArticle[]> {
+  return safeFetchJson<ApiArticle[]>(`${API_URL}/api/articles/`, []);
+}
+
+export async function getFAQs(): Promise<ApiFAQ[]> {
+  return safeFetchJson<ApiFAQ[]>(`${API_URL}/api/faqs/`, []);
+}
+
 export interface SiteData {
   settings: ApiSiteSettings | null;
   departments: ApiDepartment[];
@@ -217,22 +283,42 @@ export interface SiteData {
   gallery: ApiGalleryItem[];
   stats: ApiStat[];
   partners: ApiPartner[];
+  properties: ApiProperty[];
+  realisations: ApiRealisation[];
 }
 
 export async function getSiteData(): Promise<SiteData> {
-  const [settings, departments, credentials, gallery, stats, partners] = await Promise.all([
+  const [settings, departments, credentials, gallery, stats, partners, properties, realisations] = await Promise.all([
     getSettings(),
     getDepartments(),
     getCredentials(),
     getGallery(),
     getStats(),
     getPartners(),
+    getProperties(),
+    getRealisations(),
   ]);
-  return { settings, departments, credentials, gallery, stats, partners };
+  return { settings, departments, credentials, gallery, stats, partners, properties, realisations };
 }
 
 export async function submitJobApplication(formData: FormData): Promise<void> {
   const res = await fetch(`${API_URL}/api/applications/`, { method: "POST", body: formData });
+  if (!res.ok) {
+    let message = "Une erreur est survenue lors de l'envoi.";
+    try {
+      const data = await res.json();
+      message = Object.values(data).flat().join(" ") || message;
+    } catch {}
+    throw new Error(message);
+  }
+}
+
+export async function submitQuoteRequest(payload: Record<string, unknown>): Promise<void> {
+  const res = await fetch(`${API_URL}/api/devis/`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
   if (!res.ok) {
     let message = "Une erreur est survenue lors de l'envoi.";
     try {

@@ -9,10 +9,14 @@
     "services": "Nos activités",
     "why": "Pourquoi nous",
     "gallery": "Domaines",
+    "realisations": "Réalisations",
+    "articles": "Actualités",
     "testimonials": "Témoignages",
     "jobs": "Carrières",
     "contact": "Contact",
     "cta": "Nous contacter",
+    "quoteCta": "Demander un devis",
+    "faq": "FAQ",
     "subMenu": "Sous-menu"
   },
   "hero": {
@@ -155,6 +159,10 @@
   "stats": {
     "kicker": "En chiffres",
     "title": "KANYEL SARL en chiffres",
+    "realisationsLabel": "Projets réalisés",
+    "departmentsLabel": "Départements d'activité",
+    "propertiesLabel": "Biens gérés",
+    "partnersLabel": "Partenaires",
     "visitorsLabel": "Visiteurs du site"
   },
   "jobs": {
@@ -199,6 +207,63 @@
     "immeuble": "Immeubles",
     "priceOnRequest": "Sur demande",
     "empty": "Aucun bien publié dans cette catégorie pour le moment."
+  },
+  "realisations": {
+    "kicker": "Nos réalisations",
+    "title": "Des projets menés avec sérieux",
+    "subtitle": "Un aperçu de nos réalisations récentes, tous secteurs confondus.",
+    "empty": "Nos réalisations seront bientôt présentées ici.",
+    "clientLabel": "Client",
+    "completedLabel": "Terminé le"
+  },
+  "articles": {
+    "kicker": "Actualités",
+    "title": "Nos actualités",
+    "subtitle": "Les dernières nouvelles de KANYEL SARL : nouveaux projets, partenariats et vie de l'entreprise.",
+    "empty": "Aucune actualité publiée pour le moment.",
+    "readMore": "Lire la suite",
+    "back": "Retour aux actualités",
+    "publishedOn": "Publié le"
+  },
+  "faq": {
+    "kicker": "Questions fréquentes",
+    "title": "Vous avez des questions ?",
+    "subtitle": "Les réponses aux questions les plus courantes sur nos activités.",
+    "empty": "Aucune question fréquente publiée pour le moment.",
+    "generalTitle": "Questions générales",
+    "ctaTitle": "Vous ne trouvez pas votre réponse ?",
+    "ctaButton": "Contactez-nous"
+  },
+  "quote": {
+    "kicker": "Devis",
+    "title": "Demander un devis",
+    "subtitle": "Décrivez votre projet, nous revenons vers vous rapidement avec une proposition adaptée.",
+    "formName": "Nom complet",
+    "formEmail": "Adresse e-mail",
+    "formPhone": "Téléphone",
+    "formDepartment": "Activité concernée",
+    "formDepartmentGeneral": "Non spécifiée",
+    "formBudget": "Budget estimé",
+    "formTimeline": "Délai souhaité",
+    "formDescription": "Décrivez votre projet",
+    "formSubmit": "Envoyer ma demande",
+    "formSending": "Envoi en cours…",
+    "requiredLegend": "Champ obligatoire",
+    "success": "Votre demande de devis a bien été envoyée. Nous vous recontacterons rapidement.",
+    "budget": {
+      "lt_5m": "Moins de 5 000 000 FCFA",
+      "5m_20m": "5 000 000 – 20 000 000 FCFA",
+      "20m_100m": "20 000 000 – 100 000 000 FCFA",
+      "gt_100m": "Plus de 100 000 000 FCFA",
+      "unknown": "À définir"
+    },
+    "timeline": {
+      "urgent": "Urgent (moins d'1 mois)",
+      "1_3_months": "1 à 3 mois",
+      "3_6_months": "3 à 6 mois",
+      "6_plus_months": "Plus de 6 mois",
+      "flexible": "Flexible"
+    }
   },
   "legal": {
     "mentionsTitle": "Mentions légales",

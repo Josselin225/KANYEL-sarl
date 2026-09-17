@@ -80,6 +80,8 @@ export default function Header({
     { href: "/#about", label: t("about") },
     { href: "/#why", label: t("why") },
     { href: "/#gallery", label: t("gallery") },
+    { href: "/realisations", label: t("realisations") },
+    { href: "/actualites", label: t("articles") },
     { href: "/temoignages", label: t("testimonials") },
     { href: "/offres-emploi", label: t("jobs") },
     { href: "/#contact", label: t("contact") },
@@ -89,7 +91,7 @@ export default function Header({
     <header className="sticky top-0 z-30 w-full">
       {(phone || email || hours) && (
         <div className="hidden bg-navy-deep text-white/85 sm:block">
-          <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-5 py-2 text-xs sm:px-8">
+          <div className="flex items-center justify-between gap-6 px-4 py-2 text-xs sm:px-6 lg:px-10">
             <div className="flex items-center gap-5">
               {phone && (
                 <a href={`tel:${phone.replace(/\s+/g, "")}`} className="flex items-center gap-1.5 hover:text-gold-light">
@@ -115,30 +117,30 @@ export default function Header({
       )}
 
       <div className="border-b border-border bg-white/95 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-3 sm:px-8">
-          <Link href="/">
+        <div className="flex items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-10">
+          <Link href="/" className="shrink-0">
             <Logo />
           </Link>
 
-          <nav className="hidden items-center gap-1 lg:flex">
+          <nav className="hidden items-center gap-0.5 lg:flex xl:gap-1">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="rounded-full px-3.5 py-2 text-sm font-medium text-ink hover:bg-navy-soft hover:text-navy"
+                className="relative whitespace-nowrap px-1.5 py-2 text-sm font-medium text-ink after:absolute after:bottom-0.5 after:left-1.5 after:right-1.5 after:h-0.5 after:origin-left after:scale-x-0 after:bg-gold after:transition-transform after:duration-200 after:content-[''] hover:text-navy hover:after:scale-x-100 xl:px-2"
               >
                 {link.label}
               </Link>
             ))}
 
             <div
-              className="relative"
+              className="relative shrink-0"
               onMouseEnter={() => setActivitiesOpen(true)}
               onMouseLeave={() => setActivitiesOpen(false)}
             >
               <button
                 type="button"
-                className="flex items-center gap-1 rounded-full px-3.5 py-2 text-sm font-medium text-ink hover:bg-navy-soft hover:text-navy"
+                className="relative flex items-center gap-1 whitespace-nowrap px-1.5 py-2 text-sm font-medium text-ink after:absolute after:bottom-0.5 after:left-1.5 after:right-1.5 after:h-0.5 after:origin-left after:scale-x-0 after:bg-gold after:transition-transform after:duration-200 after:content-[''] hover:text-navy hover:after:scale-x-100 xl:px-2"
                 aria-haspopup="true"
                 aria-expanded={activitiesOpen}
               >
@@ -171,7 +173,7 @@ export default function Header({
             </div>
           </nav>
 
-          <div className="flex items-center gap-3">
+          <div className="flex shrink-0 items-center gap-2 xl:gap-3">
             <div className="hidden items-center gap-1 rounded-full bg-navy-soft p-1 text-xs font-semibold sm:flex">
               <Link
                 href={pathname}
@@ -191,7 +193,7 @@ export default function Header({
 
             <Link
               href="/#contact"
-              className="hidden rounded-full bg-navy px-5 py-2.5 text-sm font-semibold text-white shadow-soft transition-transform hover:-translate-y-0.5 sm:inline-flex"
+              className="hidden whitespace-nowrap rounded-full bg-navy px-4 py-2.5 text-sm font-semibold text-white shadow-soft transition-transform hover:-translate-y-0.5 sm:inline-flex xl:px-5"
             >
               {t("cta")}
             </Link>

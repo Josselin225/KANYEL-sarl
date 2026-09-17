@@ -248,6 +248,100 @@ export const GALLERY_RESOURCE: ResourceConfig = {
   ],
 };
 
+export const REALISATIONS_RESOURCE: ResourceConfig = {
+  key: "realisations",
+  label: "Nos réalisations",
+  idField: "id",
+  titleField: "title_fr",
+  subtitleField: "client_name",
+  imageField: "image",
+  fields: [
+    { name: "order", label: "Ordre", type: "number" },
+    {
+      name: "department",
+      label: "Activité concernée",
+      type: "relation",
+      relatedResource: "departments",
+      relatedValueField: "slug",
+      relatedLabelField: "title_fr",
+      help: "Facultatif.",
+    },
+    { name: "title_fr", label: "Titre (français)", type: "text", required: true },
+    { name: "title_en", label: "Titre (anglais)", type: "text", required: true },
+    { name: "description_fr", label: "Description (français)", type: "textarea", required: true },
+    { name: "description_en", label: "Description (anglais)", type: "textarea", required: true },
+    { name: "client_name", label: "Client", type: "text", help: "Facultatif." },
+    { name: "location", label: "Lieu", type: "text" },
+    { name: "completed_at", label: "Terminé le", type: "date", help: "Facultatif." },
+    { name: "image", label: "Photo principale", type: "image", required: true },
+    { name: "is_published", label: "Publié", type: "boolean" },
+  ],
+};
+
+export const REALISATION_IMAGES_RESOURCE: ResourceConfig = {
+  key: "realisation-images",
+  label: "Galerie des réalisations",
+  idField: "id",
+  titleField: "realisation",
+  imageField: "image",
+  fields: [
+    {
+      name: "realisation",
+      label: "Réalisation",
+      type: "relation",
+      relatedResource: "realisations",
+      relatedValueField: "id",
+      relatedLabelField: "title_fr",
+      required: true,
+    },
+    { name: "order", label: "Ordre", type: "number" },
+    { name: "image", label: "Photo", type: "image", required: true },
+  ],
+};
+
+export const ARTICLES_RESOURCE: ResourceConfig = {
+  key: "articles",
+  label: "Actualités",
+  idField: "id",
+  titleField: "title_fr",
+  subtitleField: "excerpt_fr",
+  imageField: "cover_image",
+  fields: [
+    { name: "title_fr", label: "Titre (français)", type: "text", required: true },
+    { name: "title_en", label: "Titre (anglais)", type: "text", required: true },
+    { name: "excerpt_fr", label: "Résumé (français)", type: "text", help: "Facultatif, affiché dans la liste." },
+    { name: "excerpt_en", label: "Résumé (anglais)", type: "text" },
+    { name: "content_fr", label: "Contenu (français)", type: "textarea", required: true },
+    { name: "content_en", label: "Contenu (anglais)", type: "textarea", required: true },
+    { name: "cover_image", label: "Photo de couverture", type: "image", help: "Facultatif." },
+    { name: "is_published", label: "Publié", type: "boolean" },
+  ],
+};
+
+export const FAQS_RESOURCE: ResourceConfig = {
+  key: "faqs",
+  label: "Questions fréquentes",
+  idField: "id",
+  titleField: "question_fr",
+  fields: [
+    { name: "order", label: "Ordre", type: "number" },
+    {
+      name: "department",
+      label: "Activité concernée",
+      type: "relation",
+      relatedResource: "departments",
+      relatedValueField: "slug",
+      relatedLabelField: "title_fr",
+      help: "Laisser vide pour une question générale.",
+    },
+    { name: "question_fr", label: "Question (français)", type: "text", required: true },
+    { name: "question_en", label: "Question (anglais)", type: "text", required: true },
+    { name: "answer_fr", label: "Réponse (français)", type: "textarea", required: true },
+    { name: "answer_en", label: "Réponse (anglais)", type: "textarea", required: true },
+    { name: "is_published", label: "Publié", type: "boolean" },
+  ],
+};
+
 export const SETTINGS_FIELDS: { title: string; fields: FieldConfig[] }[] = [
   {
     title: "Identité",

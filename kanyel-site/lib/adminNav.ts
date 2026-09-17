@@ -16,6 +16,11 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
   { href: "/admin/stats", label: "Statistiques clés", icon: "chart" },
   { href: "/admin/jobs", label: "Offres d'emploi", icon: "briefcase" },
   { href: "/admin/job-applications", label: "Candidatures", icon: "user" },
+  { href: "/admin/realisations", label: "Nos réalisations", icon: "star" },
+  { href: "/admin/realisation-images", label: "Galerie des réalisations", icon: "gallery" },
+  { href: "/admin/articles", label: "Actualités", icon: "news" },
+  { href: "/admin/faqs", label: "Questions fréquentes", icon: "help" },
+  { href: "/admin/quote-requests", label: "Demandes de devis", icon: "invoice" },
   { href: "/admin/messages", label: "Messages", icon: "mail" },
   { href: "/admin/settings", label: "Paramètres du site", icon: "settings" },
 ];

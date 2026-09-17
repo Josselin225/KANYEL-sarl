@@ -95,13 +95,14 @@ export default function Contact({ settings }: { settings: ApiSiteSettings | null
     const phone = String(form.get("phone") ?? "");
     const subject = String(form.get("subject") ?? "");
     const message = String(form.get("message") ?? "");
+    const website = String(form.get("website") ?? "");
 
     setSending(true);
     try {
       await fetch(`${API_URL}/api/contact/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, phone, subject, message }),
+        body: JSON.stringify({ name, email, phone, subject, message, website }),
       });
     } catch {
       // Non-blocking: the mailto: fallback below is the primary delivery path.
@@ -253,6 +254,14 @@ export default function Contact({ settings }: { settings: ApiSiteSettings | null
                       onSubmit={handleSubmit}
                       className="space-y-4 px-6 pb-6 sm:px-8 sm:pb-8"
                     >
+                      <input
+                        type="text"
+                        name="website"
+                        tabIndex={-1}
+                        autoComplete="off"
+                        aria-hidden="true"
+                        className="absolute left-[-9999px] h-0 w-0 opacity-0"
+                      />
                       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <Field name="name" label={t("formName")} required />
                         <Field name="email" label={t("formEmail")} type="email" required />
