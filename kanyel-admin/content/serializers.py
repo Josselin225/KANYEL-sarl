@@ -1,6 +1,24 @@
 from rest_framework import serializers
 
-from .models import Credential, Department, DepartmentImage, GalleryItem, JobApplication, JobOffer, Partner, Property, SiteSettings, Stat, Testimonial, ContactMessage
+from .models import (
+    Article,
+    ContactMessage,
+    Credential,
+    Department,
+    DepartmentImage,
+    FAQ,
+    GalleryItem,
+    JobApplication,
+    JobOffer,
+    Partner,
+    Property,
+    QuoteRequest,
+    Realisation,
+    RealisationImage,
+    SiteSettings,
+    Stat,
+    Testimonial,
+)
 
 
 class SiteSettingsSerializer(serializers.ModelSerializer):
@@ -123,3 +141,79 @@ class ContactMessageSerializer(serializers.ModelSerializer):
         model = ContactMessage
         fields = ["id", "name", "email", "phone", "subject", "message", "created_at", "is_read"]
         read_only_fields = ["id", "created_at", "name", "email", "phone", "subject", "message"]
+
+
+class RealisationImageSerializer(serializers.ModelSerializer):
+    realisation = serializers.PrimaryKeyRelatedField(queryset=Realisation.objects.all())
+
+    class Meta:
+        model = RealisationImage
+        fields = ["id", "realisation", "order", "image"]
+
+
+class RealisationSerializer(serializers.ModelSerializer):
+    department = serializers.SlugRelatedField(
+        slug_field="slug", queryset=Department.objects.all(), allow_null=True, required=False,
+    )
+
+    class Meta:
+        model = Realisation
+        fields = [
+            "id", "order", "department", "title_fr", "title_en", "description_fr", "description_en",
+            "client_name", "location", "completed_at", "image", "is_published",
+        ]
+
+
+class ArticleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Article
+        fields = [
+            "id", "slug", "title_fr", "title_en", "excerpt_fr", "excerpt_en",
+            "content_fr", "content_en", "cover_image", "is_published", "published_at",
+        ]
+        read_only_fields = ["id", "slug", "published_at"]
+
+
+class FAQSerializer(serializers.ModelSerializer):
+    department = serializers.SlugRelatedField(
+        slug_field="slug", queryset=Department.objects.all(), allow_null=True, required=False,
+    )
+
+    class Meta:
+        model = FAQ
+        fields = ["id", "order", "department", "question_fr", "question_en", "answer_fr", "answer_en", "is_published"]
+
+
+class QuoteRequestCreateSerializer(serializers.ModelSerializer):
+    """Used by the public quote-request form — full write access, no is_read."""
+
+    department = serializers.SlugRelatedField(
+        slug_field="slug", queryset=Department.objects.all(), allow_null=True, required=False,
+    )
+
+    class Meta:
+        model = QuoteRequest
+        fields = [
+            "id", "department", "full_name", "email", "phone", "budget", "timeline", "description", "created_at",
+        ]
+        read_only_fields = ["id", "created_at"]
+
+
+class QuoteRequestSerializer(serializers.ModelSerializer):
+    """Used by the admin panel — content is read-only, only is_read can be toggled."""
+
+    department_title = serializers.SerializerMethodField()
+
+    class Meta:
+        model = QuoteRequest
+        fields = [
+            "id", "department", "department_title", "full_name", "email", "phone",
+            "budget", "timeline", "description", "created_at", "is_read",
+        ]
+        read_only_fields = [
+            "id", "created_at", "department_title", "department", "full_name", "email", "phone",
+            "budget", "timeline", "description",
+        ]
+
+    def get_department_title(self, obj):
+        return obj.department.title_fr if obj.department else None

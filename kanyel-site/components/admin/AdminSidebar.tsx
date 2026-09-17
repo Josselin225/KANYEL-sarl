@@ -23,6 +23,10 @@ function NavIcon({ name }: { name: string }) {
     mail: <path d="M3 5h18v14H3V5Zm1 1.5L12 13l8-6.5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />,
     briefcase: <path d="M4 8h16v11H4V8Zm4 0V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M4 13h16" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />,
     user: <path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm-7 9c0-3.9 3.1-7 7-7s7 3.1 7 7" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />,
+    star: <path d="M12 2.5 14.8 8.7 21.5 9.5 16.6 14 18 20.7 12 17.2 6 20.7 7.4 14 2.5 9.5 9.2 8.7 12 2.5Z" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />,
+    news: <path d="M4 5h13v14H4V5Zm13 4h3v10H8v-2M7.5 8.5h6M7.5 11.5h6M7.5 14.5h4" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />,
+    help: <path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM9.5 9a2.5 2.5 0 1 1 3.6 2.2c-.8.4-1.1 1-1.1 1.9v.3M12 16.8v.1" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />,
+    invoice: <path d="M7 2.5h10l2 2v17l-3-2-2 2-2-2-2 2-2-2-3 2v-17l2-2Zm2 6h6M9 11.5h6M9 15h4" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />,
   };
   return (
     <svg viewBox="0 0 24 24" fill="currentColor" className="h-4.5 w-4.5">

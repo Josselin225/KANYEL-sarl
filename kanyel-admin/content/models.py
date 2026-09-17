@@ -371,3 +371,146 @@ class ContactMessage(models.Model):
 
     def __str__(self):
         return f"{self.name} — {self.subject or 'Sans objet'}"
+
+
+class Realisation(models.Model):
+    """A completed project shown in the "Nos réalisations" portfolio."""
+
+    order = models.PositiveIntegerField("Ordre", default=0)
+    department = models.ForeignKey(
+        Department, related_name="realisations", on_delete=models.SET_NULL,
+        null=True, blank=True, verbose_name="Activité concernée",
+    )
+    title_fr = models.CharField("Titre (français)", max_length=200)
+    title_en = models.CharField("Titre (anglais)", max_length=200)
+    description_fr = models.TextField("Description (français)")
+    description_en = models.TextField("Description (anglais)")
+    client_name = models.CharField("Client", max_length=200, blank=True, help_text="Facultatif.")
+    location = models.CharField("Lieu", max_length=200, blank=True)
+    completed_at = models.DateField("Terminé le", blank=True, null=True)
+    image = models.ImageField("Photo principale", upload_to="realisations/")
+    is_published = models.BooleanField("Publié", default=True)
+
+    class Meta:
+        ordering = ["order", "-completed_at", "id"]
+        verbose_name = "Réalisation"
+        verbose_name_plural = "Réalisations"
+
+    def __str__(self):
+        return self.title_fr
+
+
+class RealisationImage(models.Model):
+    """An extra photo shown in a realisation's own gallery."""
+
+    realisation = models.ForeignKey(
+        Realisation, related_name="gallery_images", on_delete=models.CASCADE, verbose_name="Réalisation",
+    )
+    order = models.PositiveIntegerField("Ordre", default=0)
+    image = models.ImageField("Photo", upload_to="realisations/gallery/")
+
+    class Meta:
+        ordering = ["realisation", "order", "id"]
+        verbose_name = "Photo de réalisation"
+        verbose_name_plural = "Photos de réalisation"
+
+    def __str__(self):
+        return f"{self.realisation.title_fr} — #{self.order}"
+
+
+class Article(models.Model):
+    """A news post shown in the "Actualités" section."""
+
+    slug = models.SlugField("Identifiant URL (slug)", max_length=220, unique=True, blank=True)
+    title_fr = models.CharField("Titre (français)", max_length=200)
+    title_en = models.CharField("Titre (anglais)", max_length=200)
+    excerpt_fr = models.CharField("Résumé (français)", max_length=300, blank=True)
+    excerpt_en = models.CharField("Résumé (anglais)", max_length=300, blank=True)
+    content_fr = models.TextField("Contenu (français)")
+    content_en = models.TextField("Contenu (anglais)")
+    cover_image = models.ImageField("Photo de couverture", upload_to="articles/", blank=True, null=True)
+    is_published = models.BooleanField("Publié", default=True)
+    published_at = models.DateTimeField("Publié le", auto_now_add=True)
+
+    class Meta:
+        ordering = ["-published_at"]
+        verbose_name = "Article"
+        verbose_name_plural = "Articles"
+
+    def __str__(self):
+        return self.title_fr
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            base = slugify(self.title_fr) or "article"
+            slug = base
+            i = 2
+            while Article.objects.exclude(pk=self.pk).filter(slug=slug).exists():
+                slug = f"{base}-{i}"
+                i += 1
+            self.slug = slug
+        super().save(*args, **kwargs)
+
+
+class FAQ(models.Model):
+    """A frequently asked question, optionally scoped to one department."""
+
+    order = models.PositiveIntegerField("Ordre", default=0)
+    department = models.ForeignKey(
+        Department, related_name="faqs", on_delete=models.SET_NULL,
+        null=True, blank=True, verbose_name="Activité concernée",
+        help_text="Laisser vide pour une question générale.",
+    )
+    question_fr = models.CharField("Question (français)", max_length=300)
+    question_en = models.CharField("Question (anglais)", max_length=300)
+    answer_fr = models.TextField("Réponse (français)")
+    answer_en = models.TextField("Réponse (anglais)")
+    is_published = models.BooleanField("Publié", default=True)
+
+    class Meta:
+        ordering = ["order", "id"]
+        verbose_name = "Question fréquente"
+        verbose_name_plural = "Questions fréquentes"
+
+    def __str__(self):
+        return self.question_fr
+
+
+class QuoteRequest(models.Model):
+    """A structured quote request submitted through the public "Demander un devis" form."""
+
+    BUDGET_CHOICES = [
+        ("lt_5m", "Moins de 5 000 000 FCFA"),
+        ("5m_20m", "5 000 000 – 20 000 000 FCFA"),
+        ("20m_100m", "20 000 000 – 100 000 000 FCFA"),
+        ("gt_100m", "Plus de 100 000 000 FCFA"),
+        ("unknown", "À définir"),
+    ]
+    TIMELINE_CHOICES = [
+        ("urgent", "Urgent (moins d'1 mois)"),
+        ("1_3_months", "1 à 3 mois"),
+        ("3_6_months", "3 à 6 mois"),
+        ("6_plus_months", "Plus de 6 mois"),
+        ("flexible", "Flexible"),
+    ]
+
+    department = models.ForeignKey(
+        Department, related_name="quote_requests", on_delete=models.SET_NULL,
+        null=True, blank=True, verbose_name="Activité concernée",
+    )
+    full_name = models.CharField("Nom complet", max_length=200)
+    email = models.EmailField("E-mail")
+    phone = models.CharField("Téléphone", max_length=50)
+    budget = models.CharField("Budget estimé", max_length=20, choices=BUDGET_CHOICES, default="unknown")
+    timeline = models.CharField("Délai souhaité", max_length=20, choices=TIMELINE_CHOICES, default="flexible")
+    description = models.TextField("Description du projet")
+    created_at = models.DateTimeField("Reçue le", auto_now_add=True)
+    is_read = models.BooleanField("Lue", default=False)
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name = "Demande de devis"
+        verbose_name_plural = "Demandes de devis"
+
+    def __str__(self):
+        return f"{self.full_name} — {self.department.title_fr if self.department else 'Devis général'}"

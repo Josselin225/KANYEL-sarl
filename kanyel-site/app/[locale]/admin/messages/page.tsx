@@ -61,10 +61,42 @@ export default function AdminMessagesPage() {
     }
   }
 
+  function exportCsv() {
+    const header = ["Nom", "E-mail", "Téléphone", "Sujet", "Message", "Reçu le"];
+    const rows = items.map((it) => [
+      it.name,
+      it.email,
+      it.phone,
+      it.subject || "Sans objet",
+      it.message.replace(/\n/g, " "),
+      new Date(it.created_at).toLocaleString("fr-FR"),
+    ]);
+    const csv = [header, ...rows]
+      .map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(","))
+      .join("\n");
+    const blob = new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `messages-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
       <div className="lg:col-span-2">
-        <h2 className="font-display text-xl font-semibold text-navy">Messages</h2>
+        <div className="flex items-center justify-between">
+          <h2 className="font-display text-xl font-semibold text-navy">Messages</h2>
+          {items.length > 0 && (
+            <button
+              onClick={exportCsv}
+              className="rounded-full bg-navy-soft px-3.5 py-1.5 text-xs font-semibold text-navy transition-colors hover:bg-navy hover:text-white"
+            >
+              Exporter CSV
+            </button>
+          )}
+        </div>
         {loading && <p className="mt-4 text-sm text-ink-dim">Chargement…</p>}
         {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
 

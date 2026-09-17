@@ -9,10 +9,14 @@
     "services": "Our Activities",
     "why": "Why Us",
     "gallery": "Fields",
+    "realisations": "Our Work",
+    "articles": "News",
     "testimonials": "Testimonials",
     "jobs": "Careers",
     "contact": "Contact",
     "cta": "Contact Us",
+    "quoteCta": "Request a Quote",
+    "faq": "FAQ",
     "subMenu": "Submenu"
   },
   "hero": {
@@ -155,6 +159,10 @@
   "stats": {
     "kicker": "By the numbers",
     "title": "KANYEL SARL by the numbers",
+    "realisationsLabel": "Completed projects",
+    "departmentsLabel": "Business departments",
+    "propertiesLabel": "Managed properties",
+    "partnersLabel": "Partners",
     "visitorsLabel": "Site visitors"
   },
   "jobs": {
@@ -199,6 +207,63 @@
     "immeuble": "Buildings",
     "priceOnRequest": "On request",
     "empty": "No properties published in this category yet."
+  },
+  "realisations": {
+    "kicker": "Our Work",
+    "title": "Projects delivered with care",
+    "subtitle": "A look at our recent work, across every sector we operate in.",
+    "empty": "Our completed projects will be showcased here soon.",
+    "clientLabel": "Client",
+    "completedLabel": "Completed on"
+  },
+  "articles": {
+    "kicker": "News",
+    "title": "Latest News",
+    "subtitle": "The latest from KANYEL SARL: new projects, partnerships, and company life.",
+    "empty": "No news posted yet.",
+    "readMore": "Read more",
+    "back": "Back to news",
+    "publishedOn": "Published on"
+  },
+  "faq": {
+    "kicker": "FAQ",
+    "title": "Got questions?",
+    "subtitle": "Answers to the questions we're asked most often.",
+    "empty": "No frequently asked questions published yet.",
+    "generalTitle": "General questions",
+    "ctaTitle": "Can't find your answer?",
+    "ctaButton": "Contact us"
+  },
+  "quote": {
+    "kicker": "Quote",
+    "title": "Request a Quote",
+    "subtitle": "Describe your project and we'll get back to you quickly with a tailored proposal.",
+    "formName": "Full name",
+    "formEmail": "Email address",
+    "formPhone": "Phone number",
+    "formDepartment": "Department concerned",
+    "formDepartmentGeneral": "Not specified",
+    "formBudget": "Estimated budget",
+    "formTimeline": "Desired timeline",
+    "formDescription": "Describe your project",
+    "formSubmit": "Send my request",
+    "formSending": "Sending…",
+    "requiredLegend": "Required field",
+    "success": "Your quote request has been sent successfully. We will get back to you soon.",
+    "budget": {
+      "lt_5m": "Under 5,000,000 FCFA",
+      "5m_20m": "5,000,000 – 20,000,000 FCFA",
+      "20m_100m": "20,000,000 – 100,000,000 FCFA",
+      "gt_100m": "Over 100,000,000 FCFA",
+      "unknown": "To be determined"
+    },
+    "timeline": {
+      "urgent": "Urgent (less than 1 month)",
+      "1_3_months": "1 to 3 months",
+      "3_6_months": "3 to 6 months",
+      "6_plus_months": "More than 6 months",
+      "flexible": "Flexible"
+    }
   },
   "legal": {
     "mentionsTitle": "Legal Notice",

@@ -1,7 +1,25 @@
 from django.contrib import admin
 from django.utils.html import format_html
 
-from .models import Credential, Department, DepartmentImage, GalleryItem, JobApplication, JobOffer, Partner, Property, SiteSettings, Stat, Testimonial, ContactMessage
+from .models import (
+    Article,
+    ContactMessage,
+    Credential,
+    Department,
+    DepartmentImage,
+    FAQ,
+    GalleryItem,
+    JobApplication,
+    JobOffer,
+    Partner,
+    Property,
+    QuoteRequest,
+    Realisation,
+    RealisationImage,
+    SiteSettings,
+    Stat,
+    Testimonial,
+)
 
 
 @admin.register(SiteSettings)
@@ -210,6 +228,81 @@ class ContactMessageAdmin(admin.ModelAdmin):
     list_editable = ("is_read",)
     search_fields = ("name", "email", "message")
     readonly_fields = ("name", "email", "phone", "subject", "message", "created_at")
+
+    def has_add_permission(self, request):
+        return False
+
+
+class RealisationImageInline(admin.TabularInline):
+    model = RealisationImage
+    extra = 1
+    fields = ("order", "image")
+
+
+@admin.register(Realisation)
+class RealisationAdmin(admin.ModelAdmin):
+    list_display = ("order", "thumbnail", "title_fr", "department", "client_name", "completed_at", "is_published")
+    list_display_links = ("title_fr",)
+    list_editable = ("order", "is_published")
+    list_filter = ("is_published", "department")
+    search_fields = ("title_fr", "title_en", "client_name")
+    inlines = [RealisationImageInline]
+    fieldsets = (
+        (None, {"fields": ("order", "department", "client_name", "location", "completed_at", "image", "is_published")}),
+        ("Français", {"fields": ("title_fr", "description_fr")}),
+        ("English", {"fields": ("title_en", "description_en")}),
+    )
+
+    def thumbnail(self, obj):
+        if obj.image:
+            return format_html('<img src="{}" style="height:40px;border-radius:6px" />', obj.image.url)
+        return "—"
+
+    thumbnail.short_description = "Aperçu"
+
+
+@admin.register(Article)
+class ArticleAdmin(admin.ModelAdmin):
+    list_display = ("published_at", "thumbnail", "title_fr", "is_published")
+    list_display_links = ("title_fr",)
+    list_editable = ("is_published",)
+    list_filter = ("is_published",)
+    search_fields = ("title_fr", "title_en", "content_fr")
+    prepopulated_fields = {"slug": ("title_fr",)}
+    fieldsets = (
+        (None, {"fields": ("slug", "cover_image", "is_published")}),
+        ("Français", {"fields": ("title_fr", "excerpt_fr", "content_fr")}),
+        ("English", {"fields": ("title_en", "excerpt_en", "content_en")}),
+    )
+
+    def thumbnail(self, obj):
+        if obj.cover_image:
+            return format_html('<img src="{}" style="height:40px;border-radius:6px" />', obj.cover_image.url)
+        return "—"
+
+    thumbnail.short_description = "Aperçu"
+
+
+@admin.register(FAQ)
+class FAQAdmin(admin.ModelAdmin):
+    list_display = ("order", "question_fr", "department", "is_published")
+    list_display_links = ("question_fr",)
+    list_editable = ("order", "is_published")
+    list_filter = ("is_published", "department")
+    fieldsets = (
+        (None, {"fields": ("order", "department", "is_published")}),
+        ("Français", {"fields": ("question_fr", "answer_fr")}),
+        ("English", {"fields": ("question_en", "answer_en")}),
+    )
+
+
+@admin.register(QuoteRequest)
+class QuoteRequestAdmin(admin.ModelAdmin):
+    list_display = ("created_at", "full_name", "department", "budget", "timeline", "is_read")
+    list_filter = ("is_read", "created_at", "department", "budget", "timeline")
+    list_editable = ("is_read",)
+    search_fields = ("full_name", "email", "description")
+    readonly_fields = ("department", "full_name", "email", "phone", "budget", "timeline", "description", "created_at")
 
     def has_add_permission(self, request):
         return False
