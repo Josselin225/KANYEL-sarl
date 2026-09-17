@@ -1,0 +1,64 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-display: var(--font-display);
+  --font-sans: var(--font-body);
+
+  --color-navy: #1e2a6e;
+  --color-navy-deep: #12173f;
+  --color-navy-soft: #eef1fa;
+
+  --color-gold: #d4af37;
+  --color-gold-light: #f2d581;
+  --color-gold-dark: #a8791a;
+  --color-gold-soft: #faf1d9;
+
+  --color-bg: #f7f2e7;
+  --color-bg-alt: #efe8d8;
+
+  --color-ink: #1f2430;
+  --color-ink-dim: #6b7280;
+
+  --color-border: #e6ddc8;
+
+  --shadow-soft: 0 10px 30px -12px rgba(18, 23, 63, 0.18);
+  --shadow-soft-lg: 0 24px 48px -16px rgba(18, 23, 63, 0.28);
+}
+
+@utility shadow-soft {
+  box-shadow: var(--shadow-soft);
+}
+
+@utility shadow-soft-lg {
+  box-shadow: var(--shadow-soft-lg);
+}
+
+@utility animate-marquee {
+  animation: marquee 32s linear infinite;
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+:root {
+  color-scheme: light;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-ink);
+}
+
+* {
+  border-color: var(--color-border);
+}
