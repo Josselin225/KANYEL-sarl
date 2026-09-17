@@ -29,13 +29,19 @@ def _env_list(name, default=''):
 # SECURITY WARNING: keep the secret key used in production secret!
 # Falls back to a dev-only key so `manage.py runserver` still works without
 # a .env file, but production MUST set DJANGO_SECRET_KEY (see .env.example).
-SECRET_KEY = os.environ.get(
-    'DJANGO_SECRET_KEY',
-    'django-insecure-dev-only-key-do-not-use-in-production',
-)
+_INSECURE_DEFAULT_KEY = 'django-insecure-dev-only-key-do-not-use-in-production'
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', _INSECURE_DEFAULT_KEY)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DJANGO_DEBUG', 'True') == 'True'
+
+# Fail loudly rather than silently serving production traffic with a public,
+# guessable secret key (which would let an attacker forge sessions/tokens).
+if not DEBUG and SECRET_KEY == _INSECURE_DEFAULT_KEY:
+    raise RuntimeError(
+        'DJANGO_SECRET_KEY must be set to a real secret when DJANGO_DEBUG=False. '
+        'Generate one and add it to the production .env file.'
+    )
 
 ALLOWED_HOSTS = _env_list('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1')
 
@@ -83,12 +89,19 @@ if not DEBUG:
 REST_FRAMEWORK = {
     'DEFAULT_THROTTLE_RATES': {
         'anon': '20/hour',
+        'login': '5/hour',
     },
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication',
+        'content.authentication.ExpiringTokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
     ],
 }
+
+# Hard ceiling on request body size (uploads included), independent of the
+# per-field validators in models.py — a defense-in-depth backstop against
+# large-payload denial-of-service attempts.
+DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10 MB
+FILE_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10 MB
 
 ROOT_URLCONF = 'config.urls'
 

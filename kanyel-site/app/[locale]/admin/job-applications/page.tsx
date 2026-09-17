@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { adminApi, ApiError } from "@/lib/adminApi";
+import { adminApi, ApiError, getToken } from "@/lib/adminApi";
 
 interface JobApplication {
   id: number;
@@ -61,6 +61,22 @@ export default function AdminJobApplicationsPage() {
       setSelected(null);
     } catch (e) {
       alert(e instanceof ApiError ? e.message : "Erreur lors de la suppression.");
+    }
+  }
+
+  async function downloadFile(url: string, filename: string) {
+    try {
+      const res = await fetch(url, { headers: { Authorization: `Token ${getToken()}` } });
+      if (!res.ok) throw new Error("Téléchargement impossible.");
+      const blob = await res.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = blobUrl;
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(blobUrl);
+    } catch {
+      alert("Impossible de télécharger ce fichier.");
     }
   }
 
@@ -178,23 +194,19 @@ export default function AdminJobApplicationsPage() {
             </dl>
 
             <div className="mt-6 flex flex-wrap gap-3">
-              <a
-                href={selected.cv}
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                onClick={() => downloadFile(selected.cv, `CV-${selected.full_name}.pdf`)}
                 className="rounded-full bg-navy px-5 py-2.5 text-sm font-semibold text-white shadow-soft transition-transform hover:-translate-y-0.5"
               >
                 Télécharger le CV
-              </a>
+              </button>
               {selected.cover_letter && (
-                <a
-                  href={selected.cover_letter}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <button
+                  onClick={() => downloadFile(selected.cover_letter!, `Lettre-${selected.full_name}.pdf`)}
                   className="rounded-full bg-navy-soft px-5 py-2.5 text-sm font-semibold text-navy transition-colors hover:bg-navy hover:text-white"
                 >
                   Lettre de motivation
-                </a>
+                </button>
               )}
             </div>
           </div>
