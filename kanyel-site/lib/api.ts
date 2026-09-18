@@ -402,3 +402,7 @@ export function pick<T extends object>(
   const value = record[`${field}_${locale}`] ?? record[`${field}_fr`];
   return typeof value === "string" ? value : "";
 }
+
+export function buildWhatsAppUrl(phone: string, message: string): string {
+  return `https://wa.me/${phone.replace(/[^\d]/g, "")}?text=${encodeURIComponent(message)}`;
+}

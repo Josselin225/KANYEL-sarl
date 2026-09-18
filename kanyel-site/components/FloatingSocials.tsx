@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { useTranslations } from "next-intl";
 import { usePathname } from "@/i18n/navigation";
-import type { ApiSiteSettings } from "@/lib/api";
+import { buildWhatsAppUrl, type ApiSiteSettings } from "@/lib/api";
 
 function IconWhatsApp() {
   return (
@@ -75,6 +76,7 @@ function IconPlus() {
 
 export default function FloatingSocials({ settings }: { settings: ApiSiteSettings | null }) {
   const pathname = usePathname();
+  const t = useTranslations("footer");
   const [open, setOpen] = useState(false);
   if (pathname.startsWith("/admin")) return null;
 
@@ -87,11 +89,7 @@ export default function FloatingSocials({ settings }: { settings: ApiSiteSetting
     { url: settings?.tiktok_url, label: "TikTok", Icon: IconTikTok },
     { url: settings?.youtube_url, label: "YouTube", Icon: IconYouTube },
     {
-      url: phone
-        ? `https://wa.me/${phone.replace(/[^\d]/g, "")}?text=${encodeURIComponent(
-            "Bonjour KANYEL SARL, je souhaite avoir plus d'informations."
-          )}`
-        : undefined,
+      url: phone ? buildWhatsAppUrl(phone, t("whatsappMessage")) : undefined,
       label: "WhatsApp",
       Icon: IconWhatsApp,
     },
@@ -120,7 +118,7 @@ export default function FloatingSocials({ settings }: { settings: ApiSiteSetting
                 href={s.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label={s.label === "WhatsApp" ? "Discuter sur WhatsApp" : s.label}
+                aria-label={s.label === "WhatsApp" ? t("whatsappCta") : s.label}
                 className="flex h-11 w-11 items-center justify-center rounded-full bg-navy text-white shadow-soft-lg transition-transform hover:scale-110 hover:bg-gold-dark"
               >
                 <s.Icon />
