@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
+from rest_framework.authtoken.models import Token
 
 from .models import (
     AdminProfile,
@@ -277,6 +278,9 @@ class AdminUserSerializer(serializers.ModelSerializer):
         password = validated_data.pop("password", None)
         if password:
             instance.set_password(password)
+            # Changing the password is the admin's remediation path after a suspected
+            # compromise — revoke the existing token so it doesn't outlive the reset.
+            Token.objects.filter(user=instance).delete()
         instance.is_active = validated_data.get("is_active", instance.is_active)
         instance.save()
         if profile_data:
