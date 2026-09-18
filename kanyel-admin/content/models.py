@@ -245,6 +245,24 @@ class Property(models.Model):
         return self.title_fr
 
 
+class PropertyImage(models.Model):
+    """An extra photo shown in a property's own gallery/lightbox."""
+
+    property = models.ForeignKey(
+        Property, related_name="gallery_images", on_delete=models.CASCADE, verbose_name="Bien",
+    )
+    order = models.PositiveIntegerField("Ordre", default=0)
+    image = models.ImageField("Photo", upload_to="properties/gallery/", validators=[validate_image_size])
+
+    class Meta:
+        ordering = ["property", "order", "id"]
+        verbose_name = "Photo de bien immobilier"
+        verbose_name_plural = "Photos de biens immobiliers"
+
+    def __str__(self):
+        return f"{self.property.title_fr} — #{self.order}"
+
+
 class Stat(models.Model):
     """A key figure shown in the "Chiffres clés" section (e.g. completed projects)."""
 
@@ -532,3 +550,73 @@ class QuoteRequest(models.Model):
 
     def __str__(self):
         return f"{self.full_name} — {self.department.title_fr if self.department else 'Devis général'}"
+
+
+class VisitLog(models.Model):
+    """One row per calendar day, incremented once per visitor per day.
+    Powers the visits-over-time chart in the admin dashboard."""
+
+    date = models.DateField("Date", unique=True)
+    count = models.PositiveIntegerField("Visites", default=0)
+
+    class Meta:
+        ordering = ["-date"]
+        verbose_name = "Journal de visites"
+        verbose_name_plural = "Journal de visites"
+
+    def __str__(self):
+        return f"{self.date} — {self.count}"
+
+
+class AdminProfile(models.Model):
+    """Extends Django's built-in User with a coarse role used to restrict
+    what a given admin account can see/do in the custom admin panel."""
+
+    ROLE_FULL = "full"
+    ROLE_RECEPTION = "reception"
+    ROLE_CHOICES = [
+        (ROLE_FULL, "Accès complet"),
+        (ROLE_RECEPTION, "Accueil (messages, candidatures, devis uniquement)"),
+    ]
+
+    user = models.OneToOneField(
+        "auth.User", related_name="admin_profile", on_delete=models.CASCADE,
+    )
+    role = models.CharField("Rôle", max_length=20, choices=ROLE_CHOICES, default=ROLE_FULL)
+
+    class Meta:
+        verbose_name = "Profil administrateur"
+        verbose_name_plural = "Profils administrateurs"
+
+    def __str__(self):
+        return f"{self.user.username} ({self.get_role_display()})"
+
+
+class AuditLogEntry(models.Model):
+    """A lightweight trace of who created/changed/deleted what, for
+    accountability once more than one admin account exists."""
+
+    ACTION_CREATE = "create"
+    ACTION_UPDATE = "update"
+    ACTION_DELETE = "delete"
+    ACTION_CHOICES = [
+        (ACTION_CREATE, "Création"),
+        (ACTION_UPDATE, "Modification"),
+        (ACTION_DELETE, "Suppression"),
+    ]
+
+    user = models.ForeignKey(
+        "auth.User", related_name="audit_entries", on_delete=models.SET_NULL, null=True,
+    )
+    action = models.CharField("Action", max_length=10, choices=ACTION_CHOICES)
+    resource = models.CharField("Ressource", max_length=100, help_text='Ex. "departments", "job-applications".')
+    object_repr = models.CharField("Élément concerné", max_length=255, blank=True)
+    created_at = models.DateTimeField("Horodatage", auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name = "Entrée du journal d'activité"
+        verbose_name_plural = "Journal d'activité"
+
+    def __str__(self):
+        return f"{self.user} — {self.get_action_display()} — {self.resource}"

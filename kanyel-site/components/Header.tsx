@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import Logo from "./Logo";
+import SearchButton from "./SearchButton";
 import { pick, type ApiDepartment, type ApiSiteSettings, type Locale } from "@/lib/api";
 
 function IconPhone() {
@@ -174,6 +175,8 @@ export default function Header({
           </nav>
 
           <div className="flex shrink-0 items-center gap-2 xl:gap-3">
+            <SearchButton />
+
             <div className="hidden items-center gap-1 rounded-full bg-navy-soft p-1 text-xs font-semibold sm:flex">
               <Link
                 href={pathname}

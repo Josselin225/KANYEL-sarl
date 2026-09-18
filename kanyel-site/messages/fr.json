@@ -26,12 +26,6 @@
     "subtitle": "Une entreprise ivoirienne multisectorielle basée à Yamoussoukro, active dans le lotissement, le bâtiment et travaux publics, l'import-export, le transport et la logistique, et l'achat-vente.",
     "ctaPrimary": "Découvrir nos activités",
     "ctaSecondary": "Demander un devis",
-    "stat1Label": "Départements d'activité",
-    "stat1Value": "06",
-    "stat2Label": "Basée à",
-    "stat2Value": "Yamoussoukro",
-    "stat3Label": "Rayonnement",
-    "stat3Value": "National & International",
     "imageCaption": "Yamoussoukro, Côte d'Ivoire",
     "imageAlt": "Équipe KANYEL SARL sur un chantier"
   },
@@ -45,14 +39,7 @@
     "ceoKicker": "Le mot du Directeur Général",
     "ceoMessage": "Depuis notre implantation à Yamoussoukro, nous avons fait le choix de la rigueur et de la proximité avec chacun de nos clients. Que ce soit dans le lotissement, le bâtiment, l'import-export, le transport ou le négoce, notre exigence reste la même : livrer un travail sérieux, dans le respect des délais et des engagements pris. Cette conviction guide chaque projet que nous menons, petit ou grand.",
     "credTitle": "Reconnaissances et engagements institutionnels",
-    "cred1Title": "Vice-Président — HPCO-CI",
-    "cred1Desc": "Haut Patronat des Commerçants et Opérateurs Économiques de Côte d'Ivoire — Délégué départemental pour la ville de Yamoussoukro.",
-    "cred2Title": "Gouverneur territorial — RIHDE",
-    "cred2Desc": "Réseau International Humanitaire pour le Développement Équitable — « Un monde juste et équitable ».",
-    "cred3Title": "Représentant exclusif — Certification ISO",
-    "cred3Desc": "Un engagement ferme pour la qualité et les normes internationales dans l'ensemble des activités du groupe.",
-    "imageCaption": "Yamoussoukro, Côte d'Ivoire",
-    "cred3TitleShort": "Certification ISO"
+    "imageCaption": "Yamoussoukro, Côte d'Ivoire"
   },
   "services": {
     "kicker": "Nos activités",
@@ -95,13 +82,7 @@
   "gallery": {
     "kicker": "Domaines d'activité",
     "title": "Nos domaines d'activité en images",
-    "subtitle": "Un aperçu visuel de nos domaines d'expertise — des photos de nos propres réalisations seront ajoutées prochainement.",
-    "item1": "Lotissements & terrains viabilisés",
-    "item2": "Chantiers de construction & travaux publics",
-    "item3": "Conteneurs import-export",
-    "item4": "Flotte transport & logistique",
-    "item5": "Biens immobiliers",
-    "item6": "Marchandises & négoce"
+    "subtitle": "Un aperçu visuel de nos domaines d'expertise."
   },
   "contact": {
     "kicker": "Contact",
@@ -206,7 +187,13 @@
     "bureau_commerce": "Bureaux & Commerces",
     "immeuble": "Immeubles",
     "priceOnRequest": "Sur demande",
-    "empty": "Aucun bien publié dans cette catégorie pour le moment."
+    "empty": "Aucun bien publié dans cette catégorie pour le moment.",
+    "filterAll": "Toutes catégories",
+    "filterLocation": "Rechercher par localisation…",
+    "filterMinPrice": "Prix min (FCFA)",
+    "filterMaxPrice": "Prix max (FCFA)",
+    "filterReset": "Réinitialiser",
+    "noResults": "Aucun bien ne correspond à ces critères."
   },
   "realisations": {
     "kicker": "Nos réalisations",
@@ -289,5 +276,20 @@
     "privacy4Title": "4. Vos droits",
     "privacy4Body": "Conformément à la loi n° 2013-450 relative à la protection des données à caractère personnel en Côte d'Ivoire, vous disposez d'un droit d'accès, de rectification et de suppression de vos données. Pour exercer ce droit, contactez-nous à kanyelsarl3@gmail.com.",
     "backHome": "Retour à l'accueil"
+  },
+  "share": {
+    "label": "Partager :",
+    "whatsapp": "Partager sur WhatsApp",
+    "facebook": "Partager sur Facebook"
+  },
+  "search": {
+    "placeholder": "Rechercher sur le site…",
+    "open": "Rechercher",
+    "noResults": "Aucun résultat pour cette recherche.",
+    "typeToSearch": "Tapez au moins 2 caractères pour lancer la recherche.",
+    "department": "Activité",
+    "property": "Bien immobilier",
+    "article": "Actualité",
+    "realisation": "Réalisation"
   }
 }

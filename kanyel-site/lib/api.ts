@@ -208,6 +208,22 @@ export interface ApiFAQ {
   is_published: boolean;
 }
 
+export interface ApiPropertyImage {
+  id: number;
+  property: number;
+  order: number;
+  image: string;
+}
+
+export type SearchResultType = "department" | "property" | "article" | "realisation";
+
+export interface ApiSearchResult {
+  type: SearchResultType;
+  title: string;
+  url: string;
+  excerpt: string;
+}
+
 async function safeFetchJson<T>(url: string, fallback: T): Promise<T> {
   try {
     const res = await fetch(url, { next: { revalidate: 60 } });
@@ -263,9 +279,8 @@ export async function getRealisations(): Promise<ApiRealisation[]> {
   return safeFetchJson<ApiRealisation[]>(`${API_URL}/api/realisations/`, []);
 }
 
-export async function getRealisationImages(realisationId: number): Promise<ApiRealisationImage[]> {
-  const all = await safeFetchJson<ApiRealisationImage[]>(`${API_URL}/api/realisation-images/`, []);
-  return all.filter((img) => img.realisation === realisationId);
+export async function getRealisationImages(): Promise<ApiRealisationImage[]> {
+  return safeFetchJson<ApiRealisationImage[]>(`${API_URL}/api/realisation-images/`, []);
 }
 
 export async function getArticles(): Promise<ApiArticle[]> {
@@ -276,6 +291,21 @@ export async function getFAQs(): Promise<ApiFAQ[]> {
   return safeFetchJson<ApiFAQ[]>(`${API_URL}/api/faqs/`, []);
 }
 
+export async function getPropertyImages(): Promise<ApiPropertyImage[]> {
+  return safeFetchJson<ApiPropertyImage[]>(`${API_URL}/api/property-images/`, []);
+}
+
+export async function searchSite(query: string): Promise<ApiSearchResult[]> {
+  if (query.trim().length < 2) return [];
+  try {
+    const res = await fetch(`${API_URL}/api/search/?q=${encodeURIComponent(query)}`);
+    if (!res.ok) return [];
+    return (await res.json()) as ApiSearchResult[];
+  } catch {
+    return [];
+  }
+}
+
 export interface SiteData {
   settings: ApiSiteSettings | null;
   departments: ApiDepartment[];
@@ -284,21 +314,46 @@ export interface SiteData {
   stats: ApiStat[];
   partners: ApiPartner[];
   properties: ApiProperty[];
+  propertyImages: ApiPropertyImage[];
   realisations: ApiRealisation[];
 }
 
 export async function getSiteData(): Promise<SiteData> {
-  const [settings, departments, credentials, gallery, stats, partners, properties, realisations] = await Promise.all([
-    getSettings(),
-    getDepartments(),
-    getCredentials(),
-    getGallery(),
-    getStats(),
-    getPartners(),
-    getProperties(),
-    getRealisations(),
-  ]);
-  return { settings, departments, credentials, gallery, stats, partners, properties, realisations };
+  const [settings, departments, credentials, gallery, stats, partners, properties, propertyImages, realisations] =
+    await Promise.all([
+      getSettings(),
+      getDepartments(),
+      getCredentials(),
+      getGallery(),
+      getStats(),
+      getPartners(),
+      getProperties(),
+      getPropertyImages(),
+      getRealisations(),
+    ]);
+  return { settings, departments, credentials, gallery, stats, partners, properties, propertyImages, realisations };
+}
+
+export function groupImagesByProperty(images: ApiPropertyImage[]): Record<number, ApiPropertyImage[]> {
+  const grouped: Record<number, ApiPropertyImage[]> = {};
+  for (const img of images) {
+    (grouped[img.property] ??= []).push(img);
+  }
+  for (const list of Object.values(grouped)) {
+    list.sort((a, b) => a.order - b.order);
+  }
+  return grouped;
+}
+
+export function groupImagesByRealisation(images: ApiRealisationImage[]): Record<number, ApiRealisationImage[]> {
+  const grouped: Record<number, ApiRealisationImage[]> = {};
+  for (const img of images) {
+    (grouped[img.realisation] ??= []).push(img);
+  }
+  for (const list of Object.values(grouped)) {
+    list.sort((a, b) => a.order - b.order);
+  }
+  return grouped;
 }
 
 export async function submitJobApplication(formData: FormData): Promise<void> {

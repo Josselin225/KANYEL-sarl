@@ -1,18 +1,26 @@
-import Image from "next/image";
 import { getTranslations } from "next-intl/server";
-import { Reveal, RevealGroup, RevealItem } from "./Reveal";
-import { pick, type ApiProperty, type Locale, type PropertyCategory } from "@/lib/api";
+import { Reveal } from "./Reveal";
+import PropertiesGridClient from "./PropertiesGridClient";
+import { groupImagesByProperty, type ApiProperty, type ApiPropertyImage, type Locale } from "@/lib/api";
 
-const CATEGORIES: PropertyCategory[] = ["villa", "appartement", "terrain", "bureau_commerce", "immeuble"];
+const T_KEYS = [
+  "villa", "appartement", "terrain", "bureau_commerce", "immeuble",
+  "priceOnRequest", "empty", "filterAll", "filterLocation", "filterMinPrice",
+  "filterMaxPrice", "filterReset", "noResults",
+];
 
 export default async function PropertiesGrid({
   properties,
+  propertyImages = [],
   locale,
 }: {
   properties: ApiProperty[];
+  propertyImages?: ApiPropertyImage[];
   locale: Locale;
 }) {
   const t = await getTranslations({ locale, namespace: "properties" });
+  const strings = Object.fromEntries(T_KEYS.map((key) => [key, t(key)]));
+  const imagesByProperty = groupImagesByProperty(propertyImages);
 
   return (
     <section className="bg-bg py-16 sm:py-20">
@@ -25,36 +33,13 @@ export default async function PropertiesGrid({
           <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-ink-dim">{t("subtitle")}</p>
         </Reveal>
 
-        <div className="mt-12 space-y-14">
-          {CATEGORIES.map((category) => {
-            const items = properties.filter((p) => p.category === category);
-            return (
-              <div key={category}>
-                <h3 className="font-display text-xl font-semibold text-navy">{t(category)}</h3>
-                {items.length === 0 ? (
-                  <p className="mt-3 text-sm text-ink-dim">{t("empty")}</p>
-                ) : (
-                  <RevealGroup className="mt-5 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                    {items.map((p) => (
-                      <RevealItem key={p.id} className="overflow-hidden rounded-3xl bg-white shadow-soft">
-                        <div className="relative aspect-[4/3]">
-                          <Image src={p.image} alt={pick(p, "title", locale)} fill sizes="(max-width: 1024px) 100vw, 33vw" className="object-cover" />
-                        </div>
-                        <div className="p-5">
-                          <h4 className="font-display text-base font-semibold text-navy">{pick(p, "title", locale)}</h4>
-                          {p.location && <p className="mt-1 text-xs text-ink-dim">{p.location}</p>}
-                          <p className="mt-2 text-sm leading-relaxed text-ink-dim">{pick(p, "description", locale)}</p>
-                          <p className="mt-3 font-display text-sm font-semibold text-gold-dark">
-                            {p.price || t("priceOnRequest")}
-                          </p>
-                        </div>
-                      </RevealItem>
-                    ))}
-                  </RevealGroup>
-                )}
-              </div>
-            );
-          })}
+        <div className="mt-12">
+          <PropertiesGridClient
+            properties={properties}
+            imagesByProperty={imagesByProperty}
+            locale={locale}
+            t={strings}
+          />
         </div>
       </div>
     </section>

@@ -1,7 +1,10 @@
+from django.contrib.auth.models import User
 from rest_framework import serializers
 
 from .models import (
+    AdminProfile,
     Article,
+    AuditLogEntry,
     ContactMessage,
     Credential,
     Department,
@@ -12,12 +15,14 @@ from .models import (
     JobOffer,
     Partner,
     Property,
+    PropertyImage,
     QuoteRequest,
     Realisation,
     RealisationImage,
     SiteSettings,
     Stat,
     Testimonial,
+    VisitLog,
 )
 
 
@@ -217,3 +222,63 @@ class QuoteRequestSerializer(serializers.ModelSerializer):
 
     def get_department_title(self, obj):
         return obj.department.title_fr if obj.department else None
+
+
+class PropertyImageSerializer(serializers.ModelSerializer):
+    property = serializers.PrimaryKeyRelatedField(queryset=Property.objects.all())
+
+    class Meta:
+        model = PropertyImage
+        fields = ["id", "property", "order", "image"]
+
+
+class VisitLogSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = VisitLog
+        fields = ["date", "count"]
+
+
+class AuditLogEntrySerializer(serializers.ModelSerializer):
+    username = serializers.SerializerMethodField()
+
+    class Meta:
+        model = AuditLogEntry
+        fields = ["id", "username", "action", "resource", "object_repr", "created_at"]
+
+    def get_username(self, obj):
+        return obj.user.username if obj.user else "—"
+
+
+class AdminUserSerializer(serializers.ModelSerializer):
+    """Used by the admin panel to list/manage additional admin accounts."""
+
+    role = serializers.ChoiceField(choices=AdminProfile.ROLE_CHOICES, source="admin_profile.role")
+    password = serializers.CharField(write_only=True, required=False, allow_blank=True)
+
+    class Meta:
+        model = User
+        fields = ["id", "username", "role", "is_active", "password"]
+
+    def create(self, validated_data):
+        profile_data = validated_data.pop("admin_profile")
+        password = validated_data.pop("password", None)
+        if not password:
+            raise serializers.ValidationError({"password": "Ce champ est obligatoire à la création."})
+        user = User.objects.create_user(
+            username=validated_data["username"],
+            password=password,
+            is_active=validated_data.get("is_active", True),
+        )
+        AdminProfile.objects.create(user=user, role=profile_data["role"])
+        return user
+
+    def update(self, instance, validated_data):
+        profile_data = validated_data.pop("admin_profile", None)
+        password = validated_data.pop("password", None)
+        if password:
+            instance.set_password(password)
+        instance.is_active = validated_data.get("is_active", instance.is_active)
+        instance.save()
+        if profile_data:
+            AdminProfile.objects.update_or_create(user=instance, defaults={"role": profile_data["role"]})
+        return instance

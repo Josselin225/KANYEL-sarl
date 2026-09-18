@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useLocale } from "next-intl";
-import { adminApi } from "@/lib/adminApi";
+import { adminApi, getRole } from "@/lib/adminApi";
 
 interface Counts {
   departments: number;
@@ -18,23 +18,71 @@ interface Counts {
   visitCount: number;
 }
 
-const CARDS: { key: keyof Counts; label: string; href: string }[] = [
-  { key: "departments", label: "Activités", href: "/admin/departments" },
-  { key: "properties", label: "Biens immobiliers", href: "/admin/properties" },
-  { key: "testimonials", label: "Témoignages", href: "/admin/testimonials" },
-  { key: "credentials", label: "Reconnaissances", href: "/admin/credentials" },
-  { key: "partners", label: "Partenaires", href: "/admin/partners" },
-  { key: "gallery", label: "Photos galerie", href: "/admin/gallery" },
-  { key: "stats", label: "Statistiques clés", href: "/admin/stats" },
-  { key: "jobs", label: "Offres d'emploi", href: "/admin/jobs" },
+const CARDS: { key: keyof Counts; label: string; href: string; roles?: ("full" | "reception")[] }[] = [
+  { key: "departments", label: "Activités", href: "/admin/departments", roles: ["full"] },
+  { key: "properties", label: "Biens immobiliers", href: "/admin/properties", roles: ["full"] },
+  { key: "testimonials", label: "Témoignages", href: "/admin/testimonials", roles: ["full"] },
+  { key: "credentials", label: "Reconnaissances", href: "/admin/credentials", roles: ["full"] },
+  { key: "partners", label: "Partenaires", href: "/admin/partners", roles: ["full"] },
+  { key: "gallery", label: "Photos galerie", href: "/admin/gallery", roles: ["full"] },
+  { key: "stats", label: "Statistiques clés", href: "/admin/stats", roles: ["full"] },
+  { key: "jobs", label: "Offres d'emploi", href: "/admin/jobs", roles: ["full"] },
   { key: "unreadApplications", label: "Candidatures non lues", href: "/admin/job-applications" },
   { key: "unreadMessages", label: "Messages non lus", href: "/admin/messages" },
-  { key: "visitCount", label: "Visiteurs du site", href: "/admin/settings" },
+  { key: "visitCount", label: "Visiteurs du site", href: "/admin/settings", roles: ["full"] },
 ];
+
+interface VisitPoint {
+  date: string;
+  count: number;
+}
+
+function VisitChart({ data }: { data: VisitPoint[] }) {
+  if (data.length === 0) {
+    return <p className="mt-4 text-sm text-ink-dim">Pas encore de données de visite.</p>;
+  }
+  const max = Math.max(...data.map((d) => d.count), 1);
+  const width = 640;
+  const height = 160;
+  const barGap = 3;
+  const barWidth = data.length > 0 ? width / data.length - barGap : 0;
+
+  return (
+    <svg viewBox={`0 0 ${width} ${height + 24}`} className="mt-4 w-full" role="img" aria-label="Visites des 30 derniers jours">
+      {data.map((d, i) => {
+        const barHeight = (d.count / max) * height;
+        const x = i * (barWidth + barGap);
+        const label = new Date(d.date).toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit" });
+        return (
+          <g key={d.date}>
+            <rect
+              x={x}
+              y={height - barHeight}
+              width={Math.max(barWidth, 1)}
+              height={barHeight}
+              rx={2}
+              className="fill-gold-dark/80"
+            >
+              <title>{`${label} : ${d.count} visite${d.count > 1 ? "s" : ""}`}</title>
+            </rect>
+            {(i === 0 || i === data.length - 1) && (
+              <text x={x} y={height + 16} fontSize="9" className="fill-ink-dim">
+                {label}
+              </text>
+            )}
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
 
 export default function AdminDashboardPage() {
   const locale = useLocale();
+  const role = getRole();
   const [counts, setCounts] = useState<Counts | null>(null);
+  const [visits, setVisits] = useState<VisitPoint[] | null>(null);
+  const cards = CARDS.filter((c) => !c.roles || c.roles.includes(role));
 
   useEffect(() => {
     (async () => {
@@ -65,6 +113,8 @@ export default function AdminDashboardPage() {
         unreadMessages: messages.filter((m) => !m.is_read).length,
         visitCount: settings.visit_count,
       });
+      const stats30 = await adminApi.list<VisitPoint>("visit-stats").catch(() => []);
+      setVisits(stats30);
     })();
   }, []);
 
@@ -74,7 +124,7 @@ export default function AdminDashboardPage() {
       <p className="mt-1 text-sm text-ink-dim">Vue d&apos;ensemble du contenu du site KANYEL SARL.</p>
 
       <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3">
-        {CARDS.map((card) => (
+        {cards.map((card) => (
           <a
             key={card.key}
             href={`/${locale}${card.href}`}
@@ -86,6 +136,15 @@ export default function AdminDashboardPage() {
             <p className="mt-1 text-sm text-ink-dim">{card.label}</p>
           </a>
         ))}
+      </div>
+
+      <div className="mt-8 rounded-3xl bg-white p-6 shadow-soft">
+        <h3 className="font-display text-base font-semibold text-navy">Visites des 30 derniers jours</h3>
+        {visits === null ? (
+          <p className="mt-4 text-sm text-ink-dim">Chargement…</p>
+        ) : (
+          <VisitChart data={visits} />
+        )}
       </div>
     </div>
   );
