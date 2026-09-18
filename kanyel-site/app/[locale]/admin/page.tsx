@@ -39,7 +39,7 @@ interface VisitPoint {
 
 function VisitChart({ data }: { data: VisitPoint[] }) {
   if (data.length === 0) {
-    return <p className="mt-4 text-sm text-ink-dim">Pas encore de données de visite.</p>;
+    return <p className="mt-4 text-sm text-admin-text-dim">Pas encore de données de visite.</p>;
   }
   const max = Math.max(...data.map((d) => d.count), 1);
   const width = 640;
@@ -66,7 +66,7 @@ function VisitChart({ data }: { data: VisitPoint[] }) {
               <title>{`${label} : ${d.count} visite${d.count > 1 ? "s" : ""}`}</title>
             </rect>
             {(i === 0 || i === data.length - 1) && (
-              <text x={x} y={height + 16} fontSize="9" className="fill-ink-dim">
+              <text x={x} y={height + 16} fontSize="9" className="fill-admin-text-dim">
                 {label}
               </text>
             )}
@@ -120,28 +120,28 @@ export default function AdminDashboardPage() {
 
   return (
     <div>
-      <h2 className="font-display text-xl font-semibold text-navy">Tableau de bord</h2>
-      <p className="mt-1 text-sm text-ink-dim">Vue d&apos;ensemble du contenu du site KANYEL SARL.</p>
+      <h2 className="font-display text-xl font-semibold text-admin-text">Tableau de bord</h2>
+      <p className="mt-1 text-sm text-admin-text-dim">Vue d&apos;ensemble du contenu du site KANYEL SARL.</p>
 
       <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3">
         {cards.map((card) => (
           <a
             key={card.key}
             href={`/${locale}${card.href}`}
-            className="rounded-3xl bg-white p-5 shadow-soft transition-transform hover:-translate-y-0.5"
+            className="rounded-3xl bg-admin-surface p-5 shadow-soft transition-transform hover:-translate-y-0.5"
           >
-            <p className="font-display text-3xl font-semibold text-navy">
+            <p className="font-display text-3xl font-semibold text-admin-text">
               {counts ? counts[card.key] : "…"}
             </p>
-            <p className="mt-1 text-sm text-ink-dim">{card.label}</p>
+            <p className="mt-1 text-sm text-admin-text-dim">{card.label}</p>
           </a>
         ))}
       </div>
 
-      <div className="mt-8 rounded-3xl bg-white p-6 shadow-soft">
-        <h3 className="font-display text-base font-semibold text-navy">Visites des 30 derniers jours</h3>
+      <div className="mt-8 rounded-3xl bg-admin-surface p-6 shadow-soft">
+        <h3 className="font-display text-base font-semibold text-admin-text">Visites des 30 derniers jours</h3>
         {visits === null ? (
-          <p className="mt-4 text-sm text-ink-dim">Chargement…</p>
+          <p className="mt-4 text-sm text-admin-text-dim">Chargement…</p>
         ) : (
           <VisitChart data={visits} />
         )}

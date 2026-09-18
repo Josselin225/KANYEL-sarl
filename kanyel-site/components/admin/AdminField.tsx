@@ -40,11 +40,11 @@ export default function AdminField({
   }, [field.type, field.relatedResource]);
 
   const baseInputClass =
-    "w-full rounded-xl border border-border bg-bg px-3.5 py-2.5 text-sm text-ink outline-none transition-colors focus:border-navy";
+    "w-full rounded-xl border border-admin-border bg-admin-bg px-3.5 py-2.5 text-sm text-admin-text outline-none transition-colors focus:border-admin-accent";
 
   return (
     <div>
-      <label className="mb-1.5 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-ink-dim">
+      <label className="mb-1.5 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-admin-text-dim">
         {field.label}
         {field.required && <span className="text-gold-dark">*</span>}
       </label>
@@ -123,14 +123,14 @@ export default function AdminField({
       )}
 
       {field.type === "boolean" && (
-        <label className="flex items-center gap-2.5 rounded-xl border border-border bg-bg px-3.5 py-2.5">
+        <label className="flex items-center gap-2.5 rounded-xl border border-admin-border bg-admin-bg px-3.5 py-2.5">
           <input
             type="checkbox"
             checked={Boolean(value)}
             onChange={(e) => onChange(e.target.checked)}
-            className="h-4 w-4 accent-navy"
+            className="h-4 w-4 accent-admin-accent"
           />
-          <span className="text-sm text-ink-dim">Activé</span>
+          <span className="text-sm text-admin-text-dim">Activé</span>
         </label>
       )}
 
@@ -141,7 +141,7 @@ export default function AdminField({
             <img
               src={preview || currentImageUrl || ""}
               alt=""
-              className="h-24 w-24 rounded-xl border border-border object-cover"
+              className="h-24 w-24 rounded-xl border border-admin-border object-cover"
             />
           )}
           <input
@@ -152,12 +152,12 @@ export default function AdminField({
               onChange(file);
               if (file) setPreview(URL.createObjectURL(file));
             }}
-            className="block w-full text-sm text-ink-dim file:mr-3 file:rounded-full file:border-0 file:bg-navy-soft file:px-4 file:py-2 file:text-xs file:font-semibold file:text-navy hover:file:bg-navy/10"
+            className="block w-full text-sm text-admin-text-dim file:mr-3 file:rounded-full file:border-0 file:bg-admin-surface-hover file:px-4 file:py-2 file:text-xs file:font-semibold file:text-admin-text hover:file:bg-admin-accent/10"
           />
         </div>
       )}
 
-      {field.help && <p className="mt-1.5 text-xs text-ink-dim">{field.help}</p>}
+      {field.help && <p className="mt-1.5 text-xs text-admin-text-dim">{field.help}</p>}
     </div>
   );
 }

@@ -40,12 +40,12 @@ export default function ChangePasswordModal({ onClose }: { onClose: () => void }
       onClick={onClose}
     >
       <div
-        className="w-full max-w-sm rounded-3xl bg-white p-6 shadow-soft-lg"
+        className="w-full max-w-sm rounded-3xl bg-admin-surface p-6 shadow-soft-lg"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between">
-          <h3 className="font-display text-lg font-semibold text-navy">Changer le mot de passe</h3>
-          <button onClick={onClose} aria-label="Fermer" className="text-ink-dim hover:text-navy">
+          <h3 className="font-display text-lg font-semibold text-admin-text">Changer le mot de passe</h3>
+          <button onClick={onClose} aria-label="Fermer" className="text-admin-text-dim hover:text-admin-text">
             <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5">
               <path d="m6 6 12 12M18 6 6 18" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
             </svg>
@@ -54,10 +54,10 @@ export default function ChangePasswordModal({ onClose }: { onClose: () => void }
 
         {done ? (
           <div className="mt-5">
-            <p className="text-sm text-ink-dim">Votre mot de passe a bien été mis à jour.</p>
+            <p className="text-sm text-admin-text-dim">Votre mot de passe a bien été mis à jour.</p>
             <button
               onClick={onClose}
-              className="mt-5 w-full rounded-full bg-navy px-6 py-2.5 text-sm font-semibold text-white shadow-soft transition-transform hover:-translate-y-0.5"
+              className="mt-5 w-full rounded-full bg-admin-accent px-6 py-2.5 text-sm font-semibold text-admin-accent-text shadow-soft transition-transform hover:-translate-y-0.5"
             >
               Fermer
             </button>
@@ -65,47 +65,47 @@ export default function ChangePasswordModal({ onClose }: { onClose: () => void }
         ) : (
           <form onSubmit={handleSubmit} className="mt-5 space-y-4">
             <div>
-              <label className="mb-1.5 block text-xs font-semibold text-ink-dim">Mot de passe actuel</label>
+              <label className="mb-1.5 block text-xs font-semibold text-admin-text-dim">Mot de passe actuel</label>
               <input
                 type="password"
                 required
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
-                className="w-full rounded-xl border border-border px-3.5 py-2.5 text-sm outline-none focus:border-navy"
+                className="w-full rounded-xl border border-admin-border bg-admin-bg px-3.5 py-2.5 text-sm text-admin-text outline-none focus:border-admin-accent"
               />
             </div>
             <div>
-              <label className="mb-1.5 block text-xs font-semibold text-ink-dim">Nouveau mot de passe</label>
+              <label className="mb-1.5 block text-xs font-semibold text-admin-text-dim">Nouveau mot de passe</label>
               <input
                 type="password"
                 required
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                className="w-full rounded-xl border border-border px-3.5 py-2.5 text-sm outline-none focus:border-navy"
+                className="w-full rounded-xl border border-admin-border bg-admin-bg px-3.5 py-2.5 text-sm text-admin-text outline-none focus:border-admin-accent"
               />
             </div>
             <div>
-              <label className="mb-1.5 block text-xs font-semibold text-ink-dim">Confirmer le nouveau mot de passe</label>
+              <label className="mb-1.5 block text-xs font-semibold text-admin-text-dim">Confirmer le nouveau mot de passe</label>
               <input
                 type="password"
                 required
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full rounded-xl border border-border px-3.5 py-2.5 text-sm outline-none focus:border-navy"
+                className="w-full rounded-xl border border-admin-border bg-admin-bg px-3.5 py-2.5 text-sm text-admin-text outline-none focus:border-admin-accent"
               />
             </div>
 
-            {error && <p className="text-sm text-red-600">{error}</p>}
+            {error && <p className="text-sm text-red-600 admin-dark:text-red-400">{error}</p>}
 
             <div className="flex items-center gap-3 pt-1">
               <button
                 type="submit"
                 disabled={saving}
-                className="rounded-full bg-navy px-6 py-2.5 text-sm font-semibold text-white shadow-soft transition-transform hover:-translate-y-0.5 disabled:opacity-60"
+                className="rounded-full bg-admin-accent px-6 py-2.5 text-sm font-semibold text-admin-accent-text shadow-soft transition-transform hover:-translate-y-0.5 disabled:opacity-60"
               >
                 {saving ? "Enregistrement…" : "Mettre à jour"}
               </button>
-              <button type="button" onClick={onClose} className="text-sm font-semibold text-ink-dim hover:text-navy">
+              <button type="button" onClick={onClose} className="text-sm font-semibold text-admin-text-dim hover:text-admin-text">
                 Annuler
               </button>
             </div>

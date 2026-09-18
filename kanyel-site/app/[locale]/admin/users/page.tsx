@@ -100,17 +100,17 @@ export default function AdminUsersPage() {
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
       <div className="lg:col-span-2">
         <div className="flex items-center justify-between">
-          <h2 className="font-display text-xl font-semibold text-navy">Comptes admin</h2>
+          <h2 className="font-display text-xl font-semibold text-admin-text">Comptes admin</h2>
           <button
             onClick={startCreate}
-            className="rounded-full bg-navy px-4 py-2 text-xs font-semibold text-white shadow-soft transition-transform hover:-translate-y-0.5"
+            className="rounded-full bg-admin-accent px-4 py-2 text-xs font-semibold text-admin-accent-text shadow-soft transition-transform hover:-translate-y-0.5"
           >
             + Ajouter
           </button>
         </div>
 
-        {loading && <p className="mt-4 text-sm text-ink-dim">Chargement…</p>}
-        {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
+        {loading && <p className="mt-4 text-sm text-admin-text-dim">Chargement…</p>}
+        {error && <p className="mt-4 text-sm text-red-600 admin-dark:text-red-400">{error}</p>}
 
         <ul className="mt-4 space-y-2">
           {items.map((item) => (
@@ -118,41 +118,43 @@ export default function AdminUsersPage() {
               <button
                 onClick={() => startEdit(item)}
                 className={`flex w-full items-center justify-between gap-3 rounded-2xl border p-3 text-left transition-colors ${
-                  editing?.id === item.id ? "border-navy bg-navy-soft" : "border-border bg-white hover:border-navy/40"
+                  editing?.id === item.id
+                    ? "border-admin-accent bg-admin-surface-hover"
+                    : "border-admin-border bg-admin-surface hover:border-admin-accent/40"
                 }`}
               >
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-semibold text-navy">
+                  <p className="truncate text-sm font-semibold text-admin-text">
                     {item.username}
-                    {item.username === myUsername && <span className="ml-1.5 text-xs text-ink-dim">(vous)</span>}
+                    {item.username === myUsername && <span className="ml-1.5 text-xs text-admin-text-dim">(vous)</span>}
                   </p>
-                  <p className="truncate text-xs text-ink-dim">
+                  <p className="truncate text-xs text-admin-text-dim">
                     {item.role === "reception" ? "Accueil (messages, candidatures, devis)" : "Accès complet"}
                   </p>
                 </div>
                 {!item.is_active && (
-                  <span className="shrink-0 rounded-full bg-ink-dim/10 px-2 py-0.5 text-[10px] font-semibold uppercase text-ink-dim">
+                  <span className="shrink-0 rounded-full bg-admin-text-dim/10 px-2 py-0.5 text-[10px] font-semibold uppercase text-admin-text-dim">
                     Désactivé
                   </span>
                 )}
               </button>
             </li>
           ))}
-          {!loading && items.length === 0 && <p className="text-sm text-ink-dim">Aucun compte pour le moment.</p>}
+          {!loading && items.length === 0 && <p className="text-sm text-admin-text-dim">Aucun compte pour le moment.</p>}
         </ul>
       </div>
 
       <div className="lg:col-span-3">
         {editing ? (
-          <div className="rounded-3xl bg-white p-6 shadow-soft">
+          <div className="rounded-3xl bg-admin-surface p-6 shadow-soft">
             <div className="flex items-center justify-between">
-              <h3 className="font-display text-lg font-semibold text-navy">
+              <h3 className="font-display text-lg font-semibold text-admin-text">
                 {isNew ? "Nouveau compte" : "Modifier le compte"}
               </h3>
               {!isNew && editing.username !== myUsername && (
                 <button
                   onClick={() => handleDelete(editing)}
-                  className="text-xs font-semibold text-red-600 hover:underline"
+                  className="text-xs font-semibold text-red-600 hover:underline admin-dark:text-red-400"
                 >
                   Supprimer
                 </button>
@@ -161,29 +163,29 @@ export default function AdminUsersPage() {
 
             <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
-                <label className="mb-1.5 block text-xs font-semibold text-ink-dim">
+                <label className="mb-1.5 block text-xs font-semibold text-admin-text-dim">
                   Identifiant <span className="text-gold-dark">*</span>
                 </label>
                 <input
                   type="text"
                   value={form.username}
                   onChange={(e) => setForm((prev) => ({ ...prev, username: e.target.value }))}
-                  className="w-full rounded-xl border border-border px-3.5 py-2.5 text-sm outline-none focus:border-navy"
+                  className="w-full rounded-xl border border-admin-border bg-admin-bg px-3.5 py-2.5 text-sm text-admin-text outline-none focus:border-admin-accent"
                 />
               </div>
               <div>
-                <label className="mb-1.5 block text-xs font-semibold text-ink-dim">Rôle</label>
+                <label className="mb-1.5 block text-xs font-semibold text-admin-text-dim">Rôle</label>
                 <select
                   value={form.role}
                   onChange={(e) => setForm((prev) => ({ ...prev, role: e.target.value as "full" | "reception" }))}
-                  className="w-full rounded-xl border border-border px-3.5 py-2.5 text-sm outline-none focus:border-navy"
+                  className="w-full rounded-xl border border-admin-border bg-admin-bg px-3.5 py-2.5 text-sm text-admin-text outline-none focus:border-admin-accent"
                 >
                   <option value="full">Accès complet</option>
                   <option value="reception">Accueil (messages, candidatures, devis uniquement)</option>
                 </select>
               </div>
               <div>
-                <label className="mb-1.5 block text-xs font-semibold text-ink-dim">
+                <label className="mb-1.5 block text-xs font-semibold text-admin-text-dim">
                   {isNew ? "Mot de passe" : "Nouveau mot de passe"}{" "}
                   {isNew && <span className="text-gold-dark">*</span>}
                 </label>
@@ -192,37 +194,37 @@ export default function AdminUsersPage() {
                   value={form.password}
                   onChange={(e) => setForm((prev) => ({ ...prev, password: e.target.value }))}
                   placeholder={isNew ? "" : "Laisser vide pour ne pas changer"}
-                  className="w-full rounded-xl border border-border px-3.5 py-2.5 text-sm outline-none focus:border-navy"
+                  className="w-full rounded-xl border border-admin-border bg-admin-bg px-3.5 py-2.5 text-sm text-admin-text outline-none focus:border-admin-accent"
                 />
               </div>
-              <label className="flex items-center gap-2.5 pt-6 text-sm text-ink-dim">
+              <label className="flex items-center gap-2.5 pt-6 text-sm text-admin-text-dim">
                 <input
                   type="checkbox"
                   checked={form.is_active}
                   onChange={(e) => setForm((prev) => ({ ...prev, is_active: e.target.checked }))}
-                  className="h-4 w-4 rounded border-border"
+                  className="h-4 w-4 rounded border-admin-border accent-admin-accent"
                 />
                 Compte actif
               </label>
             </div>
 
-            {saveError && <p className="mt-4 text-sm text-red-600">{saveError}</p>}
+            {saveError && <p className="mt-4 text-sm text-red-600 admin-dark:text-red-400">{saveError}</p>}
 
             <div className="mt-6 flex items-center gap-3">
               <button
                 onClick={handleSave}
                 disabled={saving}
-                className="rounded-full bg-navy px-6 py-2.5 text-sm font-semibold text-white shadow-soft transition-transform hover:-translate-y-0.5 disabled:opacity-60"
+                className="rounded-full bg-admin-accent px-6 py-2.5 text-sm font-semibold text-admin-accent-text shadow-soft transition-transform hover:-translate-y-0.5 disabled:opacity-60"
               >
                 {saving ? "Enregistrement…" : "Enregistrer"}
               </button>
-              <button onClick={cancelEdit} className="text-sm font-semibold text-ink-dim hover:text-navy">
+              <button onClick={cancelEdit} className="text-sm font-semibold text-admin-text-dim hover:text-admin-text">
                 Annuler
               </button>
             </div>
           </div>
         ) : (
-          <div className="flex h-full min-h-[240px] items-center justify-center rounded-3xl border border-dashed border-border text-sm text-ink-dim">
+          <div className="flex h-full min-h-[240px] items-center justify-center rounded-3xl border border-dashed border-admin-border text-sm text-admin-text-dim">
             Sélectionnez un compte à modifier, ou ajoutez-en un nouveau.
           </div>
         )}
