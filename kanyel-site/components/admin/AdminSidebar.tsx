@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useLocale } from "next-intl";
 import { usePathname } from "@/i18n/navigation";
-import { clearToken, getRole, getUsername } from "@/lib/adminApi";
+import { getRole } from "@/lib/adminApi";
 import { ADMIN_DASHBOARD_ITEM, visibleNavGroups, type AdminNavItem } from "@/lib/adminNav";
 import Logo from "../Logo";
 
@@ -72,7 +72,6 @@ function isItemActive(pathname: string, item: AdminNavItem) {
 export default function AdminSidebar() {
   const pathname = usePathname();
   const locale = useLocale();
-  const username = getUsername();
   const groups = visibleNavGroups(getRole());
   const [openGroups, setOpenGroups] = useState<Set<string>>(() => {
     const active = groups.find((g) => g.items.some((item) => isItemActive(pathname, item)));
@@ -120,21 +119,16 @@ export default function AdminSidebar() {
     setOpenGroups((prev) => new Set(prev).add(key));
   }
 
-  function handleLogout() {
-    clearToken();
-    window.location.href = `/${locale}/admin/login`;
-  }
-
   const dashboardActive = isItemActive(pathname, ADMIN_DASHBOARD_ITEM);
 
   return (
     <aside
-      className={`flex h-full shrink-0 flex-col border-r border-border bg-white transition-[width] duration-200 ${
+      className={`flex h-full shrink-0 flex-col border-r border-admin-border bg-admin-surface transition-[width] duration-200 ${
         collapsed ? "w-[4.5rem]" : "w-64"
       }`}
     >
       <div
-        className={`flex shrink-0 items-center border-b border-border py-5 ${
+        className={`flex shrink-0 items-center border-b border-admin-border py-5 ${
           collapsed ? "justify-center px-2" : "justify-between px-5"
         }`}
       >
@@ -150,7 +144,7 @@ export default function AdminSidebar() {
             type="button"
             onClick={toggleCollapsed}
             aria-label="Réduire le menu"
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-ink-dim transition-colors hover:bg-navy-soft hover:text-navy"
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-admin-text-dim transition-colors hover:bg-admin-surface-hover hover:text-admin-text"
           >
             <IconPanelToggle collapsed={false} />
           </button>
@@ -162,7 +156,7 @@ export default function AdminSidebar() {
           type="button"
           onClick={toggleCollapsed}
           aria-label="Agrandir le menu"
-          className="mx-auto mt-3 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-ink-dim transition-colors hover:bg-navy-soft hover:text-navy"
+          className="mx-auto mt-3 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-admin-text-dim transition-colors hover:bg-admin-surface-hover hover:text-admin-text"
         >
           <IconPanelToggle collapsed={true} />
         </button>
@@ -174,7 +168,7 @@ export default function AdminSidebar() {
           title={collapsed ? ADMIN_DASHBOARD_ITEM.label : undefined}
           className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
             collapsed ? "justify-center" : ""
-          } ${dashboardActive ? "bg-navy text-white" : "text-ink-dim hover:bg-navy-soft hover:text-navy"}`}
+          } ${dashboardActive ? "bg-admin-accent text-admin-accent-text" : "text-admin-text-dim hover:bg-admin-surface-hover hover:text-admin-text"}`}
         >
           <NavIcon name={ADMIN_DASHBOARD_ITEM.icon} />
           {!collapsed && ADMIN_DASHBOARD_ITEM.label}
@@ -194,7 +188,7 @@ export default function AdminSidebar() {
                 title={collapsed ? group.label : undefined}
                 className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-colors ${
                   collapsed ? "justify-center" : ""
-                } ${groupActive && !open ? "text-navy" : "text-ink-dim"} hover:bg-navy-soft hover:text-navy`}
+                } ${groupActive && !open ? "text-admin-text" : "text-admin-text-dim"} hover:bg-admin-surface-hover hover:text-admin-text`}
               >
                 <NavIcon name={group.icon} />
                 {!collapsed && (
@@ -206,7 +200,7 @@ export default function AdminSidebar() {
               </button>
 
               {open && (
-                <div className="ml-4 mt-1 space-y-1 border-l border-border pl-3">
+                <div className="ml-4 mt-1 space-y-1 border-l border-admin-border pl-3">
                   {group.items.map((item) => {
                     const active = isItemActive(pathname, item);
                     return (
@@ -214,7 +208,7 @@ export default function AdminSidebar() {
                         key={item.href}
                         href={`/${locale}${item.href}`}
                         className={`flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm font-medium transition-colors ${
-                          active ? "bg-navy text-white" : "text-ink-dim hover:bg-navy-soft hover:text-navy"
+                          active ? "bg-admin-accent text-admin-accent-text" : "text-admin-text-dim hover:bg-admin-surface-hover hover:text-admin-text"
                         }`}
                       >
                         <NavIcon name={item.icon} />
@@ -228,33 +222,6 @@ export default function AdminSidebar() {
           );
         })}
       </nav>
-
-      <div className={`shrink-0 border-t border-border ${collapsed ? "p-2" : "p-4"}`}>
-        {!collapsed && username && (
-          <p className="mb-2 truncate text-xs text-ink-dim">Connecté : {username}</p>
-        )}
-        <button
-          onClick={handleLogout}
-          title={collapsed ? "Se déconnecter" : undefined}
-          className={`flex w-full items-center justify-center gap-2 rounded-xl bg-navy-soft px-3 py-2.5 text-sm font-semibold text-navy transition-colors hover:bg-navy hover:text-white`}
-        >
-          {collapsed ? (
-            <svg viewBox="0 0 24 24" fill="none" className="h-4.5 w-4.5">
-              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          ) : (
-            "Se déconnecter"
-          )}
-        </button>
-        {!collapsed && (
-          <a
-            href={`/${locale}`}
-            className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl px-3 py-2 text-xs text-ink-dim hover:text-navy"
-          >
-            ← Retour au site
-          </a>
-        )}
-      </div>
     </aside>
   );
 }

@@ -58,20 +58,20 @@ export default function AdminSettingsPage() {
     }
   }
 
-  if (loading) return <p className="text-sm text-ink-dim">Chargement…</p>;
-  if (!settings) return <p className="text-sm text-red-600">{error || "Paramètres introuvables."}</p>;
+  if (loading) return <p className="text-sm text-admin-text-dim">Chargement…</p>;
+  if (!settings) return <p className="text-sm text-red-600 admin-dark:text-red-400">{error || "Paramètres introuvables."}</p>;
 
   return (
     <div className="mx-auto max-w-4xl">
-      <h2 className="font-display text-xl font-semibold text-navy">Paramètres du site</h2>
-      <p className="mt-1 text-sm text-ink-dim">
+      <h2 className="font-display text-xl font-semibold text-admin-text">Paramètres du site</h2>
+      <p className="mt-1 text-sm text-admin-text-dim">
         Ces informations alimentent l&apos;ensemble du site (accueil, pied de page, contact, WhatsApp, réseaux sociaux).
       </p>
 
       <div className="mt-6 space-y-8">
         {SETTINGS_FIELDS.map((group) => (
-          <div key={group.title} className="rounded-3xl bg-white p-6 shadow-soft">
-            <h3 className="font-display text-base font-semibold text-navy">{group.title}</h3>
+          <div key={group.title} className="rounded-3xl bg-admin-surface p-6 shadow-soft">
+            <h3 className="font-display text-base font-semibold text-admin-text">{group.title}</h3>
             <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
               {group.fields.map((f) => (
                 <div key={f.name} className={f.type === "textarea" || f.type === "image" ? "sm:col-span-2" : ""}>
@@ -88,14 +88,14 @@ export default function AdminSettingsPage() {
         ))}
       </div>
 
-      {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
+      {error && <p className="mt-4 text-sm text-red-600 admin-dark:text-red-400">{error}</p>}
       {success && <p className="mt-4 text-sm font-semibold text-gold-dark">✓ Paramètres enregistrés.</p>}
 
       <div className="sticky bottom-6 mt-6 flex justify-end">
         <button
           onClick={handleSave}
           disabled={saving}
-          className="rounded-full bg-navy px-7 py-3 text-sm font-semibold text-white shadow-soft-lg transition-transform hover:-translate-y-0.5 disabled:opacity-60"
+          className="rounded-full bg-admin-accent px-7 py-3 text-sm font-semibold text-admin-accent-text shadow-soft-lg transition-transform hover:-translate-y-0.5 disabled:opacity-60"
         >
           {saving ? "Enregistrement…" : "Enregistrer les modifications"}
         </button>

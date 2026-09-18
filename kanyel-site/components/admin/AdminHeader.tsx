@@ -5,6 +5,7 @@ import { useLocale } from "next-intl";
 import { usePathname } from "@/i18n/navigation";
 import { ADMIN_NAV_ITEMS } from "@/lib/adminNav";
 import { clearToken, getRole, getUsername } from "@/lib/adminApi";
+import { useAdminTheme } from "./AdminThemeContext";
 import ChangePasswordModal from "./ChangePasswordModal";
 
 function IconChevronDown() {
@@ -50,10 +51,31 @@ function IconLogout() {
     </svg>
   );
 }
+function IconSun() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className="h-4.5 w-4.5">
+      <circle cx="12" cy="12" r="4" stroke="currentColor" strokeWidth="1.6" />
+      <path
+        d="M12 2.5v2M12 19.5v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M2.5 12h2M19.5 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+function IconMoon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className="h-4.5 w-4.5">
+      <path d="M20 14.5a8.5 8.5 0 1 1-9.5-11 7 7 0 0 0 9.5 11Z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
+    </svg>
+  );
+}
 
 export default function AdminHeader() {
   const pathname = usePathname();
   const locale = useLocale();
+  const { dark, toggle } = useAdminTheme();
   const [open, setOpen] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -81,17 +103,24 @@ export default function AdminHeader() {
 
   return (
     <>
-      <header className="sticky top-0 z-10 flex shrink-0 items-center justify-between border-b border-border bg-white/95 px-8 py-4 backdrop-blur">
-        <h1 className="font-display text-lg font-semibold text-navy">{current}</h1>
+      <header className="sticky top-0 z-10 flex shrink-0 items-center justify-between border-b border-admin-border bg-admin-surface/95 px-8 py-4 backdrop-blur">
+        <h1 className="font-display text-lg font-semibold text-admin-text">{current}</h1>
 
         <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={toggle}
+            aria-label={dark ? "Passer en mode clair" : "Passer en mode sombre"}
+            className="flex h-9 w-9 items-center justify-center rounded-full text-admin-text-dim transition-colors hover:bg-admin-surface-hover hover:text-admin-text"
+          >
+            {dark ? <IconSun /> : <IconMoon />}
+          </button>
+
           <a
             href={`/${locale}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="rounded-full bg-navy-soft px-4 py-2 text-xs font-semibold text-navy transition-colors hover:bg-navy hover:text-white"
+            className="rounded-full bg-admin-surface-hover px-4 py-2 text-xs font-semibold text-admin-text transition-colors hover:bg-admin-accent hover:text-admin-accent-text"
           >
-            Voir le site ↗
+            Voir le site
           </a>
 
           <div className="relative" ref={menuRef}>
@@ -99,42 +128,42 @@ export default function AdminHeader() {
               type="button"
               onClick={() => setOpen((o) => !o)}
               aria-expanded={open}
-              className="flex items-center gap-2 rounded-full border border-border py-1 pl-1 pr-2.5 transition-colors hover:bg-navy-soft"
+              className="flex items-center gap-2 rounded-full border border-admin-border py-1 pl-1 pr-2.5 transition-colors hover:bg-admin-surface-hover"
             >
-              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-navy text-xs font-semibold text-white">
+              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-admin-accent text-xs font-semibold text-admin-accent-text">
                 {initial}
               </span>
-              <span className="max-w-[8rem] truncate text-sm font-medium text-navy">{username ?? "Compte"}</span>
+              <span className="max-w-[8rem] truncate text-sm font-medium text-admin-text">{username ?? "Compte"}</span>
               <IconChevronDown />
             </button>
 
             {open && (
-              <div className="absolute right-0 top-full z-20 mt-2 w-64 overflow-hidden rounded-2xl bg-white p-2 shadow-soft-lg">
+              <div className="absolute right-0 top-full z-20 mt-2 w-64 overflow-hidden rounded-2xl bg-admin-surface p-2 shadow-soft-lg">
                 <div className="px-3 py-2">
-                  <p className="truncate text-sm font-semibold text-navy">{username}</p>
-                  <p className="text-xs text-ink-dim">
+                  <p className="truncate text-sm font-semibold text-admin-text">{username}</p>
+                  <p className="text-xs text-admin-text-dim">
                     {role === "full" ? "Accès complet" : "Accueil (messages, candidatures, devis)"}
                   </p>
                 </div>
-                <div className="my-1 h-px bg-border" />
+                <div className="my-1 h-px bg-admin-border" />
 
                 {role === "full" && (
                   <>
                     <a
                       href={`/${locale}/admin/settings`}
-                      className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm text-ink hover:bg-navy-soft"
+                      className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm text-admin-text hover:bg-admin-surface-hover"
                     >
                       <IconSettings />
                       Paramètres du site
                     </a>
                     <a
                       href={`/${locale}/admin/users`}
-                      className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm text-ink hover:bg-navy-soft"
+                      className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm text-admin-text hover:bg-admin-surface-hover"
                     >
                       <IconUsers />
                       Gestion des utilisateurs
                     </a>
-                    <div className="my-1 h-px bg-border" />
+                    <div className="my-1 h-px bg-admin-border" />
                   </>
                 )}
 
@@ -143,17 +172,17 @@ export default function AdminHeader() {
                     setOpen(false);
                     setShowPasswordModal(true);
                   }}
-                  className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left text-sm text-ink hover:bg-navy-soft"
+                  className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left text-sm text-admin-text hover:bg-admin-surface-hover"
                 >
                   <IconKey />
                   Changer le mot de passe
                 </button>
 
-                <div className="my-1 h-px bg-border" />
+                <div className="my-1 h-px bg-admin-border" />
 
                 <button
                   onClick={handleLogout}
-                  className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50"
+                  className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left text-sm text-red-600 hover:bg-red-500/10 admin-dark:text-red-400"
                 >
                   <IconLogout />
                   Se déconnecter

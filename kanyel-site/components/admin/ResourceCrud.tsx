@@ -122,17 +122,17 @@ export default function ResourceCrud({ resource }: { resource: ResourceConfig })
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
       <div className="lg:col-span-2">
         <div className="flex items-center justify-between">
-          <h2 className="font-display text-xl font-semibold text-navy">{resource.label}</h2>
+          <h2 className="font-display text-xl font-semibold text-admin-text">{resource.label}</h2>
           <button
             onClick={startCreate}
-            className="rounded-full bg-navy px-4 py-2 text-xs font-semibold text-white shadow-soft transition-transform hover:-translate-y-0.5"
+            className="rounded-full bg-admin-accent px-4 py-2 text-xs font-semibold text-admin-accent-text shadow-soft transition-transform hover:-translate-y-0.5"
           >
             + Ajouter
           </button>
         </div>
 
-        {loading && <p className="mt-4 text-sm text-ink-dim">Chargement…</p>}
-        {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
+        {loading && <p className="mt-4 text-sm text-admin-text-dim">Chargement…</p>}
+        {error && <p className="mt-4 text-sm text-red-600 admin-dark:text-red-400">{error}</p>}
 
         <ul className="mt-4 space-y-2">
           {items.map((item) => (
@@ -140,7 +140,9 @@ export default function ResourceCrud({ resource }: { resource: ResourceConfig })
               <button
                 onClick={() => startEdit(item)}
                 className={`flex w-full items-center gap-3 rounded-2xl border p-3 text-left transition-colors ${
-                  editing === item ? "border-navy bg-navy-soft" : "border-border bg-white hover:border-navy/40"
+                  editing === item
+                    ? "border-admin-accent bg-admin-surface-hover"
+                    : "border-admin-border bg-admin-surface hover:border-admin-accent/40"
                 }`}
               >
                 {resource.imageField && item[resource.imageField] && (
@@ -152,13 +154,13 @@ export default function ResourceCrud({ resource }: { resource: ResourceConfig })
                   />
                 )}
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-semibold text-navy">{item[resource.titleField]}</p>
+                  <p className="truncate text-sm font-semibold text-admin-text">{item[resource.titleField]}</p>
                   {resource.subtitleField && (
-                    <p className="truncate text-xs text-ink-dim">{item[resource.subtitleField]}</p>
+                    <p className="truncate text-xs text-admin-text-dim">{item[resource.subtitleField]}</p>
                   )}
                 </div>
                 {"is_published" in item && !item.is_published && (
-                  <span className="shrink-0 rounded-full bg-ink-dim/10 px-2 py-0.5 text-[10px] font-semibold uppercase text-ink-dim">
+                  <span className="shrink-0 rounded-full bg-admin-text-dim/10 px-2 py-0.5 text-[10px] font-semibold uppercase text-admin-text-dim">
                     Brouillon
                   </span>
                 )}
@@ -166,22 +168,22 @@ export default function ResourceCrud({ resource }: { resource: ResourceConfig })
             </li>
           ))}
           {!loading && items.length === 0 && (
-            <p className="text-sm text-ink-dim">Aucun élément pour le moment.</p>
+            <p className="text-sm text-admin-text-dim">Aucun élément pour le moment.</p>
           )}
         </ul>
       </div>
 
       <div className="lg:col-span-3">
         {editing ? (
-          <div className="rounded-3xl bg-white p-6 shadow-soft">
+          <div className="rounded-3xl bg-admin-surface p-6 shadow-soft">
             <div className="flex items-center justify-between">
-              <h3 className="font-display text-lg font-semibold text-navy">
+              <h3 className="font-display text-lg font-semibold text-admin-text">
                 {isNew ? "Nouvel élément" : "Modifier"}
               </h3>
               {!isNew && (
                 <button
                   onClick={() => handleDelete(editing)}
-                  className="text-xs font-semibold text-red-600 hover:underline"
+                  className="text-xs font-semibold text-red-600 hover:underline admin-dark:text-red-400"
                 >
                   Supprimer
                 </button>
@@ -204,28 +206,28 @@ export default function ResourceCrud({ resource }: { resource: ResourceConfig })
             </div>
 
             {resource.fields.some((f) => f.required) && (
-              <p className="mt-4 text-xs text-ink-dim">
+              <p className="mt-4 text-xs text-admin-text-dim">
                 <span className="text-gold-dark">*</span> Champ obligatoire
               </p>
             )}
 
-            {saveError && <p className="mt-4 text-sm text-red-600">{saveError}</p>}
+            {saveError && <p className="mt-4 text-sm text-red-600 admin-dark:text-red-400">{saveError}</p>}
 
             <div className="mt-6 flex items-center gap-3">
               <button
                 onClick={handleSave}
                 disabled={saving}
-                className="rounded-full bg-navy px-6 py-2.5 text-sm font-semibold text-white shadow-soft transition-transform hover:-translate-y-0.5 disabled:opacity-60"
+                className="rounded-full bg-admin-accent px-6 py-2.5 text-sm font-semibold text-admin-accent-text shadow-soft transition-transform hover:-translate-y-0.5 disabled:opacity-60"
               >
                 {saving ? "Enregistrement…" : "Enregistrer"}
               </button>
-              <button onClick={cancelEdit} className="text-sm font-semibold text-ink-dim hover:text-navy">
+              <button onClick={cancelEdit} className="text-sm font-semibold text-admin-text-dim hover:text-admin-text">
                 Annuler
               </button>
             </div>
           </div>
         ) : (
-          <div className="flex h-full min-h-[240px] items-center justify-center rounded-3xl border border-dashed border-border text-sm text-ink-dim">
+          <div className="flex h-full min-h-[240px] items-center justify-center rounded-3xl border border-dashed border-admin-border text-sm text-admin-text-dim">
             Sélectionnez un élément à modifier, ou ajoutez-en un nouveau.
           </div>
         )}

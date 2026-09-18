@@ -25,6 +25,36 @@
   --shadow-soft-lg: 0 24px 48px -16px rgba(18, 23, 63, 0.28);
 }
 
+/* Admin-panel-only theme tokens. Kept in a separate (non-inline) @theme so
+   these stay as var() references in the generated utilities and can be
+   overridden at runtime by the .admin-dark scope below — unlike the
+   public-site tokens above, which @theme inline bakes in as literal values
+   on purpose. This is what lets dark mode stay confined to the admin panel. */
+@theme {
+  --color-admin-bg: #efe8d8;
+  --color-admin-surface: #ffffff;
+  --color-admin-surface-hover: #eef1fa;
+  --color-admin-border: #e6ddc8;
+  --color-admin-text: #1e2a6e;
+  --color-admin-text-dim: #6b7280;
+  --color-admin-accent: #1e2a6e;
+  --color-admin-accent-text: #ffffff;
+}
+
+@custom-variant admin-dark (&:where(.admin-dark, .admin-dark *));
+
+.admin-dark {
+  --color-admin-bg: #11152a;
+  --color-admin-surface: #1a2040;
+  --color-admin-surface-hover: #252c52;
+  --color-admin-border: #323a63;
+  --color-admin-text: #eef0fb;
+  --color-admin-text-dim: #9aa3c7;
+  --color-admin-accent: #3d4ea8;
+  --color-admin-accent-text: #ffffff;
+  color-scheme: dark;
+}
+
 @utility shadow-soft {
   box-shadow: var(--shadow-soft);
 }
