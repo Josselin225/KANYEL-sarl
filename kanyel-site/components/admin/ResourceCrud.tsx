@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { adminApi, ApiError } from "@/lib/adminApi";
 import type { ResourceConfig } from "@/lib/adminResources";
 import AdminField from "./AdminField";
@@ -8,6 +9,7 @@ import AdminField from "./AdminField";
 type Item = Record<string, any>;
 
 export default function ResourceCrud({ resource }: { resource: ResourceConfig }) {
+  const searchParams = useSearchParams();
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -47,6 +49,11 @@ export default function ResourceCrud({ resource }: { resource: ResourceConfig })
     setForm(initial);
     setSaveError(null);
   }
+
+  useEffect(() => {
+    if (searchParams.get("new") === "1") startCreate();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resource.key]);
 
   function startEdit(item: Item) {
     setEditing(item);
