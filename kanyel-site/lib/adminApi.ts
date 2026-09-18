@@ -2,6 +2,9 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
 const TOKEN_KEY = "kanyel_admin_token";
 const USERNAME_KEY = "kanyel_admin_username";
+const ROLE_KEY = "kanyel_admin_role";
+
+export type AdminRole = "full" | "reception";
 
 export class ApiError extends Error {}
 
@@ -15,10 +18,16 @@ export function getUsername(): string | null {
   return window.localStorage.getItem(USERNAME_KEY);
 }
 
+export function getRole(): AdminRole {
+  if (typeof window === "undefined") return "full";
+  return (window.localStorage.getItem(ROLE_KEY) as AdminRole | null) ?? "full";
+}
+
 export function clearToken(): void {
   if (typeof window === "undefined") return;
   window.localStorage.removeItem(TOKEN_KEY);
   window.localStorage.removeItem(USERNAME_KEY);
+  window.localStorage.removeItem(ROLE_KEY);
 }
 
 export async function login(
@@ -37,6 +46,7 @@ export async function login(
     const data = await res.json();
     window.localStorage.setItem(TOKEN_KEY, data.token);
     window.localStorage.setItem(USERNAME_KEY, data.username);
+    window.localStorage.setItem(ROLE_KEY, data.role ?? "full");
     return { ok: true };
   } catch {
     return { ok: false, error: "Impossible de contacter le serveur." };

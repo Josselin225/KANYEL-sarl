@@ -1,23 +1,20 @@
-import Image from "next/image";
 import { getTranslations } from "next-intl/server";
-import { Reveal, RevealGroup, RevealItem } from "./Reveal";
-import { pick, type ApiRealisation, type Locale } from "@/lib/api";
-
-function formatDate(dateStr: string, locale: Locale) {
-  return new Date(dateStr).toLocaleDateString(locale === "en" ? "en-US" : "fr-FR", {
-    year: "numeric",
-    month: "long",
-  });
-}
+import { Reveal } from "./Reveal";
+import RealisationsGridClient from "./RealisationsGridClient";
+import { groupImagesByRealisation, type ApiRealisation, type ApiRealisationImage, type Locale } from "@/lib/api";
 
 export default async function RealisationsGrid({
   realisations,
+  realisationImages = [],
   locale,
 }: {
   realisations: ApiRealisation[];
+  realisationImages?: ApiRealisationImage[];
   locale: Locale;
 }) {
   const t = await getTranslations({ locale, namespace: "realisations" });
+  const tShare = await getTranslations({ locale, namespace: "share" });
+  const imagesByRealisation = groupImagesByRealisation(realisationImages);
 
   return (
     <>
@@ -40,38 +37,18 @@ export default async function RealisationsGrid({
               <p className="text-sm text-ink-dim">{t("empty")}</p>
             </Reveal>
           ) : (
-            <RevealGroup className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {realisations.map((r) => (
-                <RevealItem key={r.id} className="overflow-hidden rounded-3xl bg-white shadow-soft">
-                  <div className="relative aspect-[4/3]">
-                    <Image
-                      src={r.image}
-                      alt={pick(r, "title", locale)}
-                      fill
-                      sizes="(max-width: 1024px) 100vw, 33vw"
-                      className="object-cover"
-                    />
-                  </div>
-                  <div className="p-6">
-                    <h3 className="font-display text-lg font-semibold text-navy">{pick(r, "title", locale)}</h3>
-                    <p className="mt-2 text-sm leading-relaxed text-ink-dim">{pick(r, "description", locale)}</p>
-                    <div className="mt-4 space-y-1 text-xs text-ink-dim">
-                      {r.client_name && (
-                        <p>
-                          <span className="font-semibold text-gold-dark">{t("clientLabel")} :</span> {r.client_name}
-                        </p>
-                      )}
-                      {r.completed_at && (
-                        <p>
-                          <span className="font-semibold text-gold-dark">{t("completedLabel")} :</span>{" "}
-                          {formatDate(r.completed_at, locale)}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                </RevealItem>
-              ))}
-            </RevealGroup>
+            <RealisationsGridClient
+              realisations={realisations}
+              imagesByRealisation={imagesByRealisation}
+              locale={locale}
+              t={{
+                clientLabel: t("clientLabel"),
+                completedLabel: t("completedLabel"),
+                shareLabel: tShare("label"),
+                shareWhatsapp: tShare("whatsapp"),
+                shareFacebook: tShare("facebook"),
+              }}
+            />
           )}
         </div>
       </section>

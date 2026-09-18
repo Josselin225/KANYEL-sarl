@@ -1,7 +1,9 @@
 from rest_framework.routers import DefaultRouter
 
 from .views import (
+    AdminUserViewSet,
     ArticleViewSet,
+    AuditLogEntryViewSet,
     ContactMessageAdminViewSet,
     ContactMessageCreateView,
     CredentialViewSet,
@@ -15,14 +17,17 @@ from .views import (
     JobOfferViewSet,
     LoginView,
     PartnerViewSet,
+    PropertyImageViewSet,
     PropertyViewSet,
     QuoteRequestAdminViewSet,
     QuoteRequestCreateView,
     RealisationImageViewSet,
     RealisationViewSet,
+    SearchView,
     SiteSettingsView,
     StatViewSet,
     TestimonialViewSet,
+    VisitStatsView,
 )
 from django.urls import path, include
 
@@ -31,6 +36,7 @@ router.register("departments", DepartmentViewSet, basename="department")
 router.register("credentials", CredentialViewSet, basename="credential")
 router.register("gallery", GalleryItemViewSet, basename="gallery-item")
 router.register("properties", PropertyViewSet, basename="property")
+router.register("property-images", PropertyImageViewSet, basename="property-image")
 router.register("testimonials", TestimonialViewSet, basename="testimonial")
 router.register("messages", ContactMessageAdminViewSet, basename="message-admin")
 router.register("stats", StatViewSet, basename="stat")
@@ -43,6 +49,8 @@ router.register("realisation-images", RealisationImageViewSet, basename="realisa
 router.register("articles", ArticleViewSet, basename="article")
 router.register("faqs", FAQViewSet, basename="faq")
 router.register("quote-requests", QuoteRequestAdminViewSet, basename="quote-request-admin")
+router.register("admin-users", AdminUserViewSet, basename="admin-user")
+router.register("audit-log", AuditLogEntryViewSet, basename="audit-log")
 
 urlpatterns = [
     path("auth/login/", LoginView.as_view(), name="admin-login"),
@@ -51,5 +59,7 @@ urlpatterns = [
     path("applications/", JobApplicationCreateView.as_view(), name="application-create"),
     path("devis/", QuoteRequestCreateView.as_view(), name="quote-request-create"),
     path("visit/", IncrementVisitView.as_view(), name="visit-increment"),
+    path("visit-stats/", VisitStatsView.as_view(), name="visit-stats"),
+    path("search/", SearchView.as_view(), name="search"),
     path("", include(router.urls)),
 ]

@@ -19,6 +19,7 @@ export default async function Home({
         settings={data.settings}
         departments={data.departments}
         credentials={data.credentials}
+        gallery={data.gallery}
         stats={data.stats}
         partners={data.partners}
         properties={data.properties}

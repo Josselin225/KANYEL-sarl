@@ -1,6 +1,6 @@
 # Rapport de conception — Site KANYEL SARL
 
-*Dernière mise à jour : 17 septembre 2026*
+*Dernière mise à jour : 18 septembre 2026 (soir)*
 
 ## 1. Présentation du projet
 
@@ -42,6 +42,10 @@ personnalisé sur mesure (`/admin`), et non l'admin Django par défaut.
 | `Article` | Actualités / blog |
 | `FAQ` | Questions fréquentes (générales ou par activité) |
 | `QuoteRequest` | Demandes de devis structurées |
+| `PropertyImage` | Galerie de plusieurs photos par bien immobilier |
+| `VisitLog` | Historique quotidien des visites (pour le graphique du tableau de bord) |
+| `AdminProfile` | Rôle de chaque compte admin ("Accès complet" / "Accueil") |
+| `AuditLogEntry` | Journal des créations/modifications/suppressions dans l'admin |
 
 Chaque modèle exposant à la fois une écriture publique (formulaire visiteur)
 et une gestion admin utilise **deux serializers distincts** (`*CreateSerializer`
@@ -109,6 +113,24 @@ dans le projet après un bug ayant exposé un risque de perte de données.
     du bord) — passage à un header pleine largeur
 22. **Audit de sécurité complet** et correction de toutes les failles
     identifiées — voir section 6
+23. Ajout de 7 nouvelles fonctionnalités : galerie photo en zoom (plein
+    écran, navigation au clavier), plusieurs photos par bien immobilier,
+    filtres de recherche sur les biens (catégorie, localisation, budget),
+    recherche interne au site (icône dans le menu), boutons de partage
+    WhatsApp/Facebook (actualités et réalisations), vraies statistiques
+    de visites avec graphique dans le tableau de bord, comptes admin
+    multiples avec rôles ("Accès complet" / "Accueil"), et journal
+    d'activité admin (qui a créé/modifié/supprimé quoi et quand)
+24. **Réorganisation du menu admin en tiroirs dépliables** (7 groupes),
+    puis **audit complet du site à la recherche de contenu "codé en dur"**
+    (c'est-à-dire ignorant les données de l'admin) — 7 points trouvés et
+    corrigés : la galerie de la page d'accueil et les photos multiples des
+    réalisations ne s'affichaient jamais bien qu'uploadées dans l'admin ;
+    la légende de la photo "À propos" et le badge de localisation du bloc
+    Contact étaient figés dans le code au lieu d'utiliser les Paramètres
+    du site ; un bug empêchait le repli correct de la fonction du
+    dirigeant en anglais ; d'anciens textes en double (reconnaissances,
+    statistiques) et des photos orphelines ont été nettoyés
 
 ## 4. Incident notable : suppression accidentelle du 17/09/2026
 
@@ -132,6 +154,9 @@ telle perte ne puisse plus se reproduire.
   et des fichiers uploadés
 - Anti-spam actif sur les formulaires de contact, candidature et devis
 - Code source sauvegardé sur GitHub (dépôt privé)
+- Recherche interne, galerie photo en zoom, filtres immobiliers, partage
+  réseaux sociaux, statistiques de visites avec graphique, comptes admin
+  à rôles et journal d'activité (voir étape 23)
 
 ## 6. Audit de sécurité (17/09/2026)
 
@@ -170,6 +195,13 @@ GitHub.
 - **Nos réalisations, Actualités, FAQ** : ces 3 nouvelles sections sont
   vides et affichent un message honnête en attendant du vrai contenu — à
   remplir depuis l'admin quand tu es prêt
+- **Comptes admin** : le compte historique reste en "Accès complet" ; crée
+  les comptes "Accueil" (réception) depuis Comptes admin si tu veux
+  déléguer la gestion des messages/candidatures/devis sans donner accès
+  au reste
+- **Chat en direct** : mis de côté pour l'instant à ta demande (nécessite
+  un compte tiers, ex. Tawk.to) — dis-moi si tu veux le reconsidérer plus
+  tard
 
 ## 8. Étapes à venir / suggestions
 

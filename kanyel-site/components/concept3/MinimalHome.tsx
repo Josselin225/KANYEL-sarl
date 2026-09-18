@@ -14,6 +14,7 @@ import {
   pick,
   type ApiCredential,
   type ApiDepartment,
+  type ApiGalleryItem,
   type ApiPartner,
   type ApiProperty,
   type ApiRealisation,
@@ -23,13 +24,8 @@ import {
 } from "@/lib/api";
 
 import btp from "@/public/images/gallery/btp.jpg";
-import lotissement from "@/public/images/gallery/lotissement.jpg";
-import immobilier from "@/public/images/gallery/immobilier.jpg";
-import transport from "@/public/images/gallery/transport.jpg";
-import importExport from "@/public/images/gallery/import-export.jpg";
 
 const DEFAULT_ICONS = ["plot", "building", "globe", "truck", "exchange", "home"] as const;
-const GALLERY_IMAGES = [lotissement, btp, importExport, transport, immobilier, btp];
 
 function Kicker({ children, light = false }: { children: React.ReactNode; light?: boolean }) {
   return (
@@ -47,6 +43,7 @@ export default function MinimalHome({
   settings,
   departments,
   credentials,
+  gallery,
   stats,
   partners,
   properties,
@@ -56,6 +53,7 @@ export default function MinimalHome({
   settings: ApiSiteSettings | null;
   departments: ApiDepartment[];
   credentials: ApiCredential[];
+  gallery: ApiGalleryItem[];
   stats: ApiStat[];
   partners: ApiPartner[];
   properties: ApiProperty[];
@@ -109,7 +107,6 @@ export default function MinimalHome({
     desc: tWhy(`item${i}Desc` as never),
   }));
 
-  const galleryItems = [1, 2, 3, 4, 5, 6].map((i) => tGallery(`item${i}` as never));
 
   return (
     <main id="top">
@@ -192,13 +189,13 @@ export default function MinimalHome({
             <Reveal className="relative aspect-[4/3] overflow-hidden rounded-3xl shadow-soft-lg">
               <Image
                 src={aboutImage}
-                alt={tAbout("imageCaption")}
+                alt={settings?.about_image_caption || tAbout("imageCaption")}
                 fill
                 sizes="(max-width: 1024px) 100vw, 50vw"
                 className="object-cover"
               />
               <div className="absolute bottom-4 left-4 rounded-full bg-white/90 px-3 py-1.5 text-xs font-semibold uppercase tracking-widest text-navy shadow-soft">
-                {tAbout("imageCaption")}
+                {settings?.about_image_caption || tAbout("imageCaption")}
               </div>
             </Reveal>
 
@@ -229,7 +226,7 @@ export default function MinimalHome({
                     {settings?.leader_name || tAbout("leaderTitle")}
                   </p>
                   <p className="text-sm text-ink-dim">
-                    {locale === "en" ? settings?.leader_role_en : settings?.leader_role_fr || tAbout("leaderRole")}
+                    {pick(settings, "leader_role", locale) || tAbout("leaderRole")}
                   </p>
                 </div>
               </div>
@@ -264,7 +261,7 @@ export default function MinimalHome({
                   {settings?.leader_name || tAbout("leaderTitle")}
                 </p>
                 <p className="text-sm text-white/60">
-                  {locale === "en" ? settings?.leader_role_en : settings?.leader_role_fr || tAbout("leaderRole")}
+                  {pick(settings, "leader_role", locale) || tAbout("leaderRole")}
                 </p>
               </div>
             </div>
@@ -363,33 +360,38 @@ export default function MinimalHome({
       </section>
 
       {/* GALLERY */}
-      <section id="gallery" className="bg-bg-alt py-16 sm:py-24">
-        <div className="mx-auto max-w-7xl px-5 sm:px-8">
-          <Reveal className="mx-auto max-w-2xl text-center">
-            <Kicker>{tGallery("kicker")}</Kicker>
-            <h2 className="mt-4 font-display text-3xl font-semibold leading-tight text-navy sm:text-4xl">
-              {tGallery("title")}
-            </h2>
-            <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-ink-dim">{tGallery("subtitle")}</p>
-          </Reveal>
+      {gallery.length > 0 && (
+        <section id="gallery" className="bg-bg-alt py-16 sm:py-24">
+          <div className="mx-auto max-w-7xl px-5 sm:px-8">
+            <Reveal className="mx-auto max-w-2xl text-center">
+              <Kicker>{tGallery("kicker")}</Kicker>
+              <h2 className="mt-4 font-display text-3xl font-semibold leading-tight text-navy sm:text-4xl">
+                {tGallery("title")}
+              </h2>
+              <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-ink-dim">{tGallery("subtitle")}</p>
+            </Reveal>
 
-          <RevealGroup className="mt-12 grid grid-cols-2 gap-4 sm:grid-cols-3">
-            {galleryItems.map((label, i) => (
-              <RevealItem key={i} className="group relative aspect-square overflow-hidden rounded-2xl">
-                <Image
-                  src={GALLERY_IMAGES[i % GALLERY_IMAGES.length]}
-                  alt={label}
-                  fill
-                  sizes="(max-width: 640px) 50vw, 33vw"
-                  className="object-cover transition-transform duration-500 group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-navy-deep/80 via-navy-deep/10 to-transparent" />
-                <p className="absolute bottom-3 left-3 right-3 text-sm font-semibold text-white">{label}</p>
-              </RevealItem>
-            ))}
-          </RevealGroup>
-        </div>
-      </section>
+            <RevealGroup className="mt-12 grid grid-cols-2 gap-4 sm:grid-cols-3">
+              {gallery.map((item) => {
+                const label = pick(item, "label", locale);
+                return (
+                  <RevealItem key={item.id} className="group relative aspect-square overflow-hidden rounded-2xl">
+                    <Image
+                      src={item.image}
+                      alt={label}
+                      fill
+                      sizes="(max-width: 640px) 50vw, 33vw"
+                      className="object-cover transition-transform duration-500 group-hover:scale-110"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-navy-deep/80 via-navy-deep/10 to-transparent" />
+                    <p className="absolute bottom-3 left-3 right-3 text-sm font-semibold text-white">{label}</p>
+                  </RevealItem>
+                );
+              })}
+            </RevealGroup>
+          </div>
+        </section>
+      )}
 
       <StatsSection
         stats={stats}

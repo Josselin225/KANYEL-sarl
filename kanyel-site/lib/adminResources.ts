@@ -136,6 +136,27 @@ export const PROPERTIES_RESOURCE: ResourceConfig = {
   ],
 };
 
+export const PROPERTY_IMAGES_RESOURCE: ResourceConfig = {
+  key: "property-images",
+  label: "Galerie des biens",
+  idField: "id",
+  titleField: "property",
+  imageField: "image",
+  fields: [
+    {
+      name: "property",
+      label: "Bien immobilier",
+      type: "relation",
+      relatedResource: "properties",
+      relatedValueField: "id",
+      relatedLabelField: "title_fr",
+      required: true,
+    },
+    { name: "order", label: "Ordre", type: "number" },
+    { name: "image", label: "Photo", type: "image", required: true },
+  ],
+};
+
 export const TESTIMONIALS_RESOURCE: ResourceConfig = {
   key: "testimonials",
   label: "Témoignages",

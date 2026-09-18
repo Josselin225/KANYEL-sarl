@@ -10,6 +10,7 @@ import {
   getDepartmentImages,
   getDepartments,
   getFAQs,
+  getPropertyImages,
   getProperties,
   getSettings,
   pick,
@@ -38,6 +39,7 @@ export default async function DepartmentDetailPage({
   const tFaq = await getTranslations({ locale, namespace: "faq" });
 
   const properties = department.has_property_listing ? await getProperties() : [];
+  const propertyImages = department.has_property_listing ? await getPropertyImages() : [];
 
   const title = pick(department, "title", locale as Locale);
   const content =
@@ -96,7 +98,9 @@ export default async function DepartmentDetailPage({
           </section>
         )}
 
-        {department.has_property_listing && <PropertiesGrid properties={properties} locale={locale as Locale} />}
+        {department.has_property_listing && (
+          <PropertiesGrid properties={properties} propertyImages={propertyImages} locale={locale as Locale} />
+        )}
 
         {faqs.length > 0 && (
           <section className="bg-bg py-16 sm:py-20">

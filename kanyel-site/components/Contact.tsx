@@ -150,7 +150,7 @@ export default function Contact({ settings }: { settings: ApiSiteSettings | null
               />
               <div className="absolute inset-0 bg-gradient-to-t from-navy-deep/70 via-transparent to-transparent" />
               <div className="absolute bottom-4 left-4 rounded-full bg-white/90 px-3 py-1.5 text-xs font-semibold uppercase tracking-widest text-navy shadow-soft">
-                Yamoussoukro, Côte d&apos;Ivoire
+                {address}
               </div>
             </div>
 

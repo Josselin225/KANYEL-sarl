@@ -26,12 +26,6 @@
     "subtitle": "An Ivorian multi-sector company based in Yamoussoukro, active in land subdivision, construction & public works, import-export, transport & logistics, and buying & selling.",
     "ctaPrimary": "Discover Our Activities",
     "ctaSecondary": "Request a Quote",
-    "stat1Label": "Business Departments",
-    "stat1Value": "06",
-    "stat2Label": "Based in",
-    "stat2Value": "Yamoussoukro",
-    "stat3Label": "Reach",
-    "stat3Value": "National & International",
     "imageCaption": "Yamoussoukro, Côte d'Ivoire",
     "imageAlt": "KANYEL SARL team on a construction site"
   },
@@ -45,14 +39,7 @@
     "ceoKicker": "A Word from the CEO",
     "ceoMessage": "Since establishing ourselves in Yamoussoukro, we have chosen rigor and closeness with each of our clients. Whether in land subdivision, construction, import-export, transport, or trading, our standard remains the same: delivering serious work, on time and true to our commitments. This conviction guides every project we undertake, large or small.",
     "credTitle": "Institutional Recognition & Commitments",
-    "cred1Title": "Vice-President — HPCO-CI",
-    "cred1Desc": "Haut Patronat des Commerçants et Opérateurs Économiques de Côte d'Ivoire (High Patronage of Traders and Economic Operators of Côte d'Ivoire) — Departmental Delegate for the city of Yamoussoukro.",
-    "cred2Title": "Territorial Governor — RIHDE",
-    "cred2Desc": "International Humanitarian Network for Equitable Development — \"A Just and Equitable World.\"",
-    "cred3Title": "Exclusive Representative — ISO Certification",
-    "cred3Desc": "A firm commitment to quality and international standards across the group's activities.",
-    "imageCaption": "Yamoussoukro, Côte d'Ivoire",
-    "cred3TitleShort": "ISO Certification"
+    "imageCaption": "Yamoussoukro, Côte d'Ivoire"
   },
   "services": {
     "kicker": "Our Activities",
@@ -95,13 +82,7 @@
   "gallery": {
     "kicker": "Fields of Activity",
     "title": "Our Fields of Activity in Pictures",
-    "subtitle": "A visual overview of our areas of expertise — photos of our own completed projects will be added soon.",
-    "item1": "Subdivisions & serviced land",
-    "item2": "Construction & public works sites",
-    "item3": "Import-export containers",
-    "item4": "Transport & logistics fleet",
-    "item5": "Real estate properties",
-    "item6": "Goods & trading"
+    "subtitle": "A visual overview of our areas of expertise."
   },
   "contact": {
     "kicker": "Contact",
@@ -206,7 +187,13 @@
     "bureau_commerce": "Offices & Commercial Spaces",
     "immeuble": "Buildings",
     "priceOnRequest": "On request",
-    "empty": "No properties published in this category yet."
+    "empty": "No properties published in this category yet.",
+    "filterAll": "All categories",
+    "filterLocation": "Search by location…",
+    "filterMinPrice": "Min price (FCFA)",
+    "filterMaxPrice": "Max price (FCFA)",
+    "filterReset": "Reset",
+    "noResults": "No property matches these criteria."
   },
   "realisations": {
     "kicker": "Our Work",
@@ -289,5 +276,20 @@
     "privacy4Title": "4. Your Rights",
     "privacy4Body": "In accordance with Law No. 2013-450 on the protection of personal data in Côte d'Ivoire, you have the right to access, rectify, and delete your data. To exercise this right, contact us at kanyelsarl3@gmail.com.",
     "backHome": "Back to home"
+  },
+  "share": {
+    "label": "Share:",
+    "whatsapp": "Share on WhatsApp",
+    "facebook": "Share on Facebook"
+  },
+  "search": {
+    "placeholder": "Search the site…",
+    "open": "Search",
+    "noResults": "No results for this search.",
+    "typeToSearch": "Type at least 2 characters to search.",
+    "department": "Activity",
+    "property": "Property",
+    "article": "News",
+    "realisation": "Project"
   }
 }
