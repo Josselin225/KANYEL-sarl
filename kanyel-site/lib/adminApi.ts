@@ -30,6 +30,11 @@ export function clearToken(): void {
   window.localStorage.removeItem(ROLE_KEY);
 }
 
+function setToken(token: string): void {
+  if (typeof window === "undefined") return;
+  window.localStorage.setItem(TOKEN_KEY, token);
+}
+
 export async function login(
   username: string,
   password: string
@@ -47,6 +52,32 @@ export async function login(
     window.localStorage.setItem(TOKEN_KEY, data.token);
     window.localStorage.setItem(USERNAME_KEY, data.username);
     window.localStorage.setItem(ROLE_KEY, data.role ?? "full");
+    return { ok: true };
+  } catch {
+    return { ok: false, error: "Impossible de contacter le serveur." };
+  }
+}
+
+export async function changeOwnPassword(
+  currentPassword: string,
+  newPassword: string
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  try {
+    const res = await fetch(`${API_URL}/api/auth/change-password/`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...authHeaders() },
+      body: JSON.stringify({ current_password: currentPassword, new_password: newPassword }),
+    });
+    if (!res.ok) {
+      let message = "Le mot de passe actuel est incorrect.";
+      try {
+        const data = await res.json();
+        message = Object.values(data).flat().join(" ") || message;
+      } catch {}
+      return { ok: false, error: message };
+    }
+    const data = await res.json();
+    setToken(data.token);
     return { ok: true };
   } catch {
     return { ok: false, error: "Impossible de contacter le serveur." };

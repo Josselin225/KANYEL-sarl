@@ -360,6 +360,29 @@ class AdminUserViewSet(AuditLogMixin, viewsets.ModelViewSet):
     permission_classes = [IsFullAdmin]
 
 
+class ChangeOwnPasswordView(views.APIView):
+    """Lets any authenticated admin account (full or reception) change its own
+    password. Issues a fresh token and revokes the old one, so a compromised
+    token doesn't survive the one remediation a user can self-serve."""
+
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        current_password = request.data.get("current_password", "")
+        new_password = request.data.get("new_password", "")
+
+        if not request.user.check_password(current_password):
+            return Response({"current_password": "Mot de passe actuel incorrect."}, status=400)
+        if len(new_password) < 8:
+            return Response({"new_password": "Le nouveau mot de passe doit contenir au moins 8 caractères."}, status=400)
+
+        request.user.set_password(new_password)
+        request.user.save()
+        Token.objects.filter(user=request.user).delete()
+        token = Token.objects.create(user=request.user)
+        return Response({"token": token.key})
+
+
 class ContactMessageCreateView(HoneypotCreateMixin, generics.CreateAPIView):
     queryset = ContactMessage.objects.all()
     serializer_class = ContactMessageCreateSerializer

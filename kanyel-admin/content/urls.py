@@ -4,6 +4,7 @@ from .views import (
     AdminUserViewSet,
     ArticleViewSet,
     AuditLogEntryViewSet,
+    ChangeOwnPasswordView,
     ContactMessageAdminViewSet,
     ContactMessageCreateView,
     CredentialViewSet,
@@ -54,6 +55,7 @@ router.register("audit-log", AuditLogEntryViewSet, basename="audit-log")
 
 urlpatterns = [
     path("auth/login/", LoginView.as_view(), name="admin-login"),
+    path("auth/change-password/", ChangeOwnPasswordView.as_view(), name="change-password"),
     path("settings/", SiteSettingsView.as_view(), name="site-settings"),
     path("contact/", ContactMessageCreateView.as_view(), name="contact-create"),
     path("applications/", JobApplicationCreateView.as_view(), name="application-create"),
