@@ -49,6 +49,22 @@ function IconChevron({ open }: { open: boolean }) {
   );
 }
 
+function IconPanelToggle({ collapsed }: { collapsed: boolean }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      className={`h-4 w-4 shrink-0 transition-transform duration-200 ${collapsed ? "rotate-180" : ""}`}
+    >
+      <rect x="3.5" y="4.5" width="17" height="15" rx="2.5" stroke="currentColor" strokeWidth="1.6" />
+      <path d="M9.5 4.5v15" stroke="currentColor" strokeWidth="1.6" />
+      <path d="m7 10.5-1.8 1.5L7 13.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+const COLLAPSE_KEY = "kanyel_admin_sidebar_collapsed";
+
 function isItemActive(pathname: string, item: AdminNavItem) {
   return item.href === "/admin" ? pathname === "/admin" : pathname.startsWith(item.href);
 }
@@ -62,6 +78,15 @@ export default function AdminSidebar() {
     const active = groups.find((g) => g.items.some((item) => isItemActive(pathname, item)));
     return new Set(active ? [active.key] : []);
   });
+  const [collapsed, setCollapsed] = useState(false);
+
+  useEffect(() => {
+    try {
+      setCollapsed(window.localStorage.getItem(COLLAPSE_KEY) === "1");
+    } catch {
+      // Ignore — defaults to expanded.
+    }
+  }, []);
 
   useEffect(() => {
     const active = groups.find((g) => g.items.some((item) => isItemActive(pathname, item)));
@@ -78,6 +103,23 @@ export default function AdminSidebar() {
     });
   }
 
+  function toggleCollapsed() {
+    setCollapsed((prev) => {
+      const next = !prev;
+      try {
+        window.localStorage.setItem(COLLAPSE_KEY, next ? "1" : "0");
+      } catch {
+        // Ignore — collapse state just won't persist.
+      }
+      return next;
+    });
+  }
+
+  function openGroupExpanded(key: string) {
+    if (collapsed) toggleCollapsed();
+    setOpenGroups((prev) => new Set(prev).add(key));
+  }
+
   function handleLogout() {
     clearToken();
     window.location.href = `/${locale}/admin/login`;
@@ -86,40 +128,81 @@ export default function AdminSidebar() {
   const dashboardActive = isItemActive(pathname, ADMIN_DASHBOARD_ITEM);
 
   return (
-    <aside className="flex h-full w-64 shrink-0 flex-col border-r border-border bg-white">
-      <div className="flex shrink-0 items-center gap-2 border-b border-border px-5 py-5">
-        <Logo />
+    <aside
+      className={`flex h-full shrink-0 flex-col border-r border-border bg-white transition-[width] duration-200 ${
+        collapsed ? "w-[4.5rem]" : "w-64"
+      }`}
+    >
+      <div
+        className={`flex shrink-0 items-center border-b border-border py-5 ${
+          collapsed ? "justify-center px-2" : "justify-between px-5"
+        }`}
+      >
+        {collapsed ? (
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-navy font-display text-base font-semibold text-gold-light">
+            K
+          </div>
+        ) : (
+          <Logo />
+        )}
+        {!collapsed && (
+          <button
+            type="button"
+            onClick={toggleCollapsed}
+            aria-label="Réduire le menu"
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-ink-dim transition-colors hover:bg-navy-soft hover:text-navy"
+          >
+            <IconPanelToggle collapsed={false} />
+          </button>
+        )}
       </div>
 
-      <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-4">
+      {collapsed && (
+        <button
+          type="button"
+          onClick={toggleCollapsed}
+          aria-label="Agrandir le menu"
+          className="mx-auto mt-3 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-ink-dim transition-colors hover:bg-navy-soft hover:text-navy"
+        >
+          <IconPanelToggle collapsed={true} />
+        </button>
+      )}
+
+      <nav className={`flex-1 space-y-1 overflow-y-auto py-4 ${collapsed ? "px-2" : "px-3"}`}>
         <a
           href={`/${locale}${ADMIN_DASHBOARD_ITEM.href}`}
+          title={collapsed ? ADMIN_DASHBOARD_ITEM.label : undefined}
           className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
-            dashboardActive ? "bg-navy text-white" : "text-ink-dim hover:bg-navy-soft hover:text-navy"
-          }`}
+            collapsed ? "justify-center" : ""
+          } ${dashboardActive ? "bg-navy text-white" : "text-ink-dim hover:bg-navy-soft hover:text-navy"}`}
         >
           <NavIcon name={ADMIN_DASHBOARD_ITEM.icon} />
-          {ADMIN_DASHBOARD_ITEM.label}
+          {!collapsed && ADMIN_DASHBOARD_ITEM.label}
         </a>
 
         <div className="pt-2" />
 
         {groups.map((group) => {
-          const open = openGroups.has(group.key);
+          const open = openGroups.has(group.key) && !collapsed;
           const groupActive = group.items.some((item) => isItemActive(pathname, item));
           return (
             <div key={group.key}>
               <button
                 type="button"
-                onClick={() => toggleGroup(group.key)}
+                onClick={() => (collapsed ? openGroupExpanded(group.key) : toggleGroup(group.key))}
                 aria-expanded={open}
+                title={collapsed ? group.label : undefined}
                 className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-colors ${
-                  groupActive && !open ? "text-navy" : "text-ink-dim"
-                } hover:bg-navy-soft hover:text-navy`}
+                  collapsed ? "justify-center" : ""
+                } ${groupActive && !open ? "text-navy" : "text-ink-dim"} hover:bg-navy-soft hover:text-navy`}
               >
                 <NavIcon name={group.icon} />
-                <span className="flex-1 text-left">{group.label}</span>
-                <IconChevron open={open} />
+                {!collapsed && (
+                  <>
+                    <span className="flex-1 text-left">{group.label}</span>
+                    <IconChevron open={open} />
+                  </>
+                )}
               </button>
 
               {open && (
@@ -146,20 +229,31 @@ export default function AdminSidebar() {
         })}
       </nav>
 
-      <div className="shrink-0 border-t border-border p-4">
-        {username && <p className="mb-2 truncate text-xs text-ink-dim">Connecté : {username}</p>}
+      <div className={`shrink-0 border-t border-border ${collapsed ? "p-2" : "p-4"}`}>
+        {!collapsed && username && (
+          <p className="mb-2 truncate text-xs text-ink-dim">Connecté : {username}</p>
+        )}
         <button
           onClick={handleLogout}
-          className="flex w-full items-center justify-center gap-2 rounded-xl bg-navy-soft px-3 py-2.5 text-sm font-semibold text-navy transition-colors hover:bg-navy hover:text-white"
+          title={collapsed ? "Se déconnecter" : undefined}
+          className={`flex w-full items-center justify-center gap-2 rounded-xl bg-navy-soft px-3 py-2.5 text-sm font-semibold text-navy transition-colors hover:bg-navy hover:text-white`}
         >
-          Se déconnecter
+          {collapsed ? (
+            <svg viewBox="0 0 24 24" fill="none" className="h-4.5 w-4.5">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          ) : (
+            "Se déconnecter"
+          )}
         </button>
-        <a
-          href={`/${locale}`}
-          className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl px-3 py-2 text-xs text-ink-dim hover:text-navy"
-        >
-          ← Retour au site
-        </a>
+        {!collapsed && (
+          <a
+            href={`/${locale}`}
+            className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl px-3 py-2 text-xs text-ink-dim hover:text-navy"
+          >
+            ← Retour au site
+          </a>
+        )}
       </div>
     </aside>
   );
