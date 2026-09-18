@@ -27,7 +27,7 @@ export default async function Home({
         locale={locale as Locale}
       />
       <Contact settings={data.settings} />
-      <Footer settings={data.settings} departments={data.departments} locale={locale as Locale} />
+      <Footer settings={data.settings} departments={data.departments} locale={locale as Locale} showMap={false} />
     </>
   );
 }

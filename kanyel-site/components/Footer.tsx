@@ -2,7 +2,7 @@ import { getTranslations } from "next-intl/server";
 import Logo from "./Logo";
 import LogoWatermark from "./LogoWatermark";
 import SocialLinks from "./SocialLinks";
-import { getArticles, pick, type ApiDepartment, type ApiSiteSettings, type Locale } from "@/lib/api";
+import { buildWhatsAppUrl, getArticles, pick, type ApiDepartment, type ApiSiteSettings, type Locale } from "@/lib/api";
 
 function IconLock() {
   return (
@@ -40,16 +40,18 @@ export default async function Footer({
   settings,
   departments,
   locale,
+  showMap = true,
 }: {
   settings: ApiSiteSettings | null;
   departments: ApiDepartment[];
   locale: Locale;
+  /** Set to false on pages that already show their own map (e.g. the homepage's Contact section). */
+  showMap?: boolean;
 }) {
   const t = await getTranslations({ locale, namespace: "footer" });
   const tNav = await getTranslations({ locale, namespace: "nav" });
   const tServices = await getTranslations({ locale, namespace: "services" });
   const tContact = await getTranslations({ locale, namespace: "contact" });
-  const tArticles = await getTranslations({ locale, namespace: "articles" });
 
   const year = new Date().getFullYear();
 
@@ -60,9 +62,7 @@ export default async function Footer({
   const website = settings?.website || "www.kanyelsarl.com";
   const hours = pick(settings, "hours", locale) || tContact("hours");
   const whatsapp = settings?.whatsapp_number;
-  const whatsappHref = whatsapp
-    ? `https://wa.me/${whatsapp.replace(/[^\d]/g, "")}?text=${encodeURIComponent(t("whatsappMessage"))}`
-    : null;
+  const whatsappHref = whatsapp ? buildWhatsAppUrl(whatsapp, t("whatsappMessage")) : null;
 
   const mapQuery =
     settings?.latitude != null && settings?.longitude != null
@@ -101,14 +101,10 @@ export default async function Footer({
         ];
 
   return (
-    <footer className="relative overflow-hidden bg-navy-deep py-16">
+    <footer className="relative overflow-hidden bg-navy-deep py-10 lg:py-14">
       <LogoWatermark className="pointer-events-none absolute -bottom-16 -left-16 h-auto w-80 opacity-[0.06] sm:w-[28rem]" />
       <div className="relative px-4 sm:px-6 lg:px-10">
-        <div
-          className={`grid grid-cols-1 gap-10 sm:grid-cols-2 ${
-            recentArticles.length > 0 ? "lg:grid-cols-4" : "lg:grid-cols-3"
-          }`}
-        >
+        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
           <div>
             <Logo variant="badge" />
             <p className="mt-4 font-display italic text-gold-light">
@@ -123,9 +119,9 @@ export default async function Footer({
             <h4 className="text-sm font-semibold uppercase tracking-wider text-white">
               {t("quickLinksTitle")}
             </h4>
-            <ul className="mt-4 space-y-2.5">
+            <ul className="mt-4 columns-2 gap-x-6 sm:columns-1 lg:columns-2">
               {quickLinks.map((link) => (
-                <li key={link.href}>
+                <li key={link.href} className="break-inside-avoid pb-2.5">
                   <a
                     href={link.href}
                     className="text-sm text-white/65 hover:text-gold-light"
@@ -148,40 +144,30 @@ export default async function Footer({
                 </li>
               ))}
             </ul>
+
+            {recentArticles.length > 0 && (
+              <>
+                <h4 className="mt-6 text-sm font-semibold uppercase tracking-wider text-white">
+                  {t("recentArticlesTitle")}
+                </h4>
+                <ul className="mt-4 space-y-3">
+                  {recentArticles.map((a) => (
+                    <li key={a.id}>
+                      <a href={`/${locale}/actualites/${a.slug}`} className="group block">
+                        <p className="text-xs font-semibold uppercase tracking-wide text-gold-light">
+                          {formatShortDate(a.published_at, locale)}
+                        </p>
+                        <p className="mt-1 text-sm text-white/75 group-hover:text-white">
+                          {pick(a, "title", locale)}
+                        </p>
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
           </div>
 
-          {recentArticles.length > 0 && (
-            <div>
-              <h4 className="text-sm font-semibold uppercase tracking-wider text-white">
-                {t("recentArticlesTitle")}
-              </h4>
-              <ul className="mt-4 space-y-4">
-                {recentArticles.map((a) => (
-                  <li key={a.id}>
-                    <a href={`/${locale}/actualites/${a.slug}`} className="group block">
-                      <p className="text-xs font-semibold uppercase tracking-wide text-gold-light">
-                        {formatShortDate(a.published_at, locale)}
-                      </p>
-                      <p className="mt-1 text-sm text-white/75 group-hover:text-white">
-                        {pick(a, "title", locale)}
-                      </p>
-                    </a>
-                  </li>
-                ))}
-              </ul>
-              <a
-                href={`/${locale}/actualites`}
-                className="mt-3 inline-block text-sm font-semibold text-gold-light hover:underline"
-              >
-                {tArticles("readMore")}
-              </a>
-            </div>
-          )}
-        </div>
-
-        <div className="mt-12 h-px w-full bg-white/10" />
-
-        <div className="mt-10 grid grid-cols-1 gap-10 lg:grid-cols-2">
           <div>
             <h4 className="text-sm font-semibold uppercase tracking-wider text-white">
               {t("contactTitle")}
@@ -208,7 +194,7 @@ export default async function Footer({
                 {hours}
               </li>
             </ul>
-            <div className="mt-5 flex flex-wrap items-center gap-3">
+            <div className="mt-4 flex flex-wrap items-center gap-3">
               <SocialLinks settings={settings} />
               {whatsappHref && (
                 <a
@@ -222,20 +208,24 @@ export default async function Footer({
                 </a>
               )}
             </div>
-          </div>
 
-          <div className="overflow-hidden rounded-3xl shadow-soft-lg ring-1 ring-white/10">
-            <iframe
-              src={mapSrc}
-              title={t("mapTitle")}
-              loading="lazy"
-              className="h-64 w-full border-0 lg:h-full lg:min-h-[220px]"
-              referrerPolicy="no-referrer-when-downgrade"
-            />
+            {showMap && (
+              <div className="mt-4 overflow-hidden rounded-2xl shadow-soft ring-1 ring-white/10">
+                <iframe
+                  src={mapSrc}
+                  title={t("mapTitle")}
+                  loading="lazy"
+                  className="h-32 w-full border-0"
+                  referrerPolicy="no-referrer-when-downgrade"
+                />
+              </div>
+            )}
           </div>
         </div>
 
-        <div className="mt-10 flex flex-col items-center justify-between gap-3 text-xs text-white/60 sm:flex-row">
+        <div className="mt-8 h-px w-full bg-white/10" />
+
+        <div className="mt-6 flex flex-col items-center justify-between gap-3 text-xs text-white/60 sm:flex-row">
           <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 sm:justify-start">
             <p>
               © {year} {companyName} — {t("rights")}
