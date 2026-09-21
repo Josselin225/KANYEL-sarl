@@ -25,7 +25,7 @@ import {
 
 import btp from "@/public/images/gallery/btp.jpg";
 
-const DEFAULT_ICONS = ["plot", "building", "globe", "truck", "exchange", "home"] as const;
+const DEFAULT_ICONS = ["plot", "building", "globe", "truck", "home"] as const;
 
 function Kicker({ children, light = false }: { children: React.ReactNode; light?: boolean }) {
   return (

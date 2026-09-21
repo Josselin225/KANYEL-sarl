@@ -95,7 +95,7 @@ class Department(models.Model):
 
     ICON_CHOICES = [
         ("plot", "Lotissement (parcelle)"),
-        ("building", "BTP (bâtiment)"),
+        ("building", "BTP & VRD (bâtiment)"),
         ("globe", "Import-Export (globe)"),
         ("truck", "Transport (camion)"),
         ("exchange", "Achats-Ventes (échange)"),
@@ -125,7 +125,7 @@ class Department(models.Model):
     )
     has_property_listing = models.BooleanField(
         "Afficher la liste des biens immobiliers", default=False,
-        help_text="À cocher uniquement pour le département Gestion Immobilière : sa page affichera les biens gérés par l'agence.",
+        help_text="À cocher uniquement pour le département Achat/Vente et Location : sa page affichera les biens gérés par l'agence.",
     )
     is_published = models.BooleanField("Publié", default=True)
 
