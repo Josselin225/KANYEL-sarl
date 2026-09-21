@@ -97,7 +97,6 @@ export default async function Footer({
           tServices("item3Title"),
           tServices("item4Title"),
           tServices("item5Title"),
-          tServices("item6Title"),
         ];
 
   return (

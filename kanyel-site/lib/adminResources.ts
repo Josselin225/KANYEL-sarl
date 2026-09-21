@@ -33,7 +33,7 @@ export interface ResourceConfig {
 
 const ICON_OPTIONS: FieldOption[] = [
   { value: "plot", label: "Lotissement (parcelle)" },
-  { value: "building", label: "BTP (bâtiment)" },
+  { value: "building", label: "BTP & VRD (bâtiment)" },
   { value: "globe", label: "Import-Export (globe)" },
   { value: "truck", label: "Transport (camion)" },
   { value: "exchange", label: "Achats-Ventes (échange)" },
@@ -73,7 +73,7 @@ export const DEPARTMENTS_RESOURCE: ResourceConfig = {
       name: "has_property_listing",
       label: "Afficher la liste des biens immobiliers",
       type: "boolean",
-      help: "À cocher uniquement pour Gestion Immobilière.",
+      help: "À cocher uniquement pour Achat/Vente et Location.",
     },
     { name: "is_published", label: "Publié", type: "boolean" },
   ],
