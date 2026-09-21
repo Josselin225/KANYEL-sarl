@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useLocale } from "next-intl";
-import { usePathname } from "@/i18n/navigation";
+import { Link, usePathname } from "@/i18n/navigation";
 import { ADMIN_NAV_ITEMS } from "@/lib/adminNav";
 import { clearToken, getRole, getUsername } from "@/lib/adminApi";
 import { useAdminTheme } from "./AdminThemeContext";
@@ -116,12 +116,12 @@ export default function AdminHeader() {
             {dark ? <IconSun /> : <IconMoon />}
           </button>
 
-          <a
-            href={`/${locale}`}
+          <Link
+            href="/"
             className="rounded-full bg-admin-surface-hover px-4 py-2 text-xs font-semibold text-admin-text transition-colors hover:bg-admin-accent hover:text-admin-accent-text"
           >
             Voir le site
-          </a>
+          </Link>
 
           <div className="relative" ref={menuRef}>
             <button
@@ -149,20 +149,20 @@ export default function AdminHeader() {
 
                 {role === "full" && (
                   <>
-                    <a
-                      href={`/${locale}/admin/settings`}
+                    <Link
+                      href="/admin/settings"
                       className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm text-admin-text hover:bg-admin-surface-hover"
                     >
                       <IconSettings />
                       Paramètres du site
-                    </a>
-                    <a
-                      href={`/${locale}/admin/users`}
+                    </Link>
+                    <Link
+                      href="/admin/users"
                       className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm text-admin-text hover:bg-admin-surface-hover"
                     >
                       <IconUsers />
                       Gestion des utilisateurs
-                    </a>
+                    </Link>
                     <div className="my-1 h-px bg-admin-border" />
                   </>
                 )}

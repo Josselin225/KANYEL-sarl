@@ -66,11 +66,16 @@ export default function StatsSection({
           <h2 className="mt-4 font-display text-2xl font-semibold text-white sm:text-3xl">{t("title")}</h2>
         </Reveal>
 
-        <RevealGroup className="mt-12 grid grid-cols-2 gap-6 sm:grid-cols-4">
+        <RevealGroup
+          className="mt-12 grid gap-x-3 gap-y-6 sm:gap-x-6"
+          style={{ gridTemplateColumns: `repeat(${items.length}, minmax(0, 1fr))` }}
+        >
           {items.map((item, i) => (
             <RevealItem key={i} className="text-center">
-              <p className="font-display text-4xl font-bold text-gold-light sm:text-5xl">{item.value}</p>
-              <p className="mt-2 text-sm text-white/70">{item.label}</p>
+              <p className="font-display text-2xl font-bold leading-tight text-gold-light sm:text-4xl lg:text-5xl">
+                {item.value}
+              </p>
+              <p className="mt-2 text-[11px] leading-tight text-white/70 sm:text-sm">{item.label}</p>
             </RevealItem>
           ))}
         </RevealGroup>
