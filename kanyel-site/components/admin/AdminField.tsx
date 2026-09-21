@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useLocale } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { adminApi } from "@/lib/adminApi";
 import type { FieldConfig, FieldOption } from "@/lib/adminResources";
 
@@ -16,7 +16,6 @@ export default function AdminField({
   onChange: (value: unknown) => void;
   currentImageUrl?: string | null;
 }) {
-  const locale = useLocale();
   const [preview, setPreview] = useState<string | null>(null);
   const [relationOptions, setRelationOptions] = useState<FieldOption[] | null>(null);
 
@@ -100,12 +99,12 @@ export default function AdminField({
       {field.type === "relation" && relationOptions && relationOptions.length === 0 ? (
         <p className="rounded-xl border border-dashed border-admin-border bg-admin-bg px-3.5 py-2.5 text-sm text-admin-text-dim">
           Aucun élément disponible pour « {field.label} » pour le moment.{" "}
-          <a
-            href={`/${locale}/admin/${field.relatedResource}?new=1`}
+          <Link
+            href={`/admin/${field.relatedResource}?new=1`}
             className="font-semibold text-admin-accent hover:underline"
           >
             En créer un
-          </a>{" "}
+          </Link>{" "}
           d&apos;abord.
         </p>
       ) : (

@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 const easeOut: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
@@ -33,10 +33,12 @@ export function RevealGroup({
   children,
   className = "",
   stagger = 0.1,
+  style,
 }: {
   children: ReactNode;
   className?: string;
   stagger?: number;
+  style?: CSSProperties;
 }) {
   return (
     <motion.div
@@ -48,6 +50,7 @@ export function RevealGroup({
         show: { transition: { staggerChildren: stagger } },
       }}
       className={className}
+      style={style}
     >
       {children}
     </motion.div>

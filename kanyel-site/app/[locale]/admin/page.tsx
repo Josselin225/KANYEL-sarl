@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useLocale } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { adminApi, getRole } from "@/lib/adminApi";
 
 interface Counts {
@@ -145,14 +145,13 @@ function PreviewColumn({
   emptyLabel: string;
   items: { id: number; title: string; subtitle: string; snippet: string; date: string }[];
 }) {
-  const locale = useLocale();
   return (
     <div className="rounded-3xl bg-admin-surface p-5 shadow-soft">
       <div className="flex items-center justify-between">
         <h4 className="font-display text-sm font-semibold text-admin-text">{title}</h4>
-        <a href={`/${locale}${href}`} className="text-xs font-semibold text-admin-accent hover:underline">
+        <Link href={href} className="text-xs font-semibold text-admin-accent hover:underline">
           Voir tout
-        </a>
+        </Link>
       </div>
       {items.length === 0 ? (
         <p className="mt-3 text-sm text-admin-text-dim">{emptyLabel}</p>
@@ -160,14 +159,14 @@ function PreviewColumn({
         <ul className="mt-3 space-y-3">
           {items.map((item) => (
             <li key={item.id}>
-              <a href={`/${locale}${href}`} className="block rounded-xl px-2 py-1.5 transition-colors hover:bg-admin-surface-hover">
+              <Link href={href} className="block rounded-xl px-2 py-1.5 transition-colors hover:bg-admin-surface-hover">
                 <div className="flex items-center justify-between gap-2">
                   <p className="truncate text-sm font-semibold text-admin-text">{item.title}</p>
                   <span className="shrink-0 text-[11px] text-admin-text-dim">{item.date}</span>
                 </div>
                 {item.subtitle && <p className="truncate text-xs text-admin-text-dim">{item.subtitle}</p>}
                 <p className="mt-0.5 truncate text-xs text-admin-text-dim/80">{item.snippet}</p>
-              </a>
+              </Link>
             </li>
           ))}
         </ul>
@@ -177,7 +176,6 @@ function PreviewColumn({
 }
 
 export default function AdminDashboardPage() {
-  const locale = useLocale();
   const role = getRole();
   const [counts, setCounts] = useState<Counts | null>(null);
   const [draftCounts, setDraftCounts] = useState<Record<string, number> | null>(null);
@@ -281,13 +279,13 @@ export default function AdminDashboardPage() {
       {isFull && (
         <div className="mt-6 flex flex-wrap gap-3">
           {QUICK_ACTIONS.map((action) => (
-            <a
+            <Link
               key={action.href}
-              href={`/${locale}${action.href}`}
+              href={action.href}
               className="rounded-full bg-admin-accent px-4 py-2 text-xs font-semibold text-admin-accent-text shadow-soft transition-transform hover:-translate-y-0.5"
             >
               {action.label}
-            </a>
+            </Link>
           ))}
         </div>
       )}
@@ -308,13 +306,13 @@ export default function AdminDashboardPage() {
           </h3>
           <div className="mt-3 flex flex-wrap gap-2">
             {draftsWithContent.map((r) => (
-              <a
+              <Link
                 key={r.key}
-                href={`/${locale}${r.href}`}
+                href={r.href}
                 className="rounded-full bg-white px-3.5 py-1.5 text-xs font-semibold text-gold-dark shadow-soft transition-transform hover:-translate-y-0.5 admin-dark:bg-admin-surface admin-dark:text-gold-light"
               >
                 {r.label} · {draftCounts![r.key]} brouillon{draftCounts![r.key] > 1 ? "s" : ""}
-              </a>
+              </Link>
             ))}
           </div>
         </div>
@@ -322,16 +320,16 @@ export default function AdminDashboardPage() {
 
       <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3">
         {cards.map((card) => (
-          <a
+          <Link
             key={card.key}
-            href={`/${locale}${card.href}`}
+            href={card.href}
             className="rounded-3xl bg-admin-surface p-5 shadow-soft transition-transform hover:-translate-y-0.5"
           >
             <p className="font-display text-3xl font-semibold text-admin-text">
               {counts ? counts[card.key] : "…"}
             </p>
             <p className="mt-1 text-sm text-admin-text-dim">{card.label}</p>
-          </a>
+          </Link>
         ))}
       </div>
 

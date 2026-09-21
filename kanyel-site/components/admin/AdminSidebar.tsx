@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useLocale } from "next-intl";
-import { usePathname } from "@/i18n/navigation";
+import { Link, usePathname } from "@/i18n/navigation";
 import { getRole } from "@/lib/adminApi";
 import { ADMIN_DASHBOARD_ITEM, visibleNavGroups, type AdminNavItem } from "@/lib/adminNav";
 import Logo from "../Logo";
@@ -71,11 +70,10 @@ function isItemActive(pathname: string, item: AdminNavItem) {
 
 export default function AdminSidebar() {
   const pathname = usePathname();
-  const locale = useLocale();
   const groups = visibleNavGroups(getRole());
-  const [openGroups, setOpenGroups] = useState<Set<string>>(() => {
+  const [openGroup, setOpenGroup] = useState<string | null>(() => {
     const active = groups.find((g) => g.items.some((item) => isItemActive(pathname, item)));
-    return new Set(active ? [active.key] : []);
+    return active?.key ?? null;
   });
   const [collapsed, setCollapsed] = useState(false);
 
@@ -89,17 +87,12 @@ export default function AdminSidebar() {
 
   useEffect(() => {
     const active = groups.find((g) => g.items.some((item) => isItemActive(pathname, item)));
-    if (active) setOpenGroups((prev) => (prev.has(active.key) ? prev : new Set(prev).add(active.key)));
+    if (active) setOpenGroup(active.key);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
 
   function toggleGroup(key: string) {
-    setOpenGroups((prev) => {
-      const next = new Set(prev);
-      if (next.has(key)) next.delete(key);
-      else next.add(key);
-      return next;
-    });
+    setOpenGroup((prev) => (prev === key ? null : key));
   }
 
   function toggleCollapsed() {
@@ -116,7 +109,7 @@ export default function AdminSidebar() {
 
   function openGroupExpanded(key: string) {
     if (collapsed) toggleCollapsed();
-    setOpenGroups((prev) => new Set(prev).add(key));
+    setOpenGroup(key);
   }
 
   const dashboardActive = isItemActive(pathname, ADMIN_DASHBOARD_ITEM);
@@ -163,8 +156,8 @@ export default function AdminSidebar() {
       )}
 
       <nav className={`flex-1 space-y-1 overflow-y-auto py-4 ${collapsed ? "px-2" : "px-3"}`}>
-        <a
-          href={`/${locale}${ADMIN_DASHBOARD_ITEM.href}`}
+        <Link
+          href={ADMIN_DASHBOARD_ITEM.href}
           title={collapsed ? ADMIN_DASHBOARD_ITEM.label : undefined}
           className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
             collapsed ? "justify-center" : ""
@@ -172,12 +165,12 @@ export default function AdminSidebar() {
         >
           <NavIcon name={ADMIN_DASHBOARD_ITEM.icon} />
           {!collapsed && ADMIN_DASHBOARD_ITEM.label}
-        </a>
+        </Link>
 
         <div className="pt-2" />
 
         {groups.map((group) => {
-          const open = openGroups.has(group.key) && !collapsed;
+          const open = openGroup === group.key && !collapsed;
           const groupActive = group.items.some((item) => isItemActive(pathname, item));
           return (
             <div key={group.key}>
@@ -204,16 +197,16 @@ export default function AdminSidebar() {
                   {group.items.map((item) => {
                     const active = isItemActive(pathname, item);
                     return (
-                      <a
+                      <Link
                         key={item.href}
-                        href={`/${locale}${item.href}`}
+                        href={item.href}
                         className={`flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm font-medium transition-colors ${
                           active ? "bg-admin-accent text-admin-accent-text" : "text-admin-text-dim hover:bg-admin-surface-hover hover:text-admin-text"
                         }`}
                       >
                         <NavIcon name={item.icon} />
                         {item.label}
-                      </a>
+                      </Link>
                     );
                   })}
                 </div>
