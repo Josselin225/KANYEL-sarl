@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useLocale } from "next-intl";
 import { adminApi } from "@/lib/adminApi";
 import type { FieldConfig, FieldOption } from "@/lib/adminResources";
 
@@ -15,6 +16,7 @@ export default function AdminField({
   onChange: (value: unknown) => void;
   currentImageUrl?: string | null;
 }) {
+  const locale = useLocale();
   const [preview, setPreview] = useState<string | null>(null);
   const [relationOptions, setRelationOptions] = useState<FieldOption[] | null>(null);
 
@@ -95,21 +97,34 @@ export default function AdminField({
         </select>
       )}
 
-      {field.type === "relation" && (
-        <select
-          value={(value as string) ?? ""}
-          onChange={(e) => onChange(e.target.value)}
-          required={field.required}
-          className={baseInputClass}
-          disabled={!relationOptions}
-        >
-          {!relationOptions && <option>Chargement…</option>}
-          {relationOptions?.map((opt) => (
-            <option key={opt.value} value={opt.value}>
-              {opt.label}
-            </option>
-          ))}
-        </select>
+      {field.type === "relation" && relationOptions && relationOptions.length === 0 ? (
+        <p className="rounded-xl border border-dashed border-admin-border bg-admin-bg px-3.5 py-2.5 text-sm text-admin-text-dim">
+          Aucun élément disponible pour « {field.label} » pour le moment.{" "}
+          <a
+            href={`/${locale}/admin/${field.relatedResource}?new=1`}
+            className="font-semibold text-admin-accent hover:underline"
+          >
+            En créer un
+          </a>{" "}
+          d&apos;abord.
+        </p>
+      ) : (
+        field.type === "relation" && (
+          <select
+            value={(value as string) ?? ""}
+            onChange={(e) => onChange(e.target.value)}
+            required={field.required}
+            className={baseInputClass}
+            disabled={!relationOptions}
+          >
+            {!relationOptions && <option>Chargement…</option>}
+            {relationOptions?.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+        )
       )}
 
       {field.type === "date" && (
