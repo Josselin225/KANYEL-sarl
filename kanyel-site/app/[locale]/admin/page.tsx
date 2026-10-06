@@ -19,6 +19,7 @@ interface Counts {
   unreadApplications: number;
   unreadMessages: number;
   unreadQuotes: number;
+  unreadVisitRequests: number;
   visitCount: number;
 }
 
@@ -37,6 +38,7 @@ const CARDS: { key: keyof Counts; label: string; href: string; roles?: ("full" |
   { key: "unreadApplications", label: "Candidatures non lues", href: "/admin/job-applications" },
   { key: "unreadMessages", label: "Messages non lus", href: "/admin/messages" },
   { key: "unreadQuotes", label: "Devis non lus", href: "/admin/quote-requests" },
+  { key: "unreadVisitRequests", label: "Demandes de visite non lues", href: "/admin/property-visit-requests" },
   { key: "visitCount", label: "Visiteurs du site", href: "/admin/settings", roles: ["full"] },
 ];
 
@@ -86,6 +88,14 @@ interface PreviewQuote {
   full_name: string;
   department_title: string | null;
   description: string;
+  created_at: string;
+  is_read: boolean;
+}
+interface PreviewVisitRequest {
+  id: number;
+  full_name: string;
+  property_title: string | null;
+  message: string;
   created_at: string;
   is_read: boolean;
 }
@@ -183,6 +193,7 @@ export default function AdminDashboardPage() {
   const [unreadMessages, setUnreadMessages] = useState<PreviewMessage[]>([]);
   const [unreadApplications, setUnreadApplications] = useState<PreviewApplication[]>([]);
   const [unreadQuotes, setUnreadQuotes] = useState<PreviewQuote[]>([]);
+  const [unreadVisitRequests, setUnreadVisitRequests] = useState<PreviewVisitRequest[]>([]);
   const cards = CARDS.filter((c) => !c.roles || c.roles.includes(role));
   const isFull = role === "full";
 
@@ -203,6 +214,7 @@ export default function AdminDashboardPage() {
         applications,
         messages,
         quotes,
+        visitRequests,
         settings,
       ] = await Promise.all([
         adminApi.list<{ is_published?: boolean }>("departments").catch(() => []),
@@ -219,6 +231,7 @@ export default function AdminDashboardPage() {
         adminApi.list<PreviewApplication>("job-applications").catch(() => []),
         adminApi.list<PreviewMessage>("messages").catch(() => []),
         adminApi.list<PreviewQuote>("quote-requests").catch(() => []),
+        adminApi.list<PreviewVisitRequest>("property-visit-requests").catch(() => []),
         adminApi.getSingleton<{ visit_count: number }>("settings").catch(() => ({ visit_count: 0 })),
       ]);
 
@@ -237,6 +250,7 @@ export default function AdminDashboardPage() {
         unreadApplications: applications.filter((a) => !a.is_read).length,
         unreadMessages: messages.filter((m) => !m.is_read).length,
         unreadQuotes: quotes.filter((q) => !q.is_read).length,
+        unreadVisitRequests: visitRequests.filter((v) => !v.is_read).length,
         visitCount: settings.visit_count,
       });
 
@@ -261,6 +275,7 @@ export default function AdminDashboardPage() {
       setUnreadMessages(messages.filter((m) => !m.is_read).slice(0, 3));
       setUnreadApplications(applications.filter((a) => !a.is_read).slice(0, 3));
       setUnreadQuotes(quotes.filter((q) => !q.is_read).slice(0, 3));
+      setUnreadVisitRequests(visitRequests.filter((v) => !v.is_read).slice(0, 3));
 
       const stats30 = await adminApi.list<VisitPoint>("visit-stats").catch(() => []);
       setVisits(stats30);
@@ -333,7 +348,7 @@ export default function AdminDashboardPage() {
         ))}
       </div>
 
-      <div className="mt-8 grid grid-cols-1 gap-4 lg:grid-cols-3">
+      <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <PreviewColumn
           title="Derniers messages non lus"
           href="/admin/messages"
@@ -368,6 +383,18 @@ export default function AdminDashboardPage() {
             subtitle: q.department_title || "Devis général",
             snippet: q.description,
             date: formatDateTime(q.created_at),
+          }))}
+        />
+        <PreviewColumn
+          title="Dernières demandes de visite non lues"
+          href="/admin/property-visit-requests"
+          emptyLabel="Aucune demande de visite non lue."
+          items={unreadVisitRequests.map((v) => ({
+            id: v.id,
+            title: v.full_name,
+            subtitle: v.property_title || "Bien supprimé",
+            snippet: v.message,
+            date: formatDateTime(v.created_at),
           }))}
         />
       </div>

@@ -142,7 +142,7 @@ export default function AdminHeader() {
                 <div className="px-3 py-2">
                   <p className="truncate text-sm font-semibold text-admin-text">{username}</p>
                   <p className="text-xs text-admin-text-dim">
-                    {role === "full" ? "Accès complet" : "Accueil (messages, candidatures, devis)"}
+                    {role === "full" ? "Accès complet" : "Accueil (messages, candidatures, devis, visites)"}
                   </p>
                 </div>
                 <div className="my-1 h-px bg-admin-border" />

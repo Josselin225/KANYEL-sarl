@@ -13,6 +13,7 @@ from .models import (
     JobOffer,
     Partner,
     Property,
+    PropertyVisitRequest,
     QuoteRequest,
     Realisation,
     RealisationImage,
@@ -303,6 +304,18 @@ class QuoteRequestAdmin(admin.ModelAdmin):
     list_editable = ("is_read",)
     search_fields = ("full_name", "email", "description")
     readonly_fields = ("department", "full_name", "email", "phone", "budget", "timeline", "description", "created_at")
+
+    def has_add_permission(self, request):
+        return False
+
+
+@admin.register(PropertyVisitRequest)
+class PropertyVisitRequestAdmin(admin.ModelAdmin):
+    list_display = ("created_at", "full_name", "property", "preferred_date", "is_read")
+    list_filter = ("is_read", "created_at")
+    list_editable = ("is_read",)
+    search_fields = ("full_name", "email", "message")
+    readonly_fields = ("property", "full_name", "email", "phone", "preferred_date", "message", "created_at")
 
     def has_add_permission(self, request):
         return False

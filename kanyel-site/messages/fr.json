@@ -196,7 +196,22 @@
     "filterMinPrice": "Prix min (FCFA)",
     "filterMaxPrice": "Prix max (FCFA)",
     "filterReset": "Réinitialiser",
-    "noResults": "Aucun bien ne correspond à ces critères."
+    "noResults": "Aucun bien ne correspond à ces critères.",
+    "requestVisit": "Demander une visite"
+  },
+  "propertyVisit": {
+    "title": "Demander une visite",
+    "subtitle": "Laissez-nous vos coordonnées, nous vous recontactons pour organiser la visite.",
+    "formName": "Nom complet",
+    "formEmail": "Adresse e-mail",
+    "formPhone": "Téléphone",
+    "formDate": "Date souhaitée (facultatif)",
+    "formMessage": "Message (facultatif)",
+    "formSubmit": "Envoyer ma demande",
+    "formSending": "Envoi en cours…",
+    "requiredLegend": "Champ obligatoire",
+    "success": "Votre demande de visite a bien été envoyée. Nous vous recontacterons rapidement.",
+    "close": "Fermer"
   },
   "realisations": {
     "kicker": "Nos réalisations",

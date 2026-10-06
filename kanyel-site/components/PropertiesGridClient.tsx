@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import Image from "next/image";
 import { RevealGroup, RevealItem } from "./Reveal";
 import Lightbox from "./Lightbox";
+import PropertyVisitModal from "./PropertyVisitModal";
 import { pick, type ApiProperty, type ApiPropertyImage, type Locale, type PropertyCategory } from "@/lib/api";
 
 const CATEGORIES: PropertyCategory[] = ["villa", "appartement", "terrain", "bureau_commerce", "immeuble"];
@@ -29,6 +30,7 @@ export default function PropertiesGridClient({
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
   const [lightbox, setLightbox] = useState<{ images: string[]; index: number; alt: string } | null>(null);
+  const [visitRequest, setVisitRequest] = useState<{ id: number; title: string } | null>(null);
 
   const filtered = useMemo(() => {
     return properties.filter((p) => {
@@ -145,6 +147,12 @@ export default function PropertiesGridClient({
                           <p className="mt-3 font-display text-sm font-semibold text-gold-dark">
                             {p.price || t.priceOnRequest}
                           </p>
+                          <button
+                            onClick={() => setVisitRequest({ id: p.id, title: pick(p, "title", locale) })}
+                            className="mt-4 w-full rounded-full border border-navy px-4 py-2 text-xs font-semibold text-navy transition-colors hover:bg-navy hover:text-white"
+                          >
+                            {t.requestVisit}
+                          </button>
                         </div>
                       </RevealItem>
                     );
@@ -159,6 +167,14 @@ export default function PropertiesGridClient({
 
       {lightbox && (
         <Lightbox images={lightbox.images} initialIndex={lightbox.index} alt={lightbox.alt} onClose={() => setLightbox(null)} />
+      )}
+
+      {visitRequest && (
+        <PropertyVisitModal
+          propertyId={visitRequest.id}
+          propertyTitle={visitRequest.title}
+          onClose={() => setVisitRequest(null)}
+        />
       )}
     </>
   );

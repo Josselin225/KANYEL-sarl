@@ -196,7 +196,22 @@
     "filterMinPrice": "Min price (FCFA)",
     "filterMaxPrice": "Max price (FCFA)",
     "filterReset": "Reset",
-    "noResults": "No property matches these criteria."
+    "noResults": "No property matches these criteria.",
+    "requestVisit": "Request a visit"
+  },
+  "propertyVisit": {
+    "title": "Request a visit",
+    "subtitle": "Leave us your details and we'll get back to you to arrange the visit.",
+    "formName": "Full name",
+    "formEmail": "Email address",
+    "formPhone": "Phone",
+    "formDate": "Preferred date (optional)",
+    "formMessage": "Message (optional)",
+    "formSubmit": "Send my request",
+    "formSending": "Sending…",
+    "requiredLegend": "Required field",
+    "success": "Your visit request has been sent. We'll get back to you shortly.",
+    "close": "Close"
   },
   "realisations": {
     "kicker": "Our Work",

@@ -384,6 +384,22 @@ export async function submitQuoteRequest(payload: Record<string, unknown>): Prom
   }
 }
 
+export async function submitPropertyVisitRequest(payload: Record<string, unknown>): Promise<void> {
+  const res = await fetch(`${API_URL}/api/visite-bien/`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    let message = "Une erreur est survenue lors de l'envoi.";
+    try {
+      const data = await res.json();
+      message = Object.values(data).flat().join(" ") || message;
+    } catch {}
+    throw new Error(message);
+  }
+}
+
 export async function incrementVisit(): Promise<void> {
   try {
     await fetch(`${API_URL}/api/visit/`, { method: "POST" });

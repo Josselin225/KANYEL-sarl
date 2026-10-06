@@ -552,6 +552,30 @@ class QuoteRequest(models.Model):
         return f"{self.full_name} — {self.department.title_fr if self.department else 'Devis général'}"
 
 
+class PropertyVisitRequest(models.Model):
+    """A request to visit a specific property, submitted from its listing on the public site."""
+
+    property = models.ForeignKey(
+        Property, related_name="visit_requests", on_delete=models.SET_NULL,
+        null=True, blank=True, verbose_name="Bien concerné",
+    )
+    full_name = models.CharField("Nom complet", max_length=200)
+    email = models.EmailField("E-mail")
+    phone = models.CharField("Téléphone", max_length=50)
+    preferred_date = models.DateField("Date souhaitée", blank=True, null=True)
+    message = models.TextField("Message", blank=True)
+    created_at = models.DateTimeField("Reçue le", auto_now_add=True)
+    is_read = models.BooleanField("Lue", default=False)
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name = "Demande de visite"
+        verbose_name_plural = "Demandes de visite"
+
+    def __str__(self):
+        return f"{self.full_name} — {self.property.title_fr if self.property else 'Bien supprimé'}"
+
+
 class VisitLog(models.Model):
     """One row per calendar day, incremented once per visitor per day.
     Powers the visits-over-time chart in the admin dashboard."""
