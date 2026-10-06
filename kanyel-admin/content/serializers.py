@@ -17,6 +17,7 @@ from .models import (
     Partner,
     Property,
     PropertyImage,
+    PropertyVisitRequest,
     QuoteRequest,
     Realisation,
     RealisationImage,
@@ -223,6 +224,37 @@ class QuoteRequestSerializer(serializers.ModelSerializer):
 
     def get_department_title(self, obj):
         return obj.department.title_fr if obj.department else None
+
+
+class PropertyVisitRequestCreateSerializer(serializers.ModelSerializer):
+    """Used by the public "Demander une visite" form on a property listing."""
+
+    property = serializers.PrimaryKeyRelatedField(queryset=Property.objects.all())
+
+    class Meta:
+        model = PropertyVisitRequest
+        fields = ["id", "property", "full_name", "email", "phone", "preferred_date", "message", "created_at"]
+        read_only_fields = ["id", "created_at"]
+
+
+class PropertyVisitRequestSerializer(serializers.ModelSerializer):
+    """Used by the admin panel — content is read-only, only is_read can be toggled."""
+
+    property_title = serializers.SerializerMethodField()
+
+    class Meta:
+        model = PropertyVisitRequest
+        fields = [
+            "id", "property", "property_title", "full_name", "email", "phone",
+            "preferred_date", "message", "created_at", "is_read",
+        ]
+        read_only_fields = [
+            "id", "created_at", "property_title", "property", "full_name", "email", "phone",
+            "preferred_date", "message",
+        ]
+
+    def get_property_title(self, obj):
+        return obj.property.title_fr if obj.property else None
 
 
 class PropertyImageSerializer(serializers.ModelSerializer):

@@ -29,6 +29,7 @@ from .models import (
     Partner,
     Property,
     PropertyImage,
+    PropertyVisitRequest,
     QuoteRequest,
     Realisation,
     RealisationImage,
@@ -56,6 +57,8 @@ from .serializers import (
     PartnerSerializer,
     PropertyImageSerializer,
     PropertySerializer,
+    PropertyVisitRequestCreateSerializer,
+    PropertyVisitRequestSerializer,
     QuoteRequestCreateSerializer,
     QuoteRequestSerializer,
     RealisationImageSerializer,
@@ -504,6 +507,32 @@ class QuoteRequestAdminViewSet(AuditLogMixin, viewsets.ModelViewSet):
     resource_key = "quote-requests"
     queryset = QuoteRequest.objects.all()
     serializer_class = QuoteRequestSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    http_method_names = ["get", "patch", "delete", "head", "options"]
+
+
+class PropertyVisitRequestCreateView(HoneypotCreateMixin, generics.CreateAPIView):
+    queryset = PropertyVisitRequest.objects.all()
+    serializer_class = PropertyVisitRequestCreateSerializer
+    permission_classes = [permissions.AllowAny]
+    throttle_classes = [AnonRateThrottle]
+
+    def perform_create(self, serializer):
+        instance = serializer.save()
+        date_str = instance.preferred_date.strftime("%d/%m/%Y") if instance.preferred_date else "Non précisée"
+        notify_admin(
+            f"Nouvelle demande de visite — {instance.property.title_fr if instance.property else 'Bien supprimé'}",
+            f"Nom : {instance.full_name}\nE-mail : {instance.email}\nTéléphone : {instance.phone}\n"
+            f"Date souhaitée : {date_str}\n\n{instance.message}",
+        )
+
+
+class PropertyVisitRequestAdminViewSet(AuditLogMixin, viewsets.ModelViewSet):
+    """Authenticated-only management of received property visit requests (list/read/mark-read/delete)."""
+
+    resource_key = "property-visit-requests"
+    queryset = PropertyVisitRequest.objects.all()
+    serializer_class = PropertyVisitRequestSerializer
     permission_classes = [permissions.IsAuthenticated]
     http_method_names = ["get", "patch", "delete", "head", "options"]
 
