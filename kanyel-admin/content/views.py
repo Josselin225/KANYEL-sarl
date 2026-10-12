@@ -26,6 +26,7 @@ from .models import (
     GalleryItem,
     JobApplication,
     JobOffer,
+    NewsletterSubscriber,
     Partner,
     Property,
     PropertyImage,
@@ -54,6 +55,8 @@ from .serializers import (
     JobApplicationCreateSerializer,
     JobApplicationSerializer,
     JobOfferSerializer,
+    NewsletterSubscriberCreateSerializer,
+    NewsletterSubscriberSerializer,
     PartnerSerializer,
     PropertyImageSerializer,
     PropertySerializer,
@@ -533,6 +536,23 @@ class PropertyVisitRequestAdminViewSet(AuditLogMixin, viewsets.ModelViewSet):
     resource_key = "property-visit-requests"
     queryset = PropertyVisitRequest.objects.all()
     serializer_class = PropertyVisitRequestSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    http_method_names = ["get", "patch", "delete", "head", "options"]
+
+
+class NewsletterSubscriberCreateView(HoneypotCreateMixin, generics.CreateAPIView):
+    queryset = NewsletterSubscriber.objects.all()
+    serializer_class = NewsletterSubscriberCreateSerializer
+    permission_classes = [permissions.AllowAny]
+    throttle_classes = [AnonRateThrottle]
+
+
+class NewsletterSubscriberAdminViewSet(AuditLogMixin, viewsets.ModelViewSet):
+    """Authenticated-only management of newsletter sign-ups."""
+
+    resource_key = "newsletter-subscribers"
+    queryset = NewsletterSubscriber.objects.all()
+    serializer_class = NewsletterSubscriberSerializer
     permission_classes = [permissions.IsAuthenticated]
     http_method_names = ["get", "patch", "delete", "head", "options"]
 

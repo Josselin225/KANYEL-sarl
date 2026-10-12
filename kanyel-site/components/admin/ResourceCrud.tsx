@@ -17,6 +17,8 @@ export default function ResourceCrud({ resource }: { resource: ResourceConfig })
   const [form, setForm] = useState<Record<string, unknown>>({});
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [selected, setSelected] = useState<Set<string | number>>(new Set());
+  const [bulkWorking, setBulkWorking] = useState(false);
 
   async function load() {
     setLoading(true);
@@ -34,6 +36,7 @@ export default function ResourceCrud({ resource }: { resource: ResourceConfig })
   useEffect(() => {
     load();
     setEditing(null);
+    setSelected(new Set());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resource.key]);
 
@@ -68,6 +71,7 @@ export default function ResourceCrud({ resource }: { resource: ResourceConfig })
   }
 
   const hasImageField = resource.fields.some((f) => f.type === "image");
+  const hasPublishField = resource.fields.some((f) => f.name === "is_published");
   const isNew = editing !== null && Object.keys(editing).length === 0;
 
   async function handleSave() {
@@ -125,6 +129,55 @@ export default function ResourceCrud({ resource }: { resource: ResourceConfig })
     }
   }
 
+  function toggleSelected(id: string | number) {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  function toggleSelectAll() {
+    setSelected((prev) =>
+      prev.size === items.length ? new Set() : new Set(items.map((it) => it[resource.idField]))
+    );
+  }
+
+  async function handleBulkPublish(value: boolean) {
+    setBulkWorking(true);
+    try {
+      const ids = Array.from(selected);
+      const updated = await Promise.all(
+        ids.map((id) => adminApi.update<Item>(resource.key, id, { is_published: value }))
+      );
+      setItems((prev) =>
+        prev.map((it) => updated.find((u) => u[resource.idField] === it[resource.idField]) ?? it)
+      );
+      setSelected(new Set());
+    } catch (e) {
+      alert(e instanceof ApiError ? e.message : "Erreur lors de la mise à jour groupée.");
+    } finally {
+      setBulkWorking(false);
+    }
+  }
+
+  async function handleBulkDelete() {
+    if (!confirm(`Supprimer définitivement ces ${selected.size} élément(s) ?`)) return;
+    setBulkWorking(true);
+    try {
+      const ids = Array.from(selected);
+      await Promise.all(ids.map((id) => adminApi.remove(resource.key, id)));
+      setItems((prev) => prev.filter((it) => !selected.has(it[resource.idField])));
+      setSelected(new Set());
+      cancelEdit();
+    } catch (e) {
+      alert(e instanceof ApiError ? e.message : "Erreur lors de la suppression groupée.");
+    } finally {
+      setBulkWorking(false);
+    }
+  }
+
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
       <div className="lg:col-span-2">
@@ -141,12 +194,62 @@ export default function ResourceCrud({ resource }: { resource: ResourceConfig })
         {loading && <p className="mt-4 text-sm text-admin-text-dim">Chargement…</p>}
         {error && <p className="mt-4 text-sm text-red-600 admin-dark:text-red-400">{error}</p>}
 
+        {items.length > 0 && (
+          <div className="mt-4 flex items-center gap-3">
+            <label className="flex items-center gap-2 text-xs font-semibold text-admin-text-dim">
+              <input
+                type="checkbox"
+                checked={selected.size === items.length}
+                onChange={toggleSelectAll}
+                className="h-4 w-4 accent-admin-accent"
+              />
+              Tout sélectionner
+            </label>
+            {selected.size > 0 && (
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-xs text-admin-text-dim">{selected.size} sélectionné(s)</span>
+                {hasPublishField && (
+                  <>
+                    <button
+                      onClick={() => handleBulkPublish(true)}
+                      disabled={bulkWorking}
+                      className="rounded-full bg-admin-surface-hover px-3 py-1 text-xs font-semibold text-admin-text transition-colors hover:bg-admin-accent hover:text-admin-accent-text disabled:opacity-60"
+                    >
+                      Publier
+                    </button>
+                    <button
+                      onClick={() => handleBulkPublish(false)}
+                      disabled={bulkWorking}
+                      className="rounded-full bg-admin-surface-hover px-3 py-1 text-xs font-semibold text-admin-text transition-colors hover:bg-admin-accent hover:text-admin-accent-text disabled:opacity-60"
+                    >
+                      Dépublier
+                    </button>
+                  </>
+                )}
+                <button
+                  onClick={handleBulkDelete}
+                  disabled={bulkWorking}
+                  className="rounded-full bg-red-600/10 px-3 py-1 text-xs font-semibold text-red-600 transition-colors hover:bg-red-600 hover:text-white disabled:opacity-60 admin-dark:text-red-400"
+                >
+                  Supprimer
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
         <ul className="mt-4 space-y-2">
           {items.map((item) => (
-            <li key={item[resource.idField]}>
+            <li key={item[resource.idField]} className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={selected.has(item[resource.idField])}
+                onChange={() => toggleSelected(item[resource.idField])}
+                className="h-4 w-4 shrink-0 accent-admin-accent"
+              />
               <button
                 onClick={() => startEdit(item)}
-                className={`flex w-full items-center gap-3 rounded-2xl border p-3 text-left transition-colors ${
+                className={`flex w-full min-w-0 items-center gap-3 rounded-2xl border p-3 text-left transition-colors ${
                   editing === item
                     ? "border-admin-accent bg-admin-surface-hover"
                     : "border-admin-border bg-admin-surface hover:border-admin-accent/40"

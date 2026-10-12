@@ -11,6 +11,7 @@ from .models import (
     GalleryItem,
     JobApplication,
     JobOffer,
+    NewsletterSubscriber,
     Partner,
     Property,
     PropertyVisitRequest,
@@ -319,6 +320,15 @@ class PropertyVisitRequestAdmin(admin.ModelAdmin):
 
     def has_add_permission(self, request):
         return False
+
+
+@admin.register(NewsletterSubscriber)
+class NewsletterSubscriberAdmin(admin.ModelAdmin):
+    list_display = ("email", "created_at", "is_active")
+    list_filter = ("is_active", "created_at")
+    list_editable = ("is_active",)
+    search_fields = ("email",)
+    readonly_fields = ("email", "created_at")
 
 
 admin.site.site_header = "KANYEL SARL — Administration"

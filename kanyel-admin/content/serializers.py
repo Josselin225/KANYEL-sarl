@@ -14,6 +14,7 @@ from .models import (
     GalleryItem,
     JobApplication,
     JobOffer,
+    NewsletterSubscriber,
     Partner,
     Property,
     PropertyImage,
@@ -318,3 +319,40 @@ class AdminUserSerializer(serializers.ModelSerializer):
         if profile_data:
             AdminProfile.objects.update_or_create(user=instance, defaults={"role": profile_data["role"]})
         return instance
+
+
+class NewsletterSubscriberCreateSerializer(serializers.ModelSerializer):
+    """Used by the public newsletter sign-up form."""
+
+    # Re-declared without the model's automatic UniqueValidator: re-subscribing
+    # a previously unsubscribed address reactivates it instead of being
+    # rejected outright, which validate_email()/create() below handle.
+    email = serializers.EmailField()
+
+    class Meta:
+        model = NewsletterSubscriber
+        fields = ["id", "email", "created_at"]
+        read_only_fields = ["id", "created_at"]
+
+    def validate_email(self, value):
+        if NewsletterSubscriber.objects.filter(email__iexact=value, is_active=True).exists():
+            raise serializers.ValidationError("Cette adresse e-mail est déjà inscrite.")
+        return value
+
+    def create(self, validated_data):
+        # Re-activates a previously unsubscribed address instead of hitting the
+        # unique constraint on email.
+        subscriber, _ = NewsletterSubscriber.objects.update_or_create(
+            email__iexact=validated_data["email"],
+            defaults={"email": validated_data["email"], "is_active": True},
+        )
+        return subscriber
+
+
+class NewsletterSubscriberSerializer(serializers.ModelSerializer):
+    """Used by the admin panel."""
+
+    class Meta:
+        model = NewsletterSubscriber
+        fields = ["id", "email", "created_at", "is_active"]
+        read_only_fields = ["id", "email", "created_at"]

@@ -3,6 +3,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { submitPropertyVisitRequest } from "@/lib/api";
+import { useFocusTrap } from "@/lib/useFocusTrap";
 
 export default function PropertyVisitModal({
   propertyId,
@@ -16,6 +17,7 @@ export default function PropertyVisitModal({
   const t = useTranslations("propertyVisit");
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState("");
+  const trapRef = useFocusTrap<HTMLDivElement>(true);
 
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
@@ -61,16 +63,21 @@ export default function PropertyVisitModal({
     <div
       className="fixed inset-0 z-[100] flex items-center justify-center bg-navy-deep/70 p-4"
       onClick={onClose}
-      role="dialog"
-      aria-modal="true"
     >
       <div
+        ref={trapRef}
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-md rounded-3xl bg-white p-6 shadow-soft-lg sm:p-8"
+        className="w-full max-w-md rounded-3xl bg-white p-6 shadow-soft-lg outline-none sm:p-8"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="property-visit-title"
+        tabIndex={-1}
       >
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h3 className="font-display text-lg font-semibold text-navy">{t("title")}</h3>
+            <h3 id="property-visit-title" className="font-display text-lg font-semibold text-navy">
+              {t("title")}
+            </h3>
             <p className="mt-1 text-sm text-ink-dim">{propertyTitle}</p>
           </div>
           <button

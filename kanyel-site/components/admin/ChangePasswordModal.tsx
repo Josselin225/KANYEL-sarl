@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { changeOwnPassword } from "@/lib/adminApi";
+import { useFocusTrap } from "@/lib/useFocusTrap";
 
 export default function ChangePasswordModal({ onClose }: { onClose: () => void }) {
   const [currentPassword, setCurrentPassword] = useState("");
@@ -10,6 +11,15 @@ export default function ChangePasswordModal({ onClose }: { onClose: () => void }
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [done, setDone] = useState(false);
+  const trapRef = useFocusTrap<HTMLDivElement>(true);
+
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") onClose();
+    }
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [onClose]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -40,11 +50,18 @@ export default function ChangePasswordModal({ onClose }: { onClose: () => void }
       onClick={onClose}
     >
       <div
-        className="w-full max-w-sm rounded-3xl bg-admin-surface p-6 shadow-soft-lg"
+        ref={trapRef}
+        className="w-full max-w-sm rounded-3xl bg-admin-surface p-6 shadow-soft-lg outline-none"
         onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="change-password-title"
+        tabIndex={-1}
       >
         <div className="flex items-center justify-between">
-          <h3 className="font-display text-lg font-semibold text-admin-text">Changer le mot de passe</h3>
+          <h3 id="change-password-title" className="font-display text-lg font-semibold text-admin-text">
+            Changer le mot de passe
+          </h3>
           <button onClick={onClose} aria-label="Fermer" className="text-admin-text-dim hover:text-admin-text">
             <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5">
               <path d="m6 6 12 12M18 6 6 18" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />

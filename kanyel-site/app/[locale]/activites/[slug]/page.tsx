@@ -139,7 +139,7 @@ export default async function DepartmentDetailPage({
           </section>
         )}
 
-        <section className="bg-navy-deep py-16 text-center sm:py-20">
+        <section className="bg-navy py-16 text-center sm:py-20">
           <div className="mx-auto max-w-2xl px-5 sm:px-8">
             <Reveal>
               <h2 className="font-display text-2xl font-semibold text-white sm:text-3xl">{t("ctaTitle")}</h2>

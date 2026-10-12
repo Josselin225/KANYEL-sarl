@@ -231,6 +231,15 @@
     "back": "Retour aux actualités",
     "publishedOn": "Publié le"
   },
+  "newsletter": {
+    "kicker": "Newsletter",
+    "title": "Ne manquez aucune actualité",
+    "subtitle": "Inscrivez-vous pour recevoir nos dernières nouvelles directement par e-mail.",
+    "placeholder": "Votre adresse e-mail",
+    "submit": "S'inscrire",
+    "sending": "Inscription…",
+    "success": "Merci ! Votre inscription a bien été prise en compte."
+  },
   "faq": {
     "kicker": "Questions fréquentes",
     "title": "Vous avez des questions ?",
