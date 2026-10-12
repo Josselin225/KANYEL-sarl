@@ -3,11 +3,14 @@ from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.utils.text import slugify
 
+from .image_processing import CompressImagesMixin
 from .validators import validate_document_size, validate_image_size
 
 
-class SiteSettings(models.Model):
+class SiteSettings(CompressImagesMixin, models.Model):
     """Singleton holding global, rarely-changing site content."""
+
+    image_fields = ["leader_photo", "hero_image", "about_image"]
 
     company_name = models.CharField("Nom de l'entreprise", max_length=200, default="KANYEL SARL")
     slogan_fr = models.CharField("Slogan (français)", max_length=200, default="La lumière de l'Éternel")
@@ -90,8 +93,10 @@ class SiteSettings(models.Model):
         super().save(*args, **kwargs)
 
 
-class Department(models.Model):
+class Department(CompressImagesMixin, models.Model):
     """A business activity / department shown in the "Nos activités" section."""
+
+    image_fields = ["detail_image"]
 
     ICON_CHOICES = [
         ("plot", "Lotissement (parcelle)"),
@@ -149,8 +154,10 @@ class Department(models.Model):
         super().save(*args, **kwargs)
 
 
-class DepartmentImage(models.Model):
+class DepartmentImage(CompressImagesMixin, models.Model):
     """An extra photo shown in the gallery of a department's detail page."""
+
+    image_fields = ["image"]
 
     department = models.ForeignKey(
         Department, related_name="gallery_images", on_delete=models.CASCADE, verbose_name="Activité",
@@ -189,8 +196,10 @@ class Credential(models.Model):
         return self.title_fr
 
 
-class GalleryItem(models.Model):
+class GalleryItem(CompressImagesMixin, models.Model):
     """A photo tile shown in the "Domaines d'intervention" gallery."""
+
+    image_fields = ["image"]
 
     ACCENT_CHOICES = [("navy", "Bleu marine"), ("gold", "Or")]
 
@@ -211,8 +220,10 @@ class GalleryItem(models.Model):
         return self.label_fr
 
 
-class Property(models.Model):
+class Property(CompressImagesMixin, models.Model):
     """A managed property shown on the "Gestion Immobilière" department page."""
+
+    image_fields = ["image"]
 
     CATEGORY_CHOICES = [
         ("villa", "Villa"),
@@ -245,8 +256,10 @@ class Property(models.Model):
         return self.title_fr
 
 
-class PropertyImage(models.Model):
+class PropertyImage(CompressImagesMixin, models.Model):
     """An extra photo shown in a property's own gallery/lightbox."""
+
+    image_fields = ["image"]
 
     property = models.ForeignKey(
         Property, related_name="gallery_images", on_delete=models.CASCADE, verbose_name="Bien",
@@ -281,8 +294,10 @@ class Stat(models.Model):
         return f"{self.value} — {self.label_fr}"
 
 
-class Partner(models.Model):
+class Partner(CompressImagesMixin, models.Model):
     """A partner/client logo shown in the scrolling "Nos partenaires" band."""
+
+    image_fields = ["logo"]
 
     order = models.PositiveIntegerField("Ordre", default=0)
     name = models.CharField("Nom du partenaire", max_length=200)
@@ -299,8 +314,10 @@ class Partner(models.Model):
         return self.name
 
 
-class Testimonial(models.Model):
+class Testimonial(CompressImagesMixin, models.Model):
     """A client testimonial shown on the "Témoignages" page."""
+
+    image_fields = ["photo"]
 
     order = models.PositiveIntegerField("Ordre", default=0)
     client_name = models.CharField("Nom du client", max_length=200)
@@ -407,8 +424,10 @@ class ContactMessage(models.Model):
         return f"{self.name} — {self.subject or 'Sans objet'}"
 
 
-class Realisation(models.Model):
+class Realisation(CompressImagesMixin, models.Model):
     """A completed project shown in the "Nos réalisations" portfolio."""
+
+    image_fields = ["image"]
 
     order = models.PositiveIntegerField("Ordre", default=0)
     department = models.ForeignKey(
@@ -434,8 +453,10 @@ class Realisation(models.Model):
         return self.title_fr
 
 
-class RealisationImage(models.Model):
+class RealisationImage(CompressImagesMixin, models.Model):
     """An extra photo shown in a realisation's own gallery."""
+
+    image_fields = ["image"]
 
     realisation = models.ForeignKey(
         Realisation, related_name="gallery_images", on_delete=models.CASCADE, verbose_name="Réalisation",
@@ -452,8 +473,10 @@ class RealisationImage(models.Model):
         return f"{self.realisation.title_fr} — #{self.order}"
 
 
-class Article(models.Model):
+class Article(CompressImagesMixin, models.Model):
     """A news post shown in the "Actualités" section."""
+
+    image_fields = ["cover_image"]
 
     slug = models.SlugField("Identifiant URL (slug)", max_length=220, unique=True, blank=True)
     title_fr = models.CharField("Titre (français)", max_length=200)
@@ -574,6 +597,22 @@ class PropertyVisitRequest(models.Model):
 
     def __str__(self):
         return f"{self.full_name} — {self.property.title_fr if self.property else 'Bien supprimé'}"
+
+
+class NewsletterSubscriber(models.Model):
+    """An email address that signed up for news updates from the public site."""
+
+    email = models.EmailField("E-mail", unique=True)
+    created_at = models.DateTimeField("Inscrit le", auto_now_add=True)
+    is_active = models.BooleanField("Actif", default=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name = "Abonné newsletter"
+        verbose_name_plural = "Abonnés newsletter"
+
+    def __str__(self):
+        return self.email
 
 
 class VisitLog(models.Model):

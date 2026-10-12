@@ -76,6 +76,7 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
       { href: "/admin/quote-requests", label: "Demandes de devis", icon: "invoice" },
       { href: "/admin/property-visit-requests", label: "Demandes de visite", icon: "home" },
       { href: "/admin/messages", label: "Messages", icon: "mail" },
+      { href: "/admin/newsletter-subscribers", label: "Abonnés newsletter", icon: "mail", roles: ["full"] },
     ],
   },
   {

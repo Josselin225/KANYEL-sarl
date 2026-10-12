@@ -17,6 +17,8 @@ from .views import (
     JobApplicationCreateView,
     JobOfferViewSet,
     LoginView,
+    NewsletterSubscriberAdminViewSet,
+    NewsletterSubscriberCreateView,
     PartnerViewSet,
     PropertyImageViewSet,
     PropertyViewSet,
@@ -53,6 +55,7 @@ router.register("articles", ArticleViewSet, basename="article")
 router.register("faqs", FAQViewSet, basename="faq")
 router.register("quote-requests", QuoteRequestAdminViewSet, basename="quote-request-admin")
 router.register("property-visit-requests", PropertyVisitRequestAdminViewSet, basename="property-visit-request-admin")
+router.register("newsletter-subscribers", NewsletterSubscriberAdminViewSet, basename="newsletter-subscriber-admin")
 router.register("admin-users", AdminUserViewSet, basename="admin-user")
 router.register("audit-log", AuditLogEntryViewSet, basename="audit-log")
 
@@ -64,6 +67,7 @@ urlpatterns = [
     path("applications/", JobApplicationCreateView.as_view(), name="application-create"),
     path("devis/", QuoteRequestCreateView.as_view(), name="quote-request-create"),
     path("visite-bien/", PropertyVisitRequestCreateView.as_view(), name="property-visit-request-create"),
+    path("newsletter/", NewsletterSubscriberCreateView.as_view(), name="newsletter-create"),
     path("visit/", IncrementVisitView.as_view(), name="visit-increment"),
     path("visit-stats/", VisitStatsView.as_view(), name="visit-stats"),
     path("search/", SearchView.as_view(), name="search"),

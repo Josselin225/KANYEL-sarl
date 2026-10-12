@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useFocusTrap } from "@/lib/useFocusTrap";
 
 export default function Lightbox({
   images,
@@ -14,6 +15,7 @@ export default function Lightbox({
   onClose: () => void;
 }) {
   const [index, setIndex] = useState(initialIndex);
+  const trapRef = useFocusTrap<HTMLDivElement>(true);
 
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
@@ -31,10 +33,13 @@ export default function Lightbox({
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-navy-deep/95 p-4"
+      ref={trapRef}
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-navy-deep/95 p-4 outline-none"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
+      aria-label={alt}
+      tabIndex={-1}
     >
       <button
         onClick={onClose}

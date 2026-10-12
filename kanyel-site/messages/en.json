@@ -231,6 +231,15 @@
     "back": "Back to news",
     "publishedOn": "Published on"
   },
+  "newsletter": {
+    "kicker": "Newsletter",
+    "title": "Never miss an update",
+    "subtitle": "Sign up to receive our latest news directly by email.",
+    "placeholder": "Your email address",
+    "submit": "Subscribe",
+    "sending": "Subscribing…",
+    "success": "Thank you! Your subscription has been received."
+  },
   "faq": {
     "kicker": "FAQ",
     "title": "Got questions?",
