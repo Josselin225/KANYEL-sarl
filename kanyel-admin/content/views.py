@@ -332,7 +332,7 @@ class SearchView(views.APIView):
         )[:10]:
             results.append({
                 "type": "property", "title": prop.title_fr,
-                "url": "/immobilier", "excerpt": prop.location,
+                "url": f"/biens/{prop.id}", "excerpt": prop.location,
             })
 
         for article in Article.objects.filter(is_published=True).filter(

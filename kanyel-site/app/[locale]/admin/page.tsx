@@ -100,6 +100,44 @@ interface PreviewVisitRequest {
   is_read: boolean;
 }
 
+function groupAndCount<T>(items: T[], keyOf: (item: T) => string): { label: string; count: number }[] {
+  const counts = new Map<string, number>();
+  for (const item of items) {
+    const key = keyOf(item);
+    counts.set(key, (counts.get(key) ?? 0) + 1);
+  }
+  return Array.from(counts, ([label, count]) => ({ label, count })).sort((a, b) => b.count - a.count);
+}
+
+function BreakdownBars({ title, items, emptyLabel }: { title: string; items: { label: string; count: number }[]; emptyLabel: string }) {
+  const max = Math.max(...items.map((i) => i.count), 1);
+  return (
+    <div className="rounded-3xl bg-admin-surface p-5 shadow-soft">
+      <h4 className="font-display text-sm font-semibold text-admin-text">{title}</h4>
+      {items.length === 0 ? (
+        <p className="mt-3 text-sm text-admin-text-dim">{emptyLabel}</p>
+      ) : (
+        <ul className="mt-4 space-y-3">
+          {items.slice(0, 6).map((item) => (
+            <li key={item.label}>
+              <div className="flex items-center justify-between text-xs">
+                <span className="truncate text-admin-text">{item.label}</span>
+                <span className="shrink-0 font-semibold text-admin-text-dim">{item.count}</span>
+              </div>
+              <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-admin-bg">
+                <div
+                  className="h-full rounded-full bg-admin-accent"
+                  style={{ width: `${(item.count / max) * 100}%` }}
+                />
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
 function formatDateTime(value: string) {
   return new Date(value).toLocaleString("fr-FR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" });
 }
@@ -194,6 +232,8 @@ export default function AdminDashboardPage() {
   const [unreadApplications, setUnreadApplications] = useState<PreviewApplication[]>([]);
   const [unreadQuotes, setUnreadQuotes] = useState<PreviewQuote[]>([]);
   const [unreadVisitRequests, setUnreadVisitRequests] = useState<PreviewVisitRequest[]>([]);
+  const [quotesByDepartment, setQuotesByDepartment] = useState<{ label: string; count: number }[]>([]);
+  const [visitsByProperty, setVisitsByProperty] = useState<{ label: string; count: number }[]>([]);
   const cards = CARDS.filter((c) => !c.roles || c.roles.includes(role));
   const isFull = role === "full";
 
@@ -276,6 +316,9 @@ export default function AdminDashboardPage() {
       setUnreadApplications(applications.filter((a) => !a.is_read).slice(0, 3));
       setUnreadQuotes(quotes.filter((q) => !q.is_read).slice(0, 3));
       setUnreadVisitRequests(visitRequests.filter((v) => !v.is_read).slice(0, 3));
+
+      setQuotesByDepartment(groupAndCount(quotes, (q) => q.department_title || "Devis général"));
+      setVisitsByProperty(groupAndCount(visitRequests, (v) => v.property_title || "Bien supprimé"));
 
       const stats30 = await adminApi.list<VisitPoint>("visit-stats").catch(() => []);
       setVisits(stats30);
@@ -396,6 +439,19 @@ export default function AdminDashboardPage() {
             snippet: v.message,
             date: formatDateTime(v.created_at),
           }))}
+        />
+      </div>
+
+      <div className="mt-8 grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <BreakdownBars
+          title="Demandes de devis par activité"
+          items={quotesByDepartment}
+          emptyLabel="Aucune demande de devis reçue pour le moment."
+        />
+        <BreakdownBars
+          title="Biens les plus demandés en visite"
+          items={visitsByProperty}
+          emptyLabel="Aucune demande de visite reçue pour le moment."
         />
       </div>
 

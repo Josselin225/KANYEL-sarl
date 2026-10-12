@@ -1,11 +1,15 @@
 import type { MetadataRoute } from "next";
-import { getArticles, getDepartments, SITE_URL } from "@/lib/api";
+import { getArticles, getDepartments, getProperties, SITE_URL } from "@/lib/api";
 import { routing } from "@/i18n/routing";
 
 export const revalidate = 60;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [departments, articles] = await Promise.all([getDepartments(), getArticles()]);
+  const [departments, articles, properties] = await Promise.all([
+    getDepartments(),
+    getArticles(),
+    getProperties(),
+  ]);
 
   const staticPaths = [
     "",
@@ -30,6 +34,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
     for (const a of articles) {
       entries.push({ url: `${SITE_URL}/${locale}/actualites/${a.slug}`, lastModified: new Date(a.published_at) });
+    }
+    for (const p of properties) {
+      entries.push({ url: `${SITE_URL}/${locale}/biens/${p.id}`, lastModified: new Date() });
     }
   }
 

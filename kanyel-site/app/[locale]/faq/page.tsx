@@ -1,9 +1,26 @@
+import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import FAQAccordion from "@/components/FAQAccordion";
 import { Reveal } from "@/components/Reveal";
 import { getDepartments, getFAQs, getSettings, pick, type Locale } from "@/lib/api";
+import { pageMetadata } from "@/lib/seo";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "faq" });
+  return pageMetadata({
+    locale: locale as Locale,
+    path: "/faq",
+    title: `${t("title")} | KANYEL SARL`,
+    description: t("subtitle"),
+  });
+}
 
 export default async function FAQPage({
   params,

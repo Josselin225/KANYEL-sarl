@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
@@ -16,6 +17,26 @@ import {
   pick,
   type Locale,
 } from "@/lib/api";
+import { pageMetadata } from "@/lib/seo";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string; slug: string }>;
+}): Promise<Metadata> {
+  const { locale, slug } = await params;
+  const departments = await getDepartments();
+  const department = departments.find((d) => d.slug === slug);
+  if (!department) return {};
+
+  return pageMetadata({
+    locale: locale as Locale,
+    path: `/activites/${slug}`,
+    title: `${pick(department, "title", locale as Locale)} | KANYEL SARL`,
+    description: pick(department, "description", locale as Locale),
+    image: department.detail_image,
+  });
+}
 
 export default async function DepartmentDetailPage({
   params,
