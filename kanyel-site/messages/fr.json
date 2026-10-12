@@ -220,7 +220,11 @@
     "subtitle": "Un aperçu de nos réalisations récentes, tous secteurs confondus.",
     "empty": "Nos réalisations seront bientôt présentées ici.",
     "clientLabel": "Client",
-    "completedLabel": "Terminé le"
+    "completedLabel": "Terminé le",
+    "back": "Retour aux réalisations",
+    "viewDetails": "Voir le détail",
+    "locationLabel": "Lieu",
+    "activityLabel": "Activité concernée"
   },
   "articles": {
     "kicker": "Actualités",

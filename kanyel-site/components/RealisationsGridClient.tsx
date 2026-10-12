@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { Link } from "@/i18n/navigation";
 import { RevealGroup, RevealItem } from "./Reveal";
 import Lightbox from "./Lightbox";
 import ShareButtons from "./ShareButtons";
@@ -61,7 +62,11 @@ export default function RealisationsGridClient({
                 )}
               </button>
               <div className="p-6">
-                <h3 className="font-display text-lg font-semibold text-navy">{pick(r, "title", locale)}</h3>
+                <Link href={`/realisations/${r.id}`} className="block">
+                  <h3 className="font-display text-lg font-semibold text-navy hover:text-gold-dark">
+                    {pick(r, "title", locale)}
+                  </h3>
+                </Link>
                 <p className="mt-2 text-sm leading-relaxed text-ink-dim">{pick(r, "description", locale)}</p>
                 <div className="mt-4 space-y-1 text-xs text-ink-dim">
                   {r.client_name && (
@@ -76,9 +81,15 @@ export default function RealisationsGridClient({
                     </p>
                   )}
                 </div>
+                <Link
+                  href={`/realisations/${r.id}`}
+                  className="mt-4 inline-block rounded-full border border-navy px-4 py-2 text-xs font-semibold text-navy transition-colors hover:bg-navy hover:text-white"
+                >
+                  {t.viewDetails}
+                </Link>
                 <div className="mt-4 border-t border-border pt-4">
                   <ShareButtons
-                    url={`${SITE_URL}/${locale}/realisations`}
+                    url={`${SITE_URL}/${locale}/realisations/${r.id}`}
                     title={pick(r, "title", locale)}
                     label={t.shareLabel}
                     whatsappLabel={t.shareWhatsapp}
