@@ -351,7 +351,7 @@ class SearchView(views.APIView):
         )[:10]:
             results.append({
                 "type": "realisation", "title": realisation.title_fr,
-                "url": "/realisations", "excerpt": realisation.description_fr,
+                "url": f"/realisations/{realisation.id}", "excerpt": realisation.description_fr,
             })
 
         return Response(results)

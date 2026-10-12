@@ -220,7 +220,11 @@
     "subtitle": "A look at our recent work, across every sector we operate in.",
     "empty": "Our completed projects will be showcased here soon.",
     "clientLabel": "Client",
-    "completedLabel": "Completed on"
+    "completedLabel": "Completed on",
+    "back": "Back to our work",
+    "viewDetails": "View details",
+    "locationLabel": "Location",
+    "activityLabel": "Related activity"
   },
   "articles": {
     "kicker": "News",

@@ -44,6 +44,7 @@ export default async function RealisationsGrid({
               t={{
                 clientLabel: t("clientLabel"),
                 completedLabel: t("completedLabel"),
+                viewDetails: t("viewDetails"),
                 shareLabel: tShare("label"),
                 shareWhatsapp: tShare("whatsapp"),
                 shareFacebook: tShare("facebook"),

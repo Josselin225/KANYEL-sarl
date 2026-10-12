@@ -103,17 +103,25 @@ export default async function DepartmentDetailPage({
                 </h2>
               </Reveal>
               <RevealGroup className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-4">
-                {images.map((img) => (
-                  <RevealItem key={img.id} className="relative aspect-square overflow-hidden rounded-2xl">
-                    <Image
-                      src={img.image}
-                      alt={pick(img, "caption", locale as Locale) || title}
-                      fill
-                      sizes="(max-width: 640px) 50vw, 25vw"
-                      className="object-cover"
-                    />
-                  </RevealItem>
-                ))}
+                {images.map((img) => {
+                  const caption = pick(img, "caption", locale as Locale);
+                  return (
+                    <RevealItem key={img.id} className="relative aspect-square overflow-hidden rounded-2xl">
+                      <Image
+                        src={img.image}
+                        alt={caption || title}
+                        fill
+                        sizes="(max-width: 640px) 50vw, 25vw"
+                        className="object-cover"
+                      />
+                      {caption && (
+                        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-navy-deep/80 to-transparent px-3 pb-2.5 pt-6">
+                          <p className="text-xs font-medium leading-tight text-white">{caption}</p>
+                        </div>
+                      )}
+                    </RevealItem>
+                  );
+                })}
               </RevealGroup>
             </div>
           </section>
