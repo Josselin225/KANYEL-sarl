@@ -6,7 +6,7 @@ import { groupImagesByProperty, type ApiProperty, type ApiPropertyImage, type Lo
 const T_KEYS = [
   "villa", "appartement", "terrain", "bureau_commerce", "immeuble",
   "priceOnRequest", "empty", "filterAll", "filterLocation", "filterMinPrice",
-  "filterMaxPrice", "filterReset", "noResults", "requestVisit",
+  "filterMaxPrice", "filterReset", "noResults", "requestVisit", "viewDetails",
 ];
 
 export default async function PropertiesGrid({

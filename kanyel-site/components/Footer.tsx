@@ -2,7 +2,7 @@ import { getTranslations } from "next-intl/server";
 import Logo from "./Logo";
 import LogoWatermark from "./LogoWatermark";
 import SocialLinks from "./SocialLinks";
-import { buildWhatsAppUrl, getArticles, pick, type ApiDepartment, type ApiSiteSettings, type Locale } from "@/lib/api";
+import { buildWhatsAppUrl, pick, type ApiDepartment, type ApiSiteSettings, type Locale } from "@/lib/api";
 
 function IconLock() {
   return (
@@ -29,24 +29,14 @@ function IconWhatsApp() {
   );
 }
 
-function formatShortDate(dateStr: string, locale: Locale) {
-  return new Date(dateStr).toLocaleDateString(locale === "en" ? "en-US" : "fr-FR", {
-    day: "2-digit",
-    month: "short",
-  });
-}
-
 export default async function Footer({
   settings,
   departments,
   locale,
-  showMap = true,
 }: {
   settings: ApiSiteSettings | null;
   departments: ApiDepartment[];
   locale: Locale;
-  /** Set to false on pages that already show their own map (e.g. the homepage's Contact section). */
-  showMap?: boolean;
 }) {
   const t = await getTranslations({ locale, namespace: "footer" });
   const tNav = await getTranslations({ locale, namespace: "nav" });
@@ -69,11 +59,6 @@ export default async function Footer({
       ? `${settings.latitude},${settings.longitude}`
       : address;
   const mapSrc = `https://www.google.com/maps?q=${encodeURIComponent(mapQuery)}&z=15&output=embed`;
-
-  const recentArticles = (await getArticles())
-    .slice()
-    .sort((a, b) => new Date(b.published_at).getTime() - new Date(a.published_at).getTime())
-    .slice(0, 3);
 
   const quickLinks = [
     { href: `/${locale}`, label: tNav("home") },
@@ -103,7 +88,7 @@ export default async function Footer({
     <footer className="relative overflow-hidden bg-navy-deep py-10 lg:py-14">
       <LogoWatermark className="pointer-events-none absolute -bottom-16 -left-16 h-auto w-80 opacity-[0.06] sm:w-[28rem]" />
       <div className="relative px-4 sm:px-6 lg:px-10">
-        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           <div>
             <Logo variant="badge" />
             <p className="mt-4 font-display italic text-gold-light">
@@ -118,7 +103,7 @@ export default async function Footer({
             <h4 className="text-sm font-semibold uppercase tracking-wider text-white">
               {t("quickLinksTitle")}
             </h4>
-            <ul className="mt-4 columns-2 gap-x-6 sm:columns-1 lg:columns-2">
+            <ul className="mt-4 columns-2 gap-x-6">
               {quickLinks.map((link) => (
                 <li key={link.href} className="break-inside-avoid pb-2.5">
                   <a
@@ -130,41 +115,17 @@ export default async function Footer({
                 </li>
               ))}
             </ul>
-          </div>
 
-          <div>
-            <h4 className="text-sm font-semibold uppercase tracking-wider text-white">
+            <h4 className="mt-6 text-sm font-semibold uppercase tracking-wider text-white">
               {t("servicesTitle")}
             </h4>
-            <ul className="mt-4 space-y-2.5">
+            <ul className="mt-4 columns-2 gap-x-6">
               {services.map((s) => (
-                <li key={s} className="text-sm text-white/65">
+                <li key={s} className="break-inside-avoid pb-2.5 text-sm text-white/65">
                   {s}
                 </li>
               ))}
             </ul>
-
-            {recentArticles.length > 0 && (
-              <>
-                <h4 className="mt-6 text-sm font-semibold uppercase tracking-wider text-white">
-                  {t("recentArticlesTitle")}
-                </h4>
-                <ul className="mt-4 space-y-3">
-                  {recentArticles.map((a) => (
-                    <li key={a.id}>
-                      <a href={`/${locale}/actualites/${a.slug}`} className="group block">
-                        <p className="text-xs font-semibold uppercase tracking-wide text-gold-light">
-                          {formatShortDate(a.published_at, locale)}
-                        </p>
-                        <p className="mt-1 text-sm text-white/75 group-hover:text-white">
-                          {pick(a, "title", locale)}
-                        </p>
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </>
-            )}
           </div>
 
           <div>
@@ -208,17 +169,15 @@ export default async function Footer({
               )}
             </div>
 
-            {showMap && (
-              <div className="mt-4 overflow-hidden rounded-2xl shadow-soft ring-1 ring-white/10">
-                <iframe
-                  src={mapSrc}
-                  title={t("mapTitle")}
-                  loading="lazy"
-                  className="h-32 w-full border-0"
-                  referrerPolicy="no-referrer-when-downgrade"
-                />
-              </div>
-            )}
+            <div className="mt-4 overflow-hidden rounded-2xl shadow-soft ring-1 ring-white/10">
+              <iframe
+                src={mapSrc}
+                title={t("mapTitle")}
+                loading="lazy"
+                className="h-32 w-full border-0"
+                referrerPolicy="no-referrer-when-downgrade"
+              />
+            </div>
           </div>
         </div>
 

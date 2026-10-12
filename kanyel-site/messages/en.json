@@ -113,8 +113,6 @@
     "quickLinksTitle": "Quick Links",
     "servicesTitle": "Our Activities",
     "contactTitle": "Contact",
-    "recentArticlesTitle": "Recent News",
-    "noArticles": "No news published yet.",
     "whatsappCta": "Chat on WhatsApp",
     "whatsappMessage": "Hello KANYEL SARL, I would like more information.",
     "mapTitle": "KANYEL SARL location",
@@ -197,7 +195,10 @@
     "filterMaxPrice": "Max price (FCFA)",
     "filterReset": "Reset",
     "noResults": "No property matches these criteria.",
-    "requestVisit": "Request a visit"
+    "requestVisit": "Request a visit",
+    "back": "Back to property listings",
+    "viewDetails": "View details",
+    "galleryTitle": "Photo gallery"
   },
   "propertyVisit": {
     "title": "Request a visit",

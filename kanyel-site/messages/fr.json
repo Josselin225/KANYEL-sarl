@@ -113,8 +113,6 @@
     "quickLinksTitle": "Liens rapides",
     "servicesTitle": "Nos activités",
     "contactTitle": "Contact",
-    "recentArticlesTitle": "Actualités récentes",
-    "noArticles": "Aucune actualité publiée pour le moment.",
     "whatsappCta": "Discuter sur WhatsApp",
     "whatsappMessage": "Bonjour KANYEL SARL, je souhaite avoir plus d'informations.",
     "mapTitle": "Localisation de KANYEL SARL",
@@ -197,7 +195,10 @@
     "filterMaxPrice": "Prix max (FCFA)",
     "filterReset": "Réinitialiser",
     "noResults": "Aucun bien ne correspond à ces critères.",
-    "requestVisit": "Demander une visite"
+    "requestVisit": "Demander une visite",
+    "back": "Retour à l'offre immobilière",
+    "viewDetails": "Voir le détail",
+    "galleryTitle": "Galerie photos"
   },
   "propertyVisit": {
     "title": "Demander une visite",

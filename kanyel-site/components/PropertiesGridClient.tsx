@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Image from "next/image";
+import { Link } from "@/i18n/navigation";
 import { RevealGroup, RevealItem } from "./Reveal";
 import Lightbox from "./Lightbox";
 import PropertyVisitModal from "./PropertyVisitModal";
@@ -141,18 +142,30 @@ export default function PropertiesGridClient({
                           )}
                         </button>
                         <div className="p-5">
-                          <h4 className="font-display text-base font-semibold text-navy">{pick(p, "title", locale)}</h4>
+                          <Link href={`/biens/${p.id}`} className="block">
+                            <h4 className="font-display text-base font-semibold text-navy hover:text-gold-dark">
+                              {pick(p, "title", locale)}
+                            </h4>
+                          </Link>
                           {p.location && <p className="mt-1 text-xs text-ink-dim">{p.location}</p>}
                           <p className="mt-2 text-sm leading-relaxed text-ink-dim">{pick(p, "description", locale)}</p>
                           <p className="mt-3 font-display text-sm font-semibold text-gold-dark">
                             {p.price || t.priceOnRequest}
                           </p>
-                          <button
-                            onClick={() => setVisitRequest({ id: p.id, title: pick(p, "title", locale) })}
-                            className="mt-4 w-full rounded-full border border-navy px-4 py-2 text-xs font-semibold text-navy transition-colors hover:bg-navy hover:text-white"
-                          >
-                            {t.requestVisit}
-                          </button>
+                          <div className="mt-4 flex gap-2">
+                            <Link
+                              href={`/biens/${p.id}`}
+                              className="flex-1 rounded-full border border-border px-4 py-2 text-center text-xs font-semibold text-navy transition-colors hover:border-navy"
+                            >
+                              {t.viewDetails}
+                            </Link>
+                            <button
+                              onClick={() => setVisitRequest({ id: p.id, title: pick(p, "title", locale) })}
+                              className="flex-1 rounded-full border border-navy px-4 py-2 text-xs font-semibold text-navy transition-colors hover:bg-navy hover:text-white"
+                            >
+                              {t.requestVisit}
+                            </button>
+                          </div>
                         </div>
                       </RevealItem>
                     );

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
@@ -5,13 +6,34 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Reveal } from "@/components/Reveal";
 import ShareButtons from "@/components/ShareButtons";
+import ArticleJsonLd from "@/components/ArticleJsonLd";
 import { getArticles, getDepartments, getSettings, pick, SITE_URL, type Locale } from "@/lib/api";
+import { pageMetadata } from "@/lib/seo";
 
 function formatDate(dateStr: string, locale: Locale) {
   return new Date(dateStr).toLocaleDateString(locale === "en" ? "en-US" : "fr-FR", {
     year: "numeric",
     month: "long",
     day: "numeric",
+  });
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string; slug: string }>;
+}): Promise<Metadata> {
+  const { locale, slug } = await params;
+  const articles = await getArticles();
+  const article = articles.find((a) => a.slug === slug);
+  if (!article) return {};
+
+  return pageMetadata({
+    locale: locale as Locale,
+    path: `/actualites/${slug}`,
+    title: `${pick(article, "title", locale as Locale)} | KANYEL SARL`,
+    description: pick(article, "excerpt", locale as Locale),
+    image: article.cover_image,
   });
 }
 
@@ -36,6 +58,7 @@ export default async function ArticleDetailPage({
 
   return (
     <>
+      <ArticleJsonLd article={article} locale={locale as Locale} />
       <Header settings={settings} departments={departments} />
       <main>
         <section className="relative flex h-[45vh] min-h-[340px] w-full items-end overflow-hidden bg-navy-deep">
