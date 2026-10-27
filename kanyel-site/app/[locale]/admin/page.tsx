@@ -6,6 +6,7 @@ import { Link } from "@/i18n/navigation";
 import { adminApi, getRole } from "@/lib/adminApi";
 import CountUp from "@/components/admin/CountUp";
 import Skeleton from "@/components/admin/Skeleton";
+import NavIcon from "@/components/admin/NavIcon";
 
 const easeOut: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
@@ -38,26 +39,34 @@ interface Counts {
   visitCount: number;
 }
 
-const CONTENT_BARS: { key: keyof Counts; label: string; href: string }[] = [
-  { key: "departments", label: "Activités", href: "/admin/departments" },
-  { key: "properties", label: "Biens immobiliers", href: "/admin/properties" },
-  { key: "testimonials", label: "Témoignages", href: "/admin/testimonials" },
-  { key: "credentials", label: "Reconnaissances", href: "/admin/credentials" },
-  { key: "partners", label: "Partenaires", href: "/admin/partners" },
-  { key: "gallery", label: "Photos galerie", href: "/admin/gallery" },
-  { key: "stats", label: "Statistiques clés", href: "/admin/stats" },
-  { key: "jobs", label: "Offres d'emploi", href: "/admin/jobs" },
-  { key: "realisations", label: "Réalisations", href: "/admin/realisations" },
-  { key: "articles", label: "Actualités", href: "/admin/articles" },
-  { key: "faqs", label: "Questions fréquentes", href: "/admin/faqs" },
+const CONTENT_BARS: { key: keyof Counts; label: string; href: string; icon: string }[] = [
+  { key: "departments", label: "Activités", href: "/admin/departments", icon: "layers" },
+  { key: "properties", label: "Biens immobiliers", href: "/admin/properties", icon: "home" },
+  { key: "testimonials", label: "Témoignages", href: "/admin/testimonials", icon: "quote" },
+  { key: "credentials", label: "Reconnaissances", href: "/admin/credentials", icon: "badge" },
+  { key: "partners", label: "Partenaires", href: "/admin/partners", icon: "handshake" },
+  { key: "gallery", label: "Photos galerie", href: "/admin/gallery", icon: "image" },
+  { key: "stats", label: "Statistiques clés", href: "/admin/stats", icon: "chart" },
+  { key: "jobs", label: "Offres d'emploi", href: "/admin/jobs", icon: "briefcase" },
+  { key: "realisations", label: "Réalisations", href: "/admin/realisations", icon: "star" },
+  { key: "articles", label: "Actualités", href: "/admin/articles", icon: "news" },
+  { key: "faqs", label: "Questions fréquentes", href: "/admin/faqs", icon: "help" },
 ];
 
-const REQUEST_BARS: { key: keyof Counts; label: string; href: string }[] = [
-  { key: "unreadMessages", label: "Messages non lus", href: "/admin/messages" },
-  { key: "unreadApplications", label: "Candidatures non lues", href: "/admin/job-applications" },
-  { key: "unreadQuotes", label: "Devis non lus", href: "/admin/quote-requests" },
-  { key: "unreadVisitRequests", label: "Demandes de visite non lues", href: "/admin/property-visit-requests" },
+const REQUEST_BARS: { key: keyof Counts; label: string; href: string; icon: string }[] = [
+  { key: "unreadMessages", label: "Messages non lus", href: "/admin/messages", icon: "mail" },
+  { key: "unreadApplications", label: "Candidatures non lues", href: "/admin/job-applications", icon: "user" },
+  { key: "unreadQuotes", label: "Devis non lus", href: "/admin/quote-requests", icon: "invoice" },
+  { key: "unreadVisitRequests", label: "Demandes de visite non lues", href: "/admin/property-visit-requests", icon: "home" },
 ];
+
+// Fixed-order, colorblind-safe categorical palette (validated set — see the
+// dataviz skill's reference palette). Cycled for lists longer than 8 — the
+// icon + label pairing (never color alone) keeps every row identifiable.
+const PALETTE = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#6250d6", "#e34948", "#008300"];
+function paletteColor(i: number) {
+  return PALETTE[i % PALETTE.length];
+}
 
 const DRAFT_RESOURCES: { key: string; label: string; href: string }[] = [
   { key: "departments", label: "Activités", href: "/admin/departments" },
@@ -136,10 +145,6 @@ const PROPERTY_CATEGORY_LABELS: Record<AdminProperty["category"], string> = {
   immeuble: "Immeubles",
 };
 
-// Fixed-order, colorblind-safe categorical palette (validated set — see the
-// dataviz skill's reference palette). Order must stay fixed across renders.
-const CATEGORY_COLORS = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4"];
-
 function groupAndCount<T>(items: T[], keyOf: (item: T) => string): { label: string; count: number }[] {
   const counts = new Map<string, number>();
   for (const item of items) {
@@ -158,7 +163,7 @@ function BreakdownBars({
   limit = 6,
 }: {
   title: string;
-  items: { label: string; count: number; href?: string }[];
+  items: { label: string; count: number; href?: string; icon?: string; color?: string }[];
   emptyLabel: string;
   loading: boolean;
   accent?: string;
@@ -186,7 +191,17 @@ function BreakdownBars({
             const row = (
               <>
                 <div className="flex items-center justify-between text-xs">
-                  <span className="truncate text-admin-text">{item.label}</span>
+                  <span className="flex min-w-0 items-center gap-2 truncate text-admin-text">
+                    {item.icon && (
+                      <span
+                        className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full"
+                        style={item.color ? { backgroundColor: `${item.color}22`, color: item.color } : undefined}
+                      >
+                        <NavIcon name={item.icon} className="h-3 w-3" />
+                      </span>
+                    )}
+                    <span className="truncate">{item.label}</span>
+                  </span>
                   <span className="shrink-0 font-semibold text-admin-text-dim">
                     <CountUp value={item.count} />
                   </span>
@@ -196,7 +211,8 @@ function BreakdownBars({
                     initial={{ width: 0 }}
                     animate={{ width: `${(item.count / max) * 100}%` }}
                     transition={{ duration: 0.6, delay: 0.1 + i * 0.05, ease: easeOut }}
-                    className={`h-full rounded-full ${accent}`}
+                    className={item.color ? "h-full rounded-full" : `h-full rounded-full ${accent}`}
+                    style={item.color ? { backgroundColor: item.color } : undefined}
                   />
                 </div>
               </>
@@ -524,7 +540,7 @@ export default function AdminDashboardPage() {
     (cat, i) => ({
       label: PROPERTY_CATEGORY_LABELS[cat],
       count: publishedProperties.filter((p) => p.category === cat).length,
-      color: CATEGORY_COLORS[i],
+      color: paletteColor(i),
     })
   );
   const rentals = publishedProperties.filter((p) => p.transaction_type === "location");
@@ -542,14 +558,22 @@ export default function AdminDashboardPage() {
   const annualRevenue = monthlyRevenue * 12;
 
   const contentBars = counts
-    ? CONTENT_BARS.map((c) => ({ label: c.label, count: counts[c.key], href: c.href })).sort(
-        (a, b) => b.count - a.count
-      )
+    ? CONTENT_BARS.map((c, i) => ({
+        label: c.label,
+        count: counts[c.key],
+        href: c.href,
+        icon: c.icon,
+        color: paletteColor(i),
+      })).sort((a, b) => b.count - a.count)
     : [];
   const requestBars = counts
-    ? REQUEST_BARS.map((c) => ({ label: c.label, count: counts[c.key], href: c.href })).sort(
-        (a, b) => b.count - a.count
-      )
+    ? REQUEST_BARS.map((c, i) => ({
+        label: c.label,
+        count: counts[c.key],
+        href: c.href,
+        icon: c.icon,
+        color: paletteColor(i),
+      })).sort((a, b) => b.count - a.count)
     : [];
   const totalContent = counts ? CONTENT_BARS.reduce((sum, c) => sum + counts[c.key], 0) : 0;
   const totalUnread = counts ? REQUEST_BARS.reduce((sum, c) => sum + counts[c.key], 0) : 0;
