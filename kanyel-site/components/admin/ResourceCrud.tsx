@@ -87,8 +87,8 @@ export default function ResourceCrud({ resource }: { resource: ResourceConfig })
             if (val instanceof File) fd.append(f.name, val);
           } else if (f.type === "boolean") {
             fd.append(f.name, val ? "true" : "false");
-          } else if (f.type === "date" && !val) {
-            // Omit empty optional dates — DRF rejects "" as an invalid date format.
+          } else if ((f.type === "date" || f.type === "number") && (val === null || val === undefined)) {
+            // Omit empty optional dates/numbers — DRF rejects "" as an invalid value for them.
           } else {
             fd.append(f.name, String(val ?? ""));
           }

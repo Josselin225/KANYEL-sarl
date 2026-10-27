@@ -232,9 +232,16 @@ class Property(CompressImagesMixin, models.Model):
         ("bureau_commerce", "Bureau / Commerce"),
         ("immeuble", "Immeuble"),
     ]
+    TRANSACTION_CHOICES = [
+        ("location", "Location"),
+        ("vente", "Vente"),
+    ]
 
     order = models.PositiveIntegerField("Ordre", default=0)
     category = models.CharField("Catégorie", max_length=20, choices=CATEGORY_CHOICES, default="villa")
+    transaction_type = models.CharField(
+        "Type de transaction", max_length=10, choices=TRANSACTION_CHOICES, default="location",
+    )
     title_fr = models.CharField("Titre (français)", max_length=200)
     title_en = models.CharField("Titre (anglais)", max_length=200)
     description_fr = models.TextField("Description (français)")
@@ -243,6 +250,19 @@ class Property(CompressImagesMixin, models.Model):
     price = models.CharField(
         "Prix / Loyer", max_length=100, blank=True,
         help_text="Ex. \"25 000 000 FCFA\", \"350 000 FCFA / mois\" ou \"Sur demande\".",
+    )
+    price_amount = models.PositiveIntegerField(
+        "Montant (FCFA)", null=True, blank=True,
+        help_text="Valeur numérique utilisée pour les statistiques du tableau de bord (bien le plus cher, "
+        "chiffre d'affaires). Laisser vide si le prix est « Sur demande ».",
+    )
+    is_occupied = models.BooleanField(
+        "Occupé", default=False,
+        help_text="Pertinent uniquement pour un bien en location : coché si un locataire occupe actuellement le bien.",
+    )
+    tenant_name = models.CharField(
+        "Locataire actuel", max_length=200, blank=True,
+        help_text="Nom du locataire si le bien est occupé. Laisser vide sinon.",
     )
     image = models.ImageField("Photo", upload_to="properties/", validators=[validate_image_size])
     is_published = models.BooleanField("Publié", default=True)

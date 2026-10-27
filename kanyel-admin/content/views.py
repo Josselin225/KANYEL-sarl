@@ -58,6 +58,7 @@ from .serializers import (
     NewsletterSubscriberCreateSerializer,
     NewsletterSubscriberSerializer,
     PartnerSerializer,
+    PropertyAdminSerializer,
     PropertyImageSerializer,
     PropertySerializer,
     PropertyVisitRequestCreateSerializer,
@@ -198,6 +199,9 @@ class PropertyViewSet(AuditLogMixin, viewsets.ModelViewSet):
     queryset = Property.objects.all()
     serializer_class = PropertySerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly, DenyReceptionRole]
+
+    def get_serializer_class(self):
+        return PropertyAdminSerializer if self._is_staff() else PropertySerializer
 
     def get_queryset(self):
         # "price" is free text (e.g. "25 000 000 FCFA" or "Sur demande"), so it

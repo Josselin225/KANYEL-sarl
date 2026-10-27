@@ -68,11 +68,25 @@ class GalleryItemSerializer(serializers.ModelSerializer):
 
 
 class PropertySerializer(serializers.ModelSerializer):
+    """Public-facing: excludes internal management fields (occupancy, tenant, exact amount)."""
+
     class Meta:
         model = Property
         fields = [
             "id", "order", "category", "title_fr", "title_en",
             "description_fr", "description_en", "location", "price", "image", "is_published",
+        ]
+
+
+class PropertyAdminSerializer(serializers.ModelSerializer):
+    """Admin-only: adds the management fields used for internal reporting."""
+
+    class Meta:
+        model = Property
+        fields = [
+            "id", "order", "category", "transaction_type", "title_fr", "title_en",
+            "description_fr", "description_en", "location", "price", "price_amount",
+            "is_occupied", "tenant_name", "image", "is_published",
         ]
 
 
