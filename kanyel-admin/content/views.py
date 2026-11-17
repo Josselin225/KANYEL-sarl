@@ -12,13 +12,13 @@ from django.utils._os import safe_join
 from django.views.static import serve as serve_static
 
 from rest_framework import generics, permissions, status, views, viewsets
-from rest_framework.authtoken.views import ObtainAuthToken
-from rest_framework.authtoken.models import Token
+from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework.response import Response
 from rest_framework.throttling import AnonRateThrottle
 
 from .models import (
     AdminProfile,
+    AdminToken,
     Article,
     AuditLogEntry,
     ContactMessage,
@@ -138,24 +138,25 @@ class VisitThrottle(AnonRateThrottle):
     scope = "visit"
 
 
-class LoginView(ObtainAuthToken):
+class LoginView(views.APIView):
     """POST {username, password} -> {token, username}. Used by the custom /admin panel."""
 
     permission_classes = [permissions.AllowAny]
+    authentication_classes = []
     throttle_classes = [LoginThrottle]
 
     def post(self, request, *args, **kwargs):
-        serializer = self.serializer_class(data=request.data, context={"request": request})
+        serializer = AuthTokenSerializer(data=request.data, context={"request": request})
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data["user"]
-        token = Token.objects.filter(user=user).first()
-        if token is None or timezone.now() - token.created > TOKEN_TTL:
-            # Never hand back an expired token: it would be rejected on first use.
-            Token.objects.filter(user=user).delete()
-            token = Token.objects.create(user=user)
+        # Housekeeping: drop this user's expired sessions.
+        AdminToken.objects.filter(user=user, created__lt=timezone.now() - TOKEN_TTL).delete()
+        # Tokens are stored hashed, so an existing one can't be handed back —
+        # each login opens a new session (one per device/browser).
+        key = AdminToken.issue(user)
         profile = getattr(user, "admin_profile", None)
         role = profile.role if profile else AdminProfile.ROLE_FULL
-        return Response({"token": token.key, "username": user.username, "role": role})
+        return Response({"token": key, "username": user.username, "role": role})
 
 
 class LogoutView(views.APIView):
@@ -164,7 +165,9 @@ class LogoutView(views.APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
-        Token.objects.filter(user=request.user).delete()
+        # Ends only this session; other devices stay signed in.
+        if isinstance(request.auth, AdminToken):
+            request.auth.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -422,9 +425,9 @@ class ChangeOwnPasswordView(views.APIView):
 
         request.user.set_password(new_password)
         request.user.save()
-        Token.objects.filter(user=request.user).delete()
-        token = Token.objects.create(user=request.user)
-        return Response({"token": token.key})
+        # Signs out every device, then opens a fresh session for this one.
+        AdminToken.objects.filter(user=request.user).delete()
+        return Response({"token": AdminToken.issue(request.user)})
 
 
 class ContactMessageCreateView(HoneypotCreateMixin, generics.CreateAPIView):

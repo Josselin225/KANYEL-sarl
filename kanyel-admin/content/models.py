@@ -717,3 +717,35 @@ class AuditLogEntry(models.Model):
 
     def __str__(self):
         return f"{self.user} — {self.get_action_display()} — {self.resource}"
+
+
+class AdminToken(models.Model):
+    """Login session for the custom admin panel. Only a SHA-256 digest of the
+    token is stored: a leaked database or backup can't be replayed as a
+    session, the same way a password hash can't be used as a password."""
+
+    user = models.ForeignKey("auth.User", related_name="admin_tokens", on_delete=models.CASCADE)
+    key_hash = models.CharField(max_length=64, unique=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Session admin"
+        verbose_name_plural = "Sessions admin"
+
+    @staticmethod
+    def hash_key(key):
+        import hashlib
+
+        return hashlib.sha256(key.encode()).hexdigest()
+
+    @classmethod
+    def issue(cls, user):
+        """Creates a session and returns the raw key — the only time it exists in clear."""
+        import secrets
+
+        key = secrets.token_hex(32)
+        cls.objects.create(user=user, key_hash=cls.hash_key(key))
+        return key
+
+    def __str__(self):
+        return f"Session de {self.user} ({self.created:%Y-%m-%d})"

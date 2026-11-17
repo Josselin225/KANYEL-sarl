@@ -2,10 +2,10 @@ from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError as DjangoValidationError
 from rest_framework import serializers
-from rest_framework.authtoken.models import Token
 
 from .models import (
     AdminProfile,
+    AdminToken,
     Article,
     AuditLogEntry,
     ContactMessage,
@@ -339,7 +339,7 @@ class AdminUserSerializer(serializers.ModelSerializer):
             instance.set_password(password)
             # Changing the password is the admin's remediation path after a suspected
             # compromise — revoke the existing token so it doesn't outlive the reset.
-            Token.objects.filter(user=instance).delete()
+            AdminToken.objects.filter(user=instance).delete()
         instance.is_active = validated_data.get("is_active", instance.is_active)
         instance.save()
         if profile_data:
