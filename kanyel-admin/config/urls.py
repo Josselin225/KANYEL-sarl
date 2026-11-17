@@ -1,8 +1,7 @@
 from django.conf import settings
 from django.urls import include, path
-from django.views.static import serve as serve_static
 
-from content.views import ProtectedMediaView
+from content.views import ProtectedMediaView, public_media
 
 # The built-in Django admin is intentionally NOT registered here: this
 # project uses a custom admin panel (the Next.js app under /admin) backed
@@ -19,11 +18,7 @@ urlpatterns += [
     path('media/applications/<path:path>', ProtectedMediaView.as_view()),
     # Everything else under /media/ (site photos, logos...) is meant to be
     # publicly visible, so it's served unconditionally (not just DEBUG) so
-    # it keeps working once DEBUG=False in production. Move to a CDN/object
-    # storage (e.g. S3) if traffic grows significantly.
-    path(
-        f'{settings.MEDIA_URL.strip("/")}/<path:path>',
-        serve_static,
-        {'document_root': settings.MEDIA_ROOT},
-    ),
+    # it keeps working once DEBUG=False in production. public_media refuses
+    # any spelling that resolves into media/applications/.
+    path(f'{settings.MEDIA_URL.strip("/")}/<path:path>', public_media),
 ]

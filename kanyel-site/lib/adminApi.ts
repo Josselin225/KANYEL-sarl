@@ -30,6 +30,22 @@ export function clearToken(): void {
   window.localStorage.removeItem(ROLE_KEY);
 }
 
+/** Revokes the token server-side, then forgets it locally. */
+export async function logout(): Promise<void> {
+  const token = getToken();
+  if (token) {
+    try {
+      await fetch(`${API_URL}/api/auth/logout/`, {
+        method: "POST",
+        headers: { Authorization: `Token ${token}` },
+      });
+    } catch {
+      // Server unreachable — still log out locally.
+    }
+  }
+  clearToken();
+}
+
 function setToken(token: string): void {
   if (typeof window === "undefined") return;
   window.localStorage.setItem(TOKEN_KEY, token);

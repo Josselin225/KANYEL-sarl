@@ -1,5 +1,6 @@
 "use client";
 
+import { toCsv } from "@/lib/csv";
 import { useEffect, useState } from "react";
 import { adminApi, ApiError } from "@/lib/adminApi";
 
@@ -56,9 +57,7 @@ export default function AdminNewsletterSubscribersPage() {
   function exportCsv() {
     const header = ["E-mail", "Inscrit le", "Actif"];
     const rows = items.map((it) => [it.email, new Date(it.created_at).toLocaleString("fr-FR"), it.is_active ? "Oui" : "Non"]);
-    const csv = [header, ...rows]
-      .map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(","))
-      .join("\n");
+    const csv = toCsv([header, ...rows]);
     const blob = new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");

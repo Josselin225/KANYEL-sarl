@@ -25,8 +25,8 @@ export default function ChangePasswordModal({ onClose }: { onClose: () => void }
     e.preventDefault();
     setError(null);
 
-    if (newPassword.length < 8) {
-      setError("Le nouveau mot de passe doit contenir au moins 8 caractères.");
+    if (newPassword.length < 10) {
+      setError("Le nouveau mot de passe doit contenir au moins 10 caractères.");
       return;
     }
     if (newPassword !== confirmPassword) {

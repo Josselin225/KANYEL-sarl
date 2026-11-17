@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useLocale } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import { ADMIN_NAV_ITEMS } from "@/lib/adminNav";
-import { clearToken, getRole, getUsername } from "@/lib/adminApi";
+import { getRole, getUsername, logout } from "@/lib/adminApi";
 import { useAdminTheme } from "./AdminThemeContext";
 import ChangePasswordModal from "./ChangePasswordModal";
 
@@ -94,8 +94,8 @@ export default function AdminHeader() {
     ADMIN_NAV_ITEMS.find((item) => (item.href === "/admin" ? pathname === "/admin" : pathname.startsWith(item.href)))
       ?.label ?? "Administration";
 
-  function handleLogout() {
-    clearToken();
+  async function handleLogout() {
+    await logout();
     window.location.href = `/${locale}/admin/login`;
   }
 

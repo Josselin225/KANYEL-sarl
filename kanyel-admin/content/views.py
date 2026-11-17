@@ -3,10 +3,13 @@ from datetime import timedelta
 
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError as DjangoValidationError
 from django.db.models import F, Q
 from django.http import FileResponse, Http404
 from django.utils import timezone
 from django.utils._os import safe_join
+from django.views.static import serve as serve_static
 
 from rest_framework import generics, permissions, status, views, viewsets
 from rest_framework.authtoken.views import ObtainAuthToken
@@ -39,6 +42,7 @@ from .models import (
     Testimonial,
     VisitLog,
 )
+from .authentication import TOKEN_TTL
 from .notifications import notify_admin
 from .permissions import DenyReceptionRole, IsFullAdmin
 from .serializers import (
@@ -120,6 +124,20 @@ class LoginThrottle(AnonRateThrottle):
     scope = "login"
 
 
+class FormThrottle(AnonRateThrottle):
+    """Public form submissions (each one emails the company)."""
+
+    scope = "forms"
+
+
+class SearchThrottle(AnonRateThrottle):
+    scope = "search"
+
+
+class VisitThrottle(AnonRateThrottle):
+    scope = "visit"
+
+
 class LoginView(ObtainAuthToken):
     """POST {username, password} -> {token, username}. Used by the custom /admin panel."""
 
@@ -130,10 +148,24 @@ class LoginView(ObtainAuthToken):
         serializer = self.serializer_class(data=request.data, context={"request": request})
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data["user"]
-        token, _ = Token.objects.get_or_create(user=user)
+        token = Token.objects.filter(user=user).first()
+        if token is None or timezone.now() - token.created > TOKEN_TTL:
+            # Never hand back an expired token: it would be rejected on first use.
+            Token.objects.filter(user=user).delete()
+            token = Token.objects.create(user=user)
         profile = getattr(user, "admin_profile", None)
         role = profile.role if profile else AdminProfile.ROLE_FULL
         return Response({"token": token.key, "username": user.username, "role": role})
+
+
+class LogoutView(views.APIView):
+    """Revokes the caller's token server-side, so logging out actually ends the session."""
+
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        Token.objects.filter(user=request.user).delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class SiteSettingsView(AuditLogMixin, generics.RetrieveUpdateAPIView):
@@ -285,7 +317,7 @@ class IncrementVisitView(views.APIView):
     """POST-only counter bump, called once per visitor/day from the frontend."""
 
     permission_classes = [permissions.AllowAny]
-    throttle_classes = [AnonRateThrottle]
+    throttle_classes = [VisitThrottle]
 
     def post(self, request, *args, **kwargs):
         settings_obj = SiteSettings.objects.first()
@@ -316,7 +348,7 @@ class SearchView(views.APIView):
     """Simple site-wide search across activities, properties, articles and realisations."""
 
     permission_classes = [permissions.AllowAny]
-    throttle_classes = [AnonRateThrottle]
+    throttle_classes = [SearchThrottle]
 
     def get(self, request, *args, **kwargs):
         query = request.query_params.get("q", "").strip()
@@ -383,8 +415,10 @@ class ChangeOwnPasswordView(views.APIView):
 
         if not request.user.check_password(current_password):
             return Response({"current_password": "Mot de passe actuel incorrect."}, status=400)
-        if len(new_password) < 8:
-            return Response({"new_password": "Le nouveau mot de passe doit contenir au moins 8 caractères."}, status=400)
+        try:
+            validate_password(new_password, request.user)
+        except DjangoValidationError as exc:
+            return Response({"new_password": " ".join(exc.messages)}, status=400)
 
         request.user.set_password(new_password)
         request.user.save()
@@ -397,7 +431,7 @@ class ContactMessageCreateView(HoneypotCreateMixin, generics.CreateAPIView):
     queryset = ContactMessage.objects.all()
     serializer_class = ContactMessageCreateSerializer
     permission_classes = [permissions.AllowAny]
-    throttle_classes = [AnonRateThrottle]
+    throttle_classes = [FormThrottle]
 
     def perform_create(self, serializer):
         instance = serializer.save()
@@ -422,7 +456,7 @@ class JobApplicationCreateView(HoneypotCreateMixin, generics.CreateAPIView):
     queryset = JobApplication.objects.all()
     serializer_class = JobApplicationCreateSerializer
     permission_classes = [permissions.AllowAny]
-    throttle_classes = [AnonRateThrottle]
+    throttle_classes = [FormThrottle]
 
     def perform_create(self, serializer):
         instance = serializer.save()
@@ -496,7 +530,7 @@ class QuoteRequestCreateView(HoneypotCreateMixin, generics.CreateAPIView):
     queryset = QuoteRequest.objects.all()
     serializer_class = QuoteRequestCreateSerializer
     permission_classes = [permissions.AllowAny]
-    throttle_classes = [AnonRateThrottle]
+    throttle_classes = [FormThrottle]
 
     def perform_create(self, serializer):
         instance = serializer.save()
@@ -522,7 +556,7 @@ class PropertyVisitRequestCreateView(HoneypotCreateMixin, generics.CreateAPIView
     queryset = PropertyVisitRequest.objects.all()
     serializer_class = PropertyVisitRequestCreateSerializer
     permission_classes = [permissions.AllowAny]
-    throttle_classes = [AnonRateThrottle]
+    throttle_classes = [FormThrottle]
 
     def perform_create(self, serializer):
         instance = serializer.save()
@@ -548,7 +582,7 @@ class NewsletterSubscriberCreateView(HoneypotCreateMixin, generics.CreateAPIView
     queryset = NewsletterSubscriber.objects.all()
     serializer_class = NewsletterSubscriberCreateSerializer
     permission_classes = [permissions.AllowAny]
-    throttle_classes = [AnonRateThrottle]
+    throttle_classes = [FormThrottle]
 
 
 class NewsletterSubscriberAdminViewSet(AuditLogMixin, viewsets.ModelViewSet):
@@ -557,7 +591,7 @@ class NewsletterSubscriberAdminViewSet(AuditLogMixin, viewsets.ModelViewSet):
     resource_key = "newsletter-subscribers"
     queryset = NewsletterSubscriber.objects.all()
     serializer_class = NewsletterSubscriberSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, DenyReceptionRole]
     http_method_names = ["get", "patch", "delete", "head", "options"]
 
 
@@ -583,3 +617,25 @@ class ProtectedMediaView(views.APIView):
         if not os.path.isfile(full_path):
             raise Http404
         return FileResponse(open(full_path, "rb"), as_attachment=True, filename=os.path.basename(full_path))
+
+
+def public_media(request, path):
+    """Serves the public part of MEDIA_ROOT (site photos, logos...).
+
+    Refuses anything that resolves inside media/applications/, whatever the
+    URL spelling: `//`, `./`, `x/../`, a different case or a Windows short
+    name all normalize to the same folder, and would otherwise bypass the
+    staff-only route above.
+    """
+    media_root = os.path.realpath(settings.MEDIA_ROOT)
+    private_root = os.path.normcase(os.path.realpath(os.path.join(media_root, "applications")))
+    try:
+        full_path = os.path.realpath(safe_join(media_root, path))
+    except ValueError:
+        raise Http404
+    normalized = os.path.normcase(full_path)
+    if normalized == private_root or normalized.startswith(private_root + os.sep):
+        raise Http404
+    if not os.path.isfile(full_path):
+        raise Http404
+    return serve_static(request, os.path.relpath(full_path, media_root), document_root=media_root)

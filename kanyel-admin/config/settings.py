@@ -33,7 +33,8 @@ _INSECURE_DEFAULT_KEY = 'django-insecure-dev-only-key-do-not-use-in-production'
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', _INSECURE_DEFAULT_KEY)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DJANGO_DEBUG', 'True') == 'True'
+# Off unless explicitly enabled, so a missing/unloaded .env fails safe.
+DEBUG = os.environ.get('DJANGO_DEBUG', 'False') == 'True'
 
 # Fail loudly rather than silently serving production traffic with a public,
 # guessable secret key (which would let an attacker forge sessions/tokens).
@@ -76,24 +77,48 @@ CORS_ALLOWED_ORIGINS = _env_list(
     'CORS_ALLOWED_ORIGINS', 'http://localhost:3000,http://127.0.0.1:3000'
 )
 
+CSRF_TRUSTED_ORIGINS = _env_list('CSRF_TRUSTED_ORIGINS', '')
+
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
+SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin'
+X_FRAME_OPTIONS = 'DENY'
+
 # Production-only hardening. Left off in DEBUG so local http:// dev keeps working.
 if not DEBUG:
+    # nginx terminates TLS and forwards plain HTTP; without this Django would
+    # think every request is insecure and SECURE_SSL_REDIRECT would loop.
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
     SECURE_HSTS_SECONDS = 31536000
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
-    SECURE_CONTENT_TYPE_NOSNIFF = True
+
+# Shared across worker processes (unlike the default in-memory cache), so
+# rate limits hold under gunicorn with several workers.
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': BASE_DIR / '.cache',
+    }
+}
 
 REST_FRAMEWORK = {
+    # Number of trusted reverse proxies in front of Django. 0 = use the TCP
+    # peer address and ignore client-supplied X-Forwarded-For (which an
+    # attacker could forge to dodge every rate limit). Set to 1 behind nginx.
+    'NUM_PROXIES': int(os.environ.get('DJANGO_NUM_PROXIES', '0')),
     'DEFAULT_THROTTLE_RATES': {
-        'anon': '20/hour',
+        'anon': '60/hour',
         'login': '5/hour',
+        'forms': '10/hour',
+        'search': '120/hour',
+        'visit': '30/hour',
     },
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'content.authentication.ExpiringTokenAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
     ],
 }
 
@@ -143,6 +168,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
     {
         'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'OPTIONS': {'min_length': 10},
     },
     {
         'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',

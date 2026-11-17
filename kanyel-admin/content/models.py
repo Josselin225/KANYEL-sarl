@@ -4,7 +4,13 @@ from django.db import models
 from django.utils.text import slugify
 
 from .image_processing import CompressImagesMixin
-from .validators import validate_document_size, validate_image_size
+from .validators import (
+    cover_letter_upload_path,
+    cv_upload_path,
+    validate_document_content,
+    validate_document_size,
+    validate_image_size,
+)
 
 
 class SiteSettings(CompressImagesMixin, models.Model):
@@ -405,12 +411,20 @@ class JobApplication(models.Model):
     phone = models.CharField("Téléphone", max_length=50)
     message = models.TextField("Message", blank=True)
     cv = models.FileField(
-        "CV", upload_to="applications/cv/",
-        validators=[validate_document_size, FileExtensionValidator(["pdf", "doc", "docx"])],
+        "CV", upload_to=cv_upload_path,
+        validators=[
+            validate_document_size,
+            FileExtensionValidator(["pdf", "doc", "docx"]),
+            validate_document_content,
+        ],
     )
     cover_letter = models.FileField(
-        "Lettre de motivation", upload_to="applications/cover_letters/", blank=True, null=True,
-        validators=[validate_document_size, FileExtensionValidator(["pdf", "doc", "docx"])],
+        "Lettre de motivation", upload_to=cover_letter_upload_path, blank=True, null=True,
+        validators=[
+            validate_document_size,
+            FileExtensionValidator(["pdf", "doc", "docx"]),
+            validate_document_content,
+        ],
     )
     created_at = models.DateTimeField("Reçue le", auto_now_add=True)
     is_read = models.BooleanField("Lue", default=False)

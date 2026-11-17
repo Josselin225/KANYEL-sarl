@@ -1,4 +1,6 @@
 from django.contrib.auth.models import User
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError as DjangoValidationError
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
 
@@ -306,6 +308,16 @@ class AdminUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ["id", "username", "role", "is_active", "password"]
+
+    def validate(self, attrs):
+        password = attrs.get("password")
+        if password:
+            user = self.instance or User(username=attrs.get("username", ""))
+            try:
+                validate_password(password, user)
+            except DjangoValidationError as exc:
+                raise serializers.ValidationError({"password": list(exc.messages)})
+        return attrs
 
     def create(self, validated_data):
         profile_data = validated_data.pop("admin_profile")
