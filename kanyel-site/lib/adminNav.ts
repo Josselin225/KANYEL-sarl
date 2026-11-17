@@ -4,7 +4,7 @@ export interface AdminNavItem {
   href: string;
   label: string;
   icon: string;
-  /** Omit to show to every role. Reception accounts only manage messages/applications/quotes. */
+  /** À omettre pour afficher à tous les rôles. Les comptes accueil ne gèrent que messages/candidatures/devis. */
   roles?: AdminRole[];
 }
 
@@ -91,7 +91,7 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
   },
 ];
 
-/** Flat list of every nav item (all roles), used where role filtering doesn't matter — e.g. resolving the page title. */
+/** Liste à plat de tous les éléments de navigation (tous rôles), utilisée quand le filtrage par rôle n'importe pas — p. ex. pour trouver le titre de la page. */
 export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
   ADMIN_DASHBOARD_ITEM,
   ...ADMIN_NAV_GROUPS.flatMap((g) => g.items),

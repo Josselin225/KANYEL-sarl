@@ -16,7 +16,7 @@ from content.models import (
     Testimonial,
 )
 
-# (model, [field names]) pairs — same mapping as each model's `image_fields`.
+# Paires (modèle, [noms de champs]) — même correspondance que le `image_fields` de chaque modèle.
 MODELS_AND_FIELDS = [
     (SiteSettings, ["leader_photo", "hero_image", "about_image"]),
     (Department, ["detail_image"]),
@@ -31,7 +31,7 @@ MODELS_AND_FIELDS = [
     (Article, ["cover_image"]),
 ]
 
-SIZE_THRESHOLD = 500 * 1024  # Only bother re-saving files already reasonably small.
+SIZE_THRESHOLD = 500 * 1024  # Inutile de réenregistrer les fichiers déjà raisonnablement petits.
 
 
 class Command(BaseCommand):

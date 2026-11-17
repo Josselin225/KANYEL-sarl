@@ -11,13 +11,13 @@ export interface FieldConfig {
   type: FieldType;
   options?: FieldOption[];
   help?: string;
-  /** Marks the field as mandatory: shows a "*" next to the label (and sets native `required` for non-image fields). */
+  /** Marque le champ comme obligatoire : affiche un "*" à côté du libellé (et pose le `required` natif pour les champs non image). */
   required?: boolean;
-  /** For type "relation": the admin API resource to fetch options from, e.g. "departments". */
+  /** Pour le type "relation" : la ressource de l'API admin d'où charger les options, ex. "departments". */
   relatedResource?: string;
-  /** For type "relation": field used as the option's value (must match what the API expects), e.g. "slug". */
+  /** Pour le type "relation" : champ utilisé comme valeur de l'option (doit correspondre à ce qu'attend l'API), ex. "slug". */
   relatedValueField?: string;
-  /** For type "relation": field used as the option's display label, e.g. "title_fr". */
+  /** Pour le type "relation" : champ utilisé comme libellé affiché de l'option, ex. "title_fr". */
   relatedLabelField?: string;
 }
 

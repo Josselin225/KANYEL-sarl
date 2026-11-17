@@ -30,7 +30,7 @@ export function clearToken(): void {
   window.localStorage.removeItem(ROLE_KEY);
 }
 
-/** Revokes the token server-side, then forgets it locally. */
+/** Révoque le token côté serveur, puis l'oublie localement. */
 export async function logout(): Promise<void> {
   const token = getToken();
   if (token) {
@@ -40,7 +40,7 @@ export async function logout(): Promise<void> {
         headers: { Authorization: `Token ${token}` },
       });
     } catch {
-      // Server unreachable — still log out locally.
+      // Serveur injoignable — on déconnecte quand même localement.
     }
   }
   clearToken();
@@ -107,8 +107,8 @@ function authHeaders(): HeadersInit {
 
 async function handleResponse<T>(res: Response): Promise<T> {
   if (res.status === 401) {
-    // Token missing/expired/revoked — clear it and send the user back to
-    // login rather than showing a confusing error on a stale page.
+    // Token absent/expiré/révoqué — on l'efface et on renvoie l'utilisateur
+    // vers la connexion plutôt que d'afficher une erreur confuse sur une page périmée.
     clearToken();
     if (typeof window !== "undefined" && !window.location.pathname.endsWith("/admin/login")) {
       window.location.href = window.location.pathname.replace(/\/admin(\/.*)?$/, "/admin/login");

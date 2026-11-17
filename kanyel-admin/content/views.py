@@ -79,8 +79,8 @@ from .serializers import (
 
 
 class AuditLogMixin:
-    """Records who created/changed/deleted what, for accountability once
-    more than one admin account exists."""
+    """Enregistre qui a créé/modifié/supprimé quoi, pour la traçabilité dès
+    qu'il existe plus d'un compte admin."""
 
     resource_key = ""
 
@@ -108,7 +108,7 @@ class AuditLogMixin:
 
 
 class HoneypotCreateMixin:
-    """Silently discards spam-bot submissions that fill a hidden field real users never see."""
+    """Ignore silencieusement les envois de spam-bots qui remplissent un champ caché que les vrais utilisateurs ne voient jamais."""
 
     honeypot_field = "website"
 
@@ -119,13 +119,13 @@ class HoneypotCreateMixin:
 
 
 class LoginThrottle(AnonRateThrottle):
-    """Strict, dedicated rate for the login endpoint to slow down credential guessing."""
+    """Limite stricte et dédiée à l'endpoint de connexion pour freiner la devinette d'identifiants."""
 
     scope = "login"
 
 
 class FormThrottle(AnonRateThrottle):
-    """Public form submissions (each one emails the company)."""
+    """Envois de formulaires publics (chacun envoie un e-mail à l'entreprise)."""
 
     scope = "forms"
 
@@ -139,7 +139,7 @@ class VisitThrottle(AnonRateThrottle):
 
 
 class LoginView(views.APIView):
-    """POST {username, password} -> {token, username}. Used by the custom /admin panel."""
+    """POST {username, password} -> {token, username}. Utilisé par le panneau /admin sur mesure."""
 
     permission_classes = [permissions.AllowAny]
     authentication_classes = []
@@ -149,10 +149,10 @@ class LoginView(views.APIView):
         serializer = AuthTokenSerializer(data=request.data, context={"request": request})
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data["user"]
-        # Housekeeping: drop this user's expired sessions.
+        # Ménage : supprime les sessions expirées de cet utilisateur.
         AdminToken.objects.filter(user=user, created__lt=timezone.now() - TOKEN_TTL).delete()
-        # Tokens are stored hashed, so an existing one can't be handed back —
-        # each login opens a new session (one per device/browser).
+        # Les tokens sont stockés hachés, un token existant ne peut donc pas être
+        # renvoyé — chaque connexion ouvre une nouvelle session (une par appareil/navigateur).
         key = AdminToken.issue(user)
         profile = getattr(user, "admin_profile", None)
         role = profile.role if profile else AdminProfile.ROLE_FULL
@@ -160,12 +160,12 @@ class LoginView(views.APIView):
 
 
 class LogoutView(views.APIView):
-    """Revokes the caller's token server-side, so logging out actually ends the session."""
+    """Révoque le token de l'appelant côté serveur, pour que la déconnexion mette réellement fin à la session."""
 
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
-        # Ends only this session; other devices stay signed in.
+        # Ne termine que cette session ; les autres appareils restent connectés.
         if isinstance(request.auth, AdminToken):
             request.auth.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
@@ -239,9 +239,9 @@ class PropertyViewSet(AuditLogMixin, viewsets.ModelViewSet):
         return PropertyAdminSerializer if self._is_staff() else PropertySerializer
 
     def get_queryset(self):
-        # "price" is free text (e.g. "25 000 000 FCFA" or "Sur demande"), so it
-        # cannot be filtered numerically in SQL — min/max price filtering is
-        # done client-side instead, on the parsed numeric value.
+        # "price" est un texte libre (ex. "25 000 000 FCFA" ou "Sur demande"), il ne
+        # peut donc pas être filtré numériquement en SQL — le filtrage prix min/max
+        # se fait côté client, sur la valeur numérique extraite.
         queryset = Property.objects.all() if self._is_staff() else Property.objects.filter(is_published=True)
         params = self.request.query_params
         category = params.get("category")
@@ -317,7 +317,7 @@ class JobOfferViewSet(AuditLogMixin, viewsets.ModelViewSet):
 
 
 class IncrementVisitView(views.APIView):
-    """POST-only counter bump, called once per visitor/day from the frontend."""
+    """Incrément du compteur (POST uniquement), appelé une fois par visiteur et par jour depuis le frontend."""
 
     permission_classes = [permissions.AllowAny]
     throttle_classes = [VisitThrottle]
@@ -337,7 +337,7 @@ class IncrementVisitView(views.APIView):
 
 
 class VisitStatsView(views.APIView):
-    """Last 30 days of real visit counts, for the admin dashboard chart."""
+    """Nombre réel de visites des 30 derniers jours, pour le graphique du tableau de bord admin."""
 
     permission_classes = [permissions.IsAuthenticated]
 
@@ -348,7 +348,7 @@ class VisitStatsView(views.APIView):
 
 
 class SearchView(views.APIView):
-    """Simple site-wide search across activities, properties, articles and realisations."""
+    """Recherche simple sur tout le site : activités, biens, articles et réalisations."""
 
     permission_classes = [permissions.AllowAny]
     throttle_classes = [SearchThrottle]
@@ -397,7 +397,7 @@ class SearchView(views.APIView):
 
 
 class AdminUserViewSet(AuditLogMixin, viewsets.ModelViewSet):
-    """Management of additional admin accounts — reserved to the "full" role."""
+    """Gestion des comptes admin supplémentaires — réservée au rôle « full »."""
 
     resource_key = "admin-users"
     queryset = User.objects.all().order_by("username")
@@ -406,9 +406,9 @@ class AdminUserViewSet(AuditLogMixin, viewsets.ModelViewSet):
 
 
 class ChangeOwnPasswordView(views.APIView):
-    """Lets any authenticated admin account (full or reception) change its own
-    password. Issues a fresh token and revokes the old one, so a compromised
-    token doesn't survive the one remediation a user can self-serve."""
+    """Permet à tout compte admin authentifié (full ou reception) de changer son
+    propre mot de passe. Émet un nouveau token et révoque l'ancien, pour qu'un token
+    compromis ne survive pas au seul recours qu'un utilisateur peut appliquer lui-même."""
 
     permission_classes = [permissions.IsAuthenticated]
 
@@ -425,7 +425,7 @@ class ChangeOwnPasswordView(views.APIView):
 
         request.user.set_password(new_password)
         request.user.save()
-        # Signs out every device, then opens a fresh session for this one.
+        # Déconnecte tous les appareils, puis ouvre une nouvelle session pour celui-ci.
         AdminToken.objects.filter(user=request.user).delete()
         return Response({"token": AdminToken.issue(request.user)})
 
@@ -446,7 +446,7 @@ class ContactMessageCreateView(HoneypotCreateMixin, generics.CreateAPIView):
 
 
 class ContactMessageAdminViewSet(AuditLogMixin, viewsets.ModelViewSet):
-    """Authenticated-only management of received contact messages (list/read/mark-read/delete)."""
+    """Gestion, réservée aux authentifiés, des messages de contact reçus (lister/lire/marquer lu/supprimer)."""
 
     resource_key = "contact-messages"
     queryset = ContactMessage.objects.all()
@@ -471,7 +471,7 @@ class JobApplicationCreateView(HoneypotCreateMixin, generics.CreateAPIView):
 
 
 class JobApplicationAdminViewSet(AuditLogMixin, viewsets.ModelViewSet):
-    """Authenticated-only management of received job applications (list/read/mark-read/delete)."""
+    """Gestion, réservée aux authentifiés, des candidatures reçues (lister/lire/marquer lu/supprimer)."""
 
     resource_key = "job-applications"
     queryset = JobApplication.objects.all()
@@ -546,7 +546,7 @@ class QuoteRequestCreateView(HoneypotCreateMixin, generics.CreateAPIView):
 
 
 class QuoteRequestAdminViewSet(AuditLogMixin, viewsets.ModelViewSet):
-    """Authenticated-only management of received quote requests (list/read/mark-read/delete)."""
+    """Gestion, réservée aux authentifiés, des demandes de devis reçues (lister/lire/marquer lu/supprimer)."""
 
     resource_key = "quote-requests"
     queryset = QuoteRequest.objects.all()
@@ -572,7 +572,7 @@ class PropertyVisitRequestCreateView(HoneypotCreateMixin, generics.CreateAPIView
 
 
 class PropertyVisitRequestAdminViewSet(AuditLogMixin, viewsets.ModelViewSet):
-    """Authenticated-only management of received property visit requests (list/read/mark-read/delete)."""
+    """Gestion, réservée aux authentifiés, des demandes de visite de biens reçues (lister/lire/marquer lu/supprimer)."""
 
     resource_key = "property-visit-requests"
     queryset = PropertyVisitRequest.objects.all()
@@ -589,7 +589,7 @@ class NewsletterSubscriberCreateView(HoneypotCreateMixin, generics.CreateAPIView
 
 
 class NewsletterSubscriberAdminViewSet(AuditLogMixin, viewsets.ModelViewSet):
-    """Authenticated-only management of newsletter sign-ups."""
+    """Gestion, réservée aux authentifiés, des inscriptions à la newsletter."""
 
     resource_key = "newsletter-subscribers"
     queryset = NewsletterSubscriber.objects.all()
@@ -599,7 +599,7 @@ class NewsletterSubscriberAdminViewSet(AuditLogMixin, viewsets.ModelViewSet):
 
 
 class AuditLogEntryViewSet(viewsets.ReadOnlyModelViewSet):
-    """Read-only log of who did what — visible only to full admins."""
+    """Journal en lecture seule de qui a fait quoi — visible uniquement par les admins « full »."""
 
     queryset = AuditLogEntry.objects.all()
     serializer_class = AuditLogEntrySerializer
@@ -607,8 +607,8 @@ class AuditLogEntryViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class ProtectedMediaView(views.APIView):
-    """Serves files under media/applications/ (CVs, cover letters — personal
-    data) to authenticated staff only, instead of the public media server."""
+    """Sert les fichiers de media/applications/ (CV, lettres de motivation — données
+    personnelles) au seul staff authentifié, au lieu du serveur de médias public."""
 
     permission_classes = [permissions.IsAuthenticated]
 
@@ -623,12 +623,12 @@ class ProtectedMediaView(views.APIView):
 
 
 def public_media(request, path):
-    """Serves the public part of MEDIA_ROOT (site photos, logos...).
+    """Sert la partie publique de MEDIA_ROOT (photos du site, logos...).
 
-    Refuses anything that resolves inside media/applications/, whatever the
-    URL spelling: `//`, `./`, `x/../`, a different case or a Windows short
-    name all normalize to the same folder, and would otherwise bypass the
-    staff-only route above.
+    Refuse tout ce qui se résout dans media/applications/, quelle que soit la
+    graphie de l'URL : `//`, `./`, `x/../`, une casse différente ou un nom court
+    Windows se normalisent tous vers le même dossier, et contourneraient sinon
+    la route réservée au staff ci-dessus.
     """
     media_root = os.path.realpath(settings.MEDIA_ROOT)
     private_root = os.path.normcase(os.path.realpath(os.path.join(media_root, "applications")))

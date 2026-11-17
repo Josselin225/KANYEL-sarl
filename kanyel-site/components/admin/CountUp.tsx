@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 
 const DURATION_MS = 700;
 
-/** Animates a number counting up from 0 to `value` on mount (and if `value` changes). */
+/** Anime un nombre qui compte de 0 jusqu'à `value` au montage (et si `value` change). */
 export default function CountUp({ value }: { value: number }) {
   const [display, setDisplay] = useState(0);
 

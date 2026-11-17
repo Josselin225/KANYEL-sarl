@@ -182,7 +182,7 @@ export default function MinimalHome({
 
       <Marquee items={marqueeItems} />
 
-      {/* ABOUT */}
+      {/* À PROPOS */}
       <section id="about" className="bg-bg py-16 sm:py-24">
         <div className="mx-auto max-w-7xl px-5 sm:px-8">
           <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2">
@@ -334,7 +334,7 @@ export default function MinimalHome({
         </div>
       </section>
 
-      {/* WHY */}
+      {/* POURQUOI */}
       <section id="why" className="bg-bg py-16 sm:py-24">
         <div className="mx-auto max-w-7xl px-5 sm:px-8">
           <Reveal className="mx-auto max-w-2xl text-center">
@@ -359,7 +359,7 @@ export default function MinimalHome({
         </div>
       </section>
 
-      {/* GALLERY */}
+      {/* GALERIE */}
       {gallery.length > 0 && (
         <section id="gallery" className="bg-bg-alt py-16 sm:py-24">
           <div className="mx-auto max-w-7xl px-5 sm:px-8">

@@ -60,9 +60,10 @@ const REQUEST_BARS: { key: keyof Counts; label: string; href: string; icon: stri
   { key: "unreadVisitRequests", label: "Demandes de visite non lues", href: "/admin/property-visit-requests", icon: "home" },
 ];
 
-// Fixed-order, colorblind-safe categorical palette (validated set — see the
-// dataviz skill's reference palette). Cycled for lists longer than 8 — the
-// icon + label pairing (never color alone) keeps every row identifiable.
+// Palette catégorielle à ordre fixe, adaptée aux daltoniens (jeu validé — voir
+// la palette de référence du skill dataviz). Réutilisée en boucle au-delà de
+// 8 éléments — l'association icône + libellé (jamais la couleur seule) garde
+// chaque ligne identifiable.
 const PALETTE = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#6250d6", "#e34948", "#008300"];
 function paletteColor(i: number) {
   return PALETTE[i % PALETTE.length];
@@ -243,7 +244,7 @@ function formatFCFA(value: number) {
   return `${value.toLocaleString("fr-FR")} FCFA`;
 }
 
-/** Builds a smooth line through points using quadratic-bezier midpoints. */
+/** Trace une courbe lissée passant par les points via des milieux de Bézier quadratiques. */
 function smoothPath(points: { x: number; y: number }[]) {
   if (points.length < 2) return "";
   let d = `M ${points[0].x} ${points[0].y}`;

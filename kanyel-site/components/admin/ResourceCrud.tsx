@@ -88,7 +88,7 @@ export default function ResourceCrud({ resource }: { resource: ResourceConfig })
           } else if (f.type === "boolean") {
             fd.append(f.name, val ? "true" : "false");
           } else if ((f.type === "date" || f.type === "number") && (val === null || val === undefined)) {
-            // Omit empty optional dates/numbers — DRF rejects "" as an invalid value for them.
+            // Omet les dates/nombres optionnels vides — DRF rejette "" comme valeur invalide pour ces champs.
           } else {
             fd.append(f.name, String(val ?? ""));
           }

@@ -1,11 +1,11 @@
-"""Backs up the SQLite database and uploaded media into a single timestamped,
-AES-256-GCM encrypted archive (.zip.enc), then deletes archives older than
-30 days. The key is BACKUP_ENCRYPTION_KEY in .env — keep a copy of it
-somewhere safe outside the server, or the backups can't be restored.
+"""Sauvegarde la base SQLite et les médias uploadés dans une archive unique
+horodatée, chiffrée en AES-256-GCM (.zip.enc), puis supprime les archives de
+plus de 30 jours. La clé est BACKUP_ENCRYPTION_KEY dans .env — gardez-en une
+copie en lieu sûr hors du serveur, sinon les sauvegardes sont irrécupérables.
 
-Run manually with:  python manage.py backup_data
-Restore with:       python manage.py decrypt_backup backups/<file>.zip.enc
-Intended to run daily via a Windows Scheduled Task (see docs/BACKUP.md).
+Lancement manuel :  python manage.py backup_data
+Restauration :      python manage.py decrypt_backup backups/<file>.zip.enc
+Prévu pour tourner chaque jour via une tâche planifiée Windows (voir docs/BACKUP.md).
 """
 
 import sqlite3
@@ -31,7 +31,7 @@ class Command(BaseCommand):
         try:
             key = load_key()
         except BackupKeyError as exc:
-            # Fail closed: never write an unencrypted backup.
+            # Échec sécurisé : ne jamais écrire de sauvegarde non chiffrée.
             raise CommandError(str(exc))
 
         backups_dir = Path(settings.BASE_DIR) / "backups"
@@ -43,12 +43,12 @@ class Command(BaseCommand):
         db_path = Path(settings.DATABASES["default"]["NAME"])
         media_root = Path(settings.MEDIA_ROOT)
 
-        # Plaintext only ever exists in the OS temp dir, and is removed right after.
+        # Le clair n'existe que dans le dossier temporaire de l'OS, et est supprimé aussitôt après.
         with tempfile.TemporaryDirectory() as tmp:
             zip_path = Path(tmp) / "backup.zip"
             with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zf:
                 if db_path.exists():
-                    # Consistent snapshot even if the site is writing meanwhile.
+                    # Instantané cohérent même si le site écrit pendant ce temps.
                     snapshot = Path(tmp) / db_path.name
                     with closing(sqlite3.connect(db_path)) as src, closing(sqlite3.connect(snapshot)) as dst:
                         src.backup(dst)

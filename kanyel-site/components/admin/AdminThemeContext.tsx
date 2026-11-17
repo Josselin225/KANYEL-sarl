@@ -16,7 +16,7 @@ export function AdminThemeProvider({ children }: { children: React.ReactNode }) 
     try {
       setDark(window.localStorage.getItem(THEME_KEY) === "dark");
     } catch {
-      // Ignore — defaults to light.
+      // Ignoré — thème clair par défaut.
     }
   }, []);
 
@@ -26,7 +26,7 @@ export function AdminThemeProvider({ children }: { children: React.ReactNode }) 
       try {
         window.localStorage.setItem(THEME_KEY, next ? "dark" : "light");
       } catch {
-        // Ignore — preference just won't persist.
+        // Ignoré — la préférence ne sera simplement pas conservée.
       }
       return next;
     });

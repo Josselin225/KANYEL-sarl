@@ -25,11 +25,12 @@
   --shadow-soft-lg: 0 24px 48px -16px rgba(18, 23, 63, 0.28);
 }
 
-/* Admin-panel-only theme tokens. Kept in a separate (non-inline) @theme so
-   these stay as var() references in the generated utilities and can be
-   overridden at runtime by the .admin-dark scope below — unlike the
-   public-site tokens above, which @theme inline bakes in as literal values
-   on purpose. This is what lets dark mode stay confined to the admin panel. */
+/* Tokens de thème réservés au panneau d'administration. Placés dans un @theme
+   séparé (non inline) pour qu'ils restent des références var() dans les
+   utilitaires générés et puissent être surchargés au runtime par le scope
+   .admin-dark ci-dessous — contrairement aux tokens du site public ci-dessus,
+   que @theme inline fige volontairement en valeurs littérales. C'est ce qui
+   permet de cantonner le mode sombre au panneau d'administration. */
 @theme {
   --color-admin-bg: #efe8d8;
   --color-admin-surface: #ffffff;

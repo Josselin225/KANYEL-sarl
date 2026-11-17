@@ -9,8 +9,8 @@ JPEG_QUALITY = 82
 
 
 def compress_image(uploaded_file):
-    """Downscale and re-encode an uploaded image so it doesn't sit on disk (and get served
-    to every visitor) at its original multi-megabyte camera resolution."""
+    """Réduit et réencode une image uploadée pour qu'elle ne reste pas sur disque (ni servie
+    à chaque visiteur) dans sa résolution d'appareil photo d'origine de plusieurs Mo."""
     image = Image.open(uploaded_file)
     image = ImageOps.exif_transpose(image)
 
@@ -35,8 +35,8 @@ def compress_image(uploaded_file):
 
 
 class CompressImagesMixin:
-    """Automatically compresses every field listed in `image_fields` on save. Only runs on
-    newly uploaded files (not already-saved ones re-saved for an unrelated field change)."""
+    """Compresse automatiquement chaque champ listé dans `image_fields` à l'enregistrement. Ne
+    s'applique qu'aux nouveaux uploads (pas aux fichiers déjà enregistrés, réenregistrés pour un autre champ)."""
 
     image_fields: list[str] = []
 

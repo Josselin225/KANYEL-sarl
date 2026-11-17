@@ -4,15 +4,15 @@ from django.utils import timezone
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.exceptions import AuthenticationFailed
 
-# Forces re-login after this long, even if the token was never explicitly
-# revoked. Mitigates the impact of a token leaked from a shared device or a
-# compromised browser extension.
+# Impose une reconnexion après ce délai, même si le token n'a jamais été
+# révoqué explicitement. Limite l'impact d'un token fuité depuis un appareil
+# partagé ou une extension de navigateur compromise.
 TOKEN_TTL = timedelta(days=14)
 
 
 class ExpiringTokenAuthentication(TokenAuthentication):
-    """`Authorization: Token <key>` against AdminToken, which stores only a
-    SHA-256 digest of each key (never the key itself)."""
+    """`Authorization: Token <key>` vérifié contre AdminToken, qui ne stocke
+    qu'une empreinte SHA-256 de chaque clé (jamais la clé elle-même)."""
 
     def authenticate_credentials(self, key):
         from .models import AdminToken

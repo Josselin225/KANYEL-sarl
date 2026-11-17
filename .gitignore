@@ -1,4 +1,4 @@
-# --- Secrets & environment ---
+# --- Secrets & environnement ---
 .env
 .env.local
 .env.*.local
@@ -15,12 +15,12 @@ __pycache__/
 *.pyc
 staticfiles/
 
-# --- Database & uploaded media (contains real personal data: CVs, contact info) ---
+# --- Base de données & médias uploadés (contient de vraies données personnelles : CV, coordonnées) ---
 kanyel-admin/db.sqlite3
 kanyel-admin/media/
 kanyel-admin/backups/
 
-# --- Editor / tooling ---
-.claude/
+# --- Éditeur / outillage ---
 .vscode/
 *.log
+*.tsbuildinfo

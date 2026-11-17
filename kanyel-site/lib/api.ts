@@ -420,7 +420,7 @@ export async function incrementVisit(): Promise<void> {
   try {
     await fetch(`${API_URL}/api/visit/`, { method: "POST" });
   } catch {
-    // Non-blocking.
+    // Non bloquant.
   }
 }
 

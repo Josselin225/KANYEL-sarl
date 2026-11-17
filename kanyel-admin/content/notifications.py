@@ -5,7 +5,7 @@ from .models import SiteSettings
 
 
 def notify_admin(subject: str, message: str) -> None:
-    """Best-effort email alert to the company's main address. Never raises."""
+    """Alerte e-mail « best-effort » vers l'adresse principale de l'entreprise. Ne lève jamais d'exception."""
     if not django_settings.EMAIL_HOST_USER:
         return
     site_settings = SiteSettings.objects.first()

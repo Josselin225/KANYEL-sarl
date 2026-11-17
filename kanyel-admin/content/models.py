@@ -14,7 +14,7 @@ from .validators import (
 
 
 class SiteSettings(CompressImagesMixin, models.Model):
-    """Singleton holding global, rarely-changing site content."""
+    """Singleton contenant le contenu global du site, rarement modifié."""
 
     image_fields = ["leader_photo", "hero_image", "about_image"]
 
@@ -100,7 +100,7 @@ class SiteSettings(CompressImagesMixin, models.Model):
 
 
 class Department(CompressImagesMixin, models.Model):
-    """A business activity / department shown in the "Nos activités" section."""
+    """Une activité / un département affiché dans la section « Nos activités »."""
 
     image_fields = ["detail_image"]
 
@@ -161,7 +161,7 @@ class Department(CompressImagesMixin, models.Model):
 
 
 class DepartmentImage(CompressImagesMixin, models.Model):
-    """An extra photo shown in the gallery of a department's detail page."""
+    """Une photo supplémentaire affichée dans la galerie de la page détail d'un département."""
 
     image_fields = ["image"]
 
@@ -184,7 +184,7 @@ class DepartmentImage(CompressImagesMixin, models.Model):
 
 
 class Credential(models.Model):
-    """An institutional recognition/credential shown in the "À propos" section."""
+    """Une reconnaissance/accréditation institutionnelle affichée dans la section « À propos »."""
 
     order = models.PositiveIntegerField("Ordre", default=0)
     title_fr = models.CharField("Titre (français)", max_length=255)
@@ -203,7 +203,7 @@ class Credential(models.Model):
 
 
 class GalleryItem(CompressImagesMixin, models.Model):
-    """A photo tile shown in the "Domaines d'intervention" gallery."""
+    """Une vignette photo affichée dans la galerie « Domaines d'intervention »."""
 
     image_fields = ["image"]
 
@@ -227,7 +227,7 @@ class GalleryItem(CompressImagesMixin, models.Model):
 
 
 class Property(CompressImagesMixin, models.Model):
-    """A managed property shown on the "Gestion Immobilière" department page."""
+    """Un bien géré affiché sur la page du département « Gestion Immobilière »."""
 
     image_fields = ["image"]
 
@@ -283,7 +283,7 @@ class Property(CompressImagesMixin, models.Model):
 
 
 class PropertyImage(CompressImagesMixin, models.Model):
-    """An extra photo shown in a property's own gallery/lightbox."""
+    """Une photo supplémentaire affichée dans la galerie/lightbox propre à un bien."""
 
     image_fields = ["image"]
 
@@ -303,7 +303,7 @@ class PropertyImage(CompressImagesMixin, models.Model):
 
 
 class Stat(models.Model):
-    """A key figure shown in the "Chiffres clés" section (e.g. completed projects)."""
+    """Un chiffre clé affiché dans la section « Chiffres clés » (ex. projets réalisés)."""
 
     order = models.PositiveIntegerField("Ordre", default=0)
     label_fr = models.CharField("Libellé (français)", max_length=200)
@@ -321,7 +321,7 @@ class Stat(models.Model):
 
 
 class Partner(CompressImagesMixin, models.Model):
-    """A partner/client logo shown in the scrolling "Nos partenaires" band."""
+    """Un logo de partenaire/client affiché dans le bandeau défilant « Nos partenaires »."""
 
     image_fields = ["logo"]
 
@@ -341,7 +341,7 @@ class Partner(CompressImagesMixin, models.Model):
 
 
 class Testimonial(CompressImagesMixin, models.Model):
-    """A client testimonial shown on the "Témoignages" page."""
+    """Un témoignage client affiché sur la page « Témoignages »."""
 
     image_fields = ["photo"]
 
@@ -367,7 +367,7 @@ class Testimonial(CompressImagesMixin, models.Model):
 
 
 class JobOffer(models.Model):
-    """A job opening shown on the "Offres d'emploi" page."""
+    """Une offre d'emploi affichée sur la page « Offres d'emploi »."""
 
     CONTRACT_CHOICES = [
         ("cdi", "CDI"),
@@ -399,7 +399,7 @@ class JobOffer(models.Model):
 
 
 class JobApplication(models.Model):
-    """A candidate application submitted through the public "Offres d'emploi" page."""
+    """Une candidature envoyée via la page publique « Offres d'emploi »."""
 
     job = models.ForeignKey(
         JobOffer, related_name="applications", on_delete=models.CASCADE,
@@ -439,7 +439,7 @@ class JobApplication(models.Model):
 
 
 class ContactMessage(models.Model):
-    """A message submitted through the public contact form."""
+    """Un message envoyé via le formulaire de contact public."""
 
     name = models.CharField("Nom", max_length=200)
     email = models.EmailField("E-mail")
@@ -459,7 +459,7 @@ class ContactMessage(models.Model):
 
 
 class Realisation(CompressImagesMixin, models.Model):
-    """A completed project shown in the "Nos réalisations" portfolio."""
+    """Un projet réalisé affiché dans le portfolio « Nos réalisations »."""
 
     image_fields = ["image"]
 
@@ -488,7 +488,7 @@ class Realisation(CompressImagesMixin, models.Model):
 
 
 class RealisationImage(CompressImagesMixin, models.Model):
-    """An extra photo shown in a realisation's own gallery."""
+    """Une photo supplémentaire affichée dans la galerie propre à une réalisation."""
 
     image_fields = ["image"]
 
@@ -508,7 +508,7 @@ class RealisationImage(CompressImagesMixin, models.Model):
 
 
 class Article(CompressImagesMixin, models.Model):
-    """A news post shown in the "Actualités" section."""
+    """Un article d'actualité affiché dans la section « Actualités »."""
 
     image_fields = ["cover_image"]
 
@@ -546,7 +546,7 @@ class Article(CompressImagesMixin, models.Model):
 
 
 class FAQ(models.Model):
-    """A frequently asked question, optionally scoped to one department."""
+    """Une question fréquente, éventuellement limitée à un département."""
 
     order = models.PositiveIntegerField("Ordre", default=0)
     department = models.ForeignKey(
@@ -570,7 +570,7 @@ class FAQ(models.Model):
 
 
 class QuoteRequest(models.Model):
-    """A structured quote request submitted through the public "Demander un devis" form."""
+    """Une demande de devis structurée envoyée via le formulaire public « Demander un devis »."""
 
     BUDGET_CHOICES = [
         ("lt_5m", "Moins de 5 000 000 FCFA"),
@@ -610,7 +610,7 @@ class QuoteRequest(models.Model):
 
 
 class PropertyVisitRequest(models.Model):
-    """A request to visit a specific property, submitted from its listing on the public site."""
+    """Une demande de visite d'un bien précis, envoyée depuis sa fiche sur le site public."""
 
     property = models.ForeignKey(
         Property, related_name="visit_requests", on_delete=models.SET_NULL,
@@ -634,7 +634,7 @@ class PropertyVisitRequest(models.Model):
 
 
 class NewsletterSubscriber(models.Model):
-    """An email address that signed up for news updates from the public site."""
+    """Une adresse e-mail inscrite aux actualités depuis le site public."""
 
     email = models.EmailField("E-mail", unique=True)
     created_at = models.DateTimeField("Inscrit le", auto_now_add=True)
@@ -650,8 +650,8 @@ class NewsletterSubscriber(models.Model):
 
 
 class VisitLog(models.Model):
-    """One row per calendar day, incremented once per visitor per day.
-    Powers the visits-over-time chart in the admin dashboard."""
+    """Une ligne par jour calendaire, incrémentée une fois par visiteur et par jour.
+    Alimente le graphique des visites dans le temps du tableau de bord admin."""
 
     date = models.DateField("Date", unique=True)
     count = models.PositiveIntegerField("Visites", default=0)
@@ -666,8 +666,8 @@ class VisitLog(models.Model):
 
 
 class AdminProfile(models.Model):
-    """Extends Django's built-in User with a coarse role used to restrict
-    what a given admin account can see/do in the custom admin panel."""
+    """Étend le User intégré de Django avec un rôle grossier servant à restreindre
+    ce qu'un compte admin peut voir/faire dans le panneau d'administration sur mesure."""
 
     ROLE_FULL = "full"
     ROLE_RECEPTION = "reception"
@@ -690,8 +690,8 @@ class AdminProfile(models.Model):
 
 
 class AuditLogEntry(models.Model):
-    """A lightweight trace of who created/changed/deleted what, for
-    accountability once more than one admin account exists."""
+    """Une trace légère de qui a créé/modifié/supprimé quoi, pour la
+    traçabilité dès qu'il existe plus d'un compte admin."""
 
     ACTION_CREATE = "create"
     ACTION_UPDATE = "update"
@@ -720,9 +720,10 @@ class AuditLogEntry(models.Model):
 
 
 class AdminToken(models.Model):
-    """Login session for the custom admin panel. Only a SHA-256 digest of the
-    token is stored: a leaked database or backup can't be replayed as a
-    session, the same way a password hash can't be used as a password."""
+    """Session de connexion du panneau d'administration sur mesure. Seule une
+    empreinte SHA-256 du token est stockée : une base ou une sauvegarde fuitée ne
+    peut pas être rejouée comme session, de même qu'un hash de mot de passe ne
+    peut pas servir de mot de passe."""
 
     user = models.ForeignKey("auth.User", related_name="admin_tokens", on_delete=models.CASCADE)
     key_hash = models.CharField(max_length=64, unique=True)
@@ -740,7 +741,7 @@ class AdminToken(models.Model):
 
     @classmethod
     def issue(cls, user):
-        """Creates a session and returns the raw key — the only time it exists in clear."""
+        """Crée une session et renvoie la clé brute — le seul moment où elle existe en clair."""
         import secrets
 
         key = secrets.token_hex(32)

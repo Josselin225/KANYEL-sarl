@@ -41,7 +41,7 @@ export default function AdminSettingsPage() {
           if (f.type === "image") {
             if (val instanceof File) fd.append(f.name, val);
           } else if (f.type === "number" && (val === null || val === undefined || val === "")) {
-            // Omit empty optional coordinates — DRF rejects "" as an invalid number.
+            // Omettre les coordonnées facultatives vides — DRF rejette "" comme nombre invalide.
           } else {
             fd.append(f.name, String(val ?? ""));
           }

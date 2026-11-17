@@ -65,7 +65,7 @@ export default function AdminQuoteRequestsPage() {
         setItems((prev) => prev.map((it) => (it.id === item.id ? updated : it)));
         setSelected(updated);
       } catch {
-        // Non-blocking.
+        // Non bloquant.
       }
     }
   }

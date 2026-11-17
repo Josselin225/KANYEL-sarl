@@ -4,10 +4,10 @@ from .models import AdminProfile
 
 
 class DenyReceptionRole(permissions.BasePermission):
-    """Blocks the "reception" admin role from content-management endpoints
-    (activities, properties, testimonials, settings, etc.). Has no effect
-    on anonymous public reads or on the "full" role — combine with
-    IsAuthenticatedOrReadOnly/IsAuthenticated as usual."""
+    """Interdit au rôle admin « reception » les endpoints de gestion de contenu
+    (activités, biens, témoignages, paramètres, etc.). Sans effet sur les
+    lectures publiques anonymes ni sur le rôle « full » — à combiner avec
+    IsAuthenticatedOrReadOnly/IsAuthenticated comme d'habitude."""
 
     def has_permission(self, request, view):
         user = request.user
@@ -20,8 +20,8 @@ class DenyReceptionRole(permissions.BasePermission):
 
 
 class IsFullAdmin(permissions.BasePermission):
-    """Only accounts with the "full" role (or a superuser with no profile
-    yet) may manage other admin accounts."""
+    """Seuls les comptes au rôle « full » (ou un superuser encore sans profil)
+    peuvent gérer les autres comptes admin."""
 
     def has_permission(self, request, view):
         user = request.user

@@ -70,7 +70,7 @@ class GalleryItemSerializer(serializers.ModelSerializer):
 
 
 class PropertySerializer(serializers.ModelSerializer):
-    """Public-facing: excludes internal management fields (occupancy, tenant, exact amount)."""
+    """Côté public : exclut les champs de gestion internes (occupation, locataire, montant exact)."""
 
     class Meta:
         model = Property
@@ -81,7 +81,7 @@ class PropertySerializer(serializers.ModelSerializer):
 
 
 class PropertyAdminSerializer(serializers.ModelSerializer):
-    """Admin-only: adds the management fields used for internal reporting."""
+    """Réservé à l'admin : ajoute les champs de gestion utilisés pour le reporting interne."""
 
     class Meta:
         model = Property
@@ -122,7 +122,7 @@ class JobOfferSerializer(serializers.ModelSerializer):
 
 
 class JobApplicationCreateSerializer(serializers.ModelSerializer):
-    """Used by the public application form — full write access, no is_read."""
+    """Utilisé par le formulaire public de candidature — écriture complète, sans is_read."""
 
     class Meta:
         model = JobApplication
@@ -131,7 +131,7 @@ class JobApplicationCreateSerializer(serializers.ModelSerializer):
 
 
 class JobApplicationSerializer(serializers.ModelSerializer):
-    """Used by the admin panel — content is read-only, only is_read can be toggled."""
+    """Utilisé par le panneau admin — contenu en lecture seule, seul is_read peut être basculé."""
 
     job_title = serializers.SerializerMethodField()
 
@@ -150,7 +150,7 @@ class JobApplicationSerializer(serializers.ModelSerializer):
 
 
 class ContactMessageCreateSerializer(serializers.ModelSerializer):
-    """Used by the public contact form — full write access."""
+    """Utilisé par le formulaire de contact public — écriture complète."""
 
     class Meta:
         model = ContactMessage
@@ -159,7 +159,7 @@ class ContactMessageCreateSerializer(serializers.ModelSerializer):
 
 
 class ContactMessageSerializer(serializers.ModelSerializer):
-    """Used by the admin panel — content is read-only, only is_read can be toggled."""
+    """Utilisé par le panneau admin — contenu en lecture seule, seul is_read peut être basculé."""
 
     class Meta:
         model = ContactMessage
@@ -209,7 +209,7 @@ class FAQSerializer(serializers.ModelSerializer):
 
 
 class QuoteRequestCreateSerializer(serializers.ModelSerializer):
-    """Used by the public quote-request form — full write access, no is_read."""
+    """Utilisé par le formulaire public de demande de devis — écriture complète, sans is_read."""
 
     department = serializers.SlugRelatedField(
         slug_field="slug", queryset=Department.objects.all(), allow_null=True, required=False,
@@ -224,7 +224,7 @@ class QuoteRequestCreateSerializer(serializers.ModelSerializer):
 
 
 class QuoteRequestSerializer(serializers.ModelSerializer):
-    """Used by the admin panel — content is read-only, only is_read can be toggled."""
+    """Utilisé par le panneau admin — contenu en lecture seule, seul is_read peut être basculé."""
 
     department_title = serializers.SerializerMethodField()
 
@@ -244,7 +244,7 @@ class QuoteRequestSerializer(serializers.ModelSerializer):
 
 
 class PropertyVisitRequestCreateSerializer(serializers.ModelSerializer):
-    """Used by the public "Demander une visite" form on a property listing."""
+    """Utilisé par le formulaire public « Demander une visite » sur la fiche d'un bien."""
 
     property = serializers.PrimaryKeyRelatedField(queryset=Property.objects.all())
 
@@ -255,7 +255,7 @@ class PropertyVisitRequestCreateSerializer(serializers.ModelSerializer):
 
 
 class PropertyVisitRequestSerializer(serializers.ModelSerializer):
-    """Used by the admin panel — content is read-only, only is_read can be toggled."""
+    """Utilisé par le panneau admin — contenu en lecture seule, seul is_read peut être basculé."""
 
     property_title = serializers.SerializerMethodField()
 
@@ -300,7 +300,7 @@ class AuditLogEntrySerializer(serializers.ModelSerializer):
 
 
 class AdminUserSerializer(serializers.ModelSerializer):
-    """Used by the admin panel to list/manage additional admin accounts."""
+    """Utilisé par le panneau admin pour lister/gérer les comptes admin supplémentaires."""
 
     role = serializers.ChoiceField(choices=AdminProfile.ROLE_CHOICES, source="admin_profile.role")
     password = serializers.CharField(write_only=True, required=False, allow_blank=True)
@@ -337,8 +337,8 @@ class AdminUserSerializer(serializers.ModelSerializer):
         password = validated_data.pop("password", None)
         if password:
             instance.set_password(password)
-            # Changing the password is the admin's remediation path after a suspected
-            # compromise — revoke the existing token so it doesn't outlive the reset.
+            # Changer le mot de passe est le recours de l'admin en cas de compromission
+            # suspectée — on révoque le token existant pour qu'il ne survive pas à la réinitialisation.
             AdminToken.objects.filter(user=instance).delete()
         instance.is_active = validated_data.get("is_active", instance.is_active)
         instance.save()
@@ -348,11 +348,11 @@ class AdminUserSerializer(serializers.ModelSerializer):
 
 
 class NewsletterSubscriberCreateSerializer(serializers.ModelSerializer):
-    """Used by the public newsletter sign-up form."""
+    """Utilisé par le formulaire public d'inscription à la newsletter."""
 
-    # Re-declared without the model's automatic UniqueValidator: re-subscribing
-    # a previously unsubscribed address reactivates it instead of being
-    # rejected outright, which validate_email()/create() below handle.
+    # Redéclaré sans le UniqueValidator automatique du modèle : réinscrire une
+    # adresse précédemment désinscrite la réactive au lieu d'être rejetée
+    # d'emblée, ce que gèrent validate_email()/create() ci-dessous.
     email = serializers.EmailField()
 
     class Meta:
@@ -366,8 +366,8 @@ class NewsletterSubscriberCreateSerializer(serializers.ModelSerializer):
         return value
 
     def create(self, validated_data):
-        # Re-activates a previously unsubscribed address instead of hitting the
-        # unique constraint on email.
+        # Réactive une adresse précédemment désinscrite au lieu de heurter la
+        # contrainte d'unicité sur l'e-mail.
         subscriber, _ = NewsletterSubscriber.objects.update_or_create(
             email__iexact=validated_data["email"],
             defaults={"email": validated_data["email"], "is_active": True},
@@ -376,7 +376,7 @@ class NewsletterSubscriberCreateSerializer(serializers.ModelSerializer):
 
 
 class NewsletterSubscriberSerializer(serializers.ModelSerializer):
-    """Used by the admin panel."""
+    """Utilisé par le panneau admin."""
 
     class Meta:
         model = NewsletterSubscriber

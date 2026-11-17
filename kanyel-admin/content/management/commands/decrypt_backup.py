@@ -1,8 +1,8 @@
-"""Decrypts a backup produced by backup_data back into a plain .zip.
+"""Déchiffre une sauvegarde produite par backup_data en un simple .zip.
 
     python manage.py decrypt_backup backups/kanyel-backup-<date>.zip.enc [output.zip]
 
-Optionally encrypts legacy plaintext backups in place:
+Chiffre aussi, en option, les anciennes sauvegardes en clair sur place :
 
     python manage.py decrypt_backup --encrypt-legacy
 """
@@ -45,7 +45,7 @@ class Command(BaseCommand):
         if not source:
             raise CommandError("Indiquez le fichier .zip.enc à déchiffrer.")
         src = Path(source)
-        dst = Path(output) if output else src.with_suffix("")  # strips ".enc"
+        dst = Path(output) if output else src.with_suffix("")  # retire ".enc"
         if dst.exists():
             raise CommandError(f"{dst} existe déjà.")
         try:

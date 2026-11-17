@@ -5,15 +5,15 @@ const withNextIntl = createNextIntlPlugin();
 
 const isDev = process.env.NODE_ENV !== "production";
 
-// Only accept images from our own backend's exact host, never a wildcard —
-// otherwise the Next.js image optimizer could be tricked into fetching
-// arbitrary URLs on the server's behalf (SSRF).
+// N'accepter que les images de l'hôte exact de notre backend, jamais un joker —
+// sinon l'optimiseur d'images de Next.js pourrait être amené à récupérer
+// des URL arbitraires au nom du serveur (SSRF).
 const apiUrl = new URL(process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000");
 
-// Content-Security-Policy: limits where scripts, images, frames and API calls
-// may come from, so an injected <script> or exfiltration request is blocked.
-// 'unsafe-inline' for scripts is required by Next.js's inline bootstrap and
-// the JSON-LD blocks; 'unsafe-eval' and websockets only for dev (HMR).
+// Content-Security-Policy : limite les origines des scripts, images, frames et
+// appels API, afin de bloquer un <script> injecté ou une requête d'exfiltration.
+// 'unsafe-inline' pour les scripts est requis par le bootstrap inline de Next.js
+// et les blocs JSON-LD ; 'unsafe-eval' et les websockets seulement en dev (HMR).
 const csp = [
   "default-src 'self'",
   `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
@@ -31,8 +31,8 @@ const csp = [
 
 const nextConfig: NextConfig = {
   images: {
-    // Local IPs (localhost) are only needed in development; never allow
-    // this in a production build.
+    // Les IP locales (localhost) ne servent qu'en développement ; ne jamais
+    // les autoriser dans un build de production.
     dangerouslyAllowLocalIP: isDev,
     remotePatterns: [
       {

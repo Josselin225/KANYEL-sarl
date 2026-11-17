@@ -52,7 +52,7 @@ export default function AdminSidebar() {
     try {
       setCollapsed(window.localStorage.getItem(COLLAPSE_KEY) === "1");
     } catch {
-      // Ignore — defaults to expanded.
+      // Ignoré — déplié par défaut.
     }
   }, []);
 
@@ -72,7 +72,7 @@ export default function AdminSidebar() {
       try {
         window.localStorage.setItem(COLLAPSE_KEY, next ? "1" : "0");
       } catch {
-        // Ignore — collapse state just won't persist.
+        // Ignoré — l'état replié ne sera simplement pas conservé.
       }
       return next;
     });

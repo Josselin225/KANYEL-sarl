@@ -105,7 +105,7 @@ export default function Contact({ settings }: { settings: ApiSiteSettings | null
         body: JSON.stringify({ name, email, phone, subject, message, website }),
       });
     } catch {
-      // Non-blocking: the mailto: fallback below is the primary delivery path.
+      // Non bloquant : le fallback mailto: ci-dessous est le canal d'envoi principal.
     } finally {
       setSending(false);
     }

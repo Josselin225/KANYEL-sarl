@@ -1,6 +1,6 @@
-// Cells starting with these characters are interpreted as formulas by
-// Excel/LibreOffice — a visitor could submit "=HYPERLINK(...)" in a form and
-// have it execute when an admin opens the export (CSV injection).
+// Les cellules commençant par ces caractères sont interprétées comme des formules
+// par Excel/LibreOffice — un visiteur pourrait saisir "=HYPERLINK(...)" dans un
+// formulaire et le faire exécuter quand un admin ouvre l'export (injection CSV).
 const FORMULA_PREFIX = /^[=+\-@\t\r]/;
 
 function escapeCell(cell: unknown): string {

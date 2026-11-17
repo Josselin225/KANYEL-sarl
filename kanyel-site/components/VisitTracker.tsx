@@ -14,7 +14,7 @@ export default function VisitTracker() {
       window.localStorage.setItem(STORAGE_KEY, today);
       incrementVisit();
     } catch {
-      // Ignore storage access errors (private browsing, etc.).
+      // Ignore les erreurs d'accès au stockage (navigation privée, etc.).
     }
   }, []);
 

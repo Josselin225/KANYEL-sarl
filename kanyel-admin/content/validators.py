@@ -4,16 +4,16 @@ import zipfile
 
 from django.core.exceptions import ValidationError
 
-MAX_IMAGE_SIZE = 8 * 1024 * 1024  # 8 MB
-MAX_DOCUMENT_SIZE = 5 * 1024 * 1024  # 5 MB
+MAX_IMAGE_SIZE = 8 * 1024 * 1024  # 8 Mo
+MAX_DOCUMENT_SIZE = 5 * 1024 * 1024  # 5 Mo
 
-# Leading bytes each accepted document type must start with.
+# Octets de tête par lesquels chaque type de document accepté doit commencer.
 _DOCUMENT_SIGNATURES = {
     ".pdf": [b"%PDF-"],
     ".docx": [b"PK\x03\x04"],
     ".doc": [b"\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1"],
 }
-# Markers of active content (macros, scripts, auto-launch) a CV never needs.
+# Marqueurs de contenu actif (macros, scripts, lancement auto) dont un CV n'a jamais besoin.
 _PDF_ACTIVE_MARKERS = [b"/JavaScript", b"/Launch", b"/EmbeddedFile"]
 _OLE_MACRO_MARKER = "_VBA_PROJECT".encode("utf-16-le")
 
@@ -29,8 +29,8 @@ def validate_document_size(file):
 
 
 def validate_document_content(file):
-    """Checks the file really is the PDF/Word document its extension claims,
-    and rejects documents carrying macros or embedded scripts."""
+    """Vérifie que le fichier est bien le document PDF/Word annoncé par son extension,
+    et rejette les documents contenant des macros ou des scripts intégrés."""
     ext = os.path.splitext(file.name)[1].lower()
     signatures = _DOCUMENT_SIGNATURES.get(ext)
     if signatures is None:
@@ -64,8 +64,8 @@ def validate_document_content(file):
 
 
 def _random_upload_path(folder, filename):
-    # Random names: an uploaded file's URL can't be guessed from the
-    # applicant's original filename.
+    # Noms aléatoires : l'URL d'un fichier uploadé ne peut pas être devinée
+    # à partir du nom de fichier d'origine du candidat.
     ext = os.path.splitext(filename)[1].lower()
     return f"{folder}/{uuid.uuid4().hex}{ext}"
 

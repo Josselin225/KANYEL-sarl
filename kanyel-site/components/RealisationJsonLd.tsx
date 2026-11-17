@@ -16,9 +16,9 @@ export default function RealisationJsonLd({ realisation, locale }: { realisation
     },
   };
 
-  // Escape "<" so a value containing "</script>" can't break out of the
-  // script tag and inject arbitrary HTML/JS (JSON.stringify alone does not
-  // escape it).
+  // Échappe "<" pour qu'une valeur contenant "</script>" ne puisse pas sortir
+  // de la balise script et injecter du HTML/JS arbitraire (JSON.stringify seul
+  // ne l'échappe pas).
   const json = JSON.stringify(jsonLd).replace(/</g, "\\u003c");
 
   return (

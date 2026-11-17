@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { SITE_URL, type Locale } from "./api";
 
-/** Builds a consistent title/description/OG/hreflang block for a public page. */
+/** Construit un bloc title/description/OG/hreflang cohérent pour une page publique. */
 export function pageMetadata({
   locale,
   path,
@@ -10,7 +10,7 @@ export function pageMetadata({
   image,
 }: {
   locale: Locale;
-  /** Path without the locale prefix, e.g. "/realisations" or "/actualites/mon-article". */
+  /** Chemin sans le préfixe de locale, ex. "/realisations" ou "/actualites/mon-article". */
   path: string;
   title: string;
   description: string;

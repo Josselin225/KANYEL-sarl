@@ -1,9 +1,9 @@
-"""Streaming AES-256-GCM encryption for backup archives.
+"""Chiffrement AES-256-GCM en flux des archives de sauvegarde.
 
-File format:  MAGIC | chunk*   where each chunk is
-    length (4 bytes, big-endian) | nonce (12 bytes) | ciphertext+tag
-The chunk index and a "last chunk" flag are bound as associated data, so
-chunks can't be reordered, dropped or truncated without detection.
+Format du fichier :  MAGIC | chunk*   où chaque chunk est
+    longueur (4 octets, big-endian) | nonce (12 octets) | texte chiffré+tag
+L'index du chunk et un indicateur « dernier chunk » sont liés comme données
+associées : les chunks ne peuvent être réordonnés, supprimés ou tronqués sans détection.
 """
 
 import base64
@@ -13,7 +13,7 @@ import struct
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
 MAGIC = b"KANYELBK1"
-CHUNK_SIZE = 4 * 1024 * 1024  # 4 MB
+CHUNK_SIZE = 4 * 1024 * 1024  # 4 Mo
 ENV_VAR = "BACKUP_ENCRYPTION_KEY"
 
 
@@ -74,6 +74,6 @@ def decrypt_file(src_path, dst_path, key):
             sealed = src.read(length)
             header = src.read(4)
             last = not header
-            # Raises InvalidTag on a wrong key or any tampering/truncation.
+            # Lève InvalidTag en cas de mauvaise clé ou de toute altération/troncature.
             dst.write(aes.decrypt(nonce, sealed, _aad(index, last)))
             index += 1
